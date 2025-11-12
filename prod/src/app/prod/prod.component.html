@@ -1,0 +1,425 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+  <!-- Background avec particules -->
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+       style="background-image: url('https://www.tannerag.ch/Marketing/News%20and%20Social%20Media/38748/image-thumb__38748__contentImageLarge/production-process.e47f5cea.jpg')">
+  </div>
+
+  <!-- Système de particules -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div *ngFor="let particle of particles()" 
+         class="particle absolute rounded-full bg-cyan-400/40"
+         [style.left]="particle.left"
+         [style.animation-delay]="particle.animationDelay"
+         [style.width]="particle.size"
+         [style.height]="particle.size"
+         [style.opacity]="particle.opacity">
+    </div>
+  </div>
+
+  <!-- Container principal -->
+  <div class="relative z-10 container mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
+        Gestionnaire de Production
+      </h1>
+      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
+        Interface d'administration des lignes et références de production industrielle
+      </p>
+    </header>
+
+    <!-- Navigation par onglets -->
+    <div class="flex justify-center mb-8">
+      <div class="bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 border border-gray-600/30">
+        <button 
+          (click)="setActiveTab('view')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'view' ? 
+                   'bg-cyan-600 text-white shadow-lg shadow-cyan-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          📋 Voir les Lignes
+        </button>
+        <button 
+          (click)="setActiveTab('create')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 mx-2"
+          [class]="activeTab() === 'create' ? 
+                   'bg-green-600 text-white shadow-lg shadow-green-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          ➕ Nouvelle Ligne
+        </button>
+        <button 
+          (click)="setActiveTab('add-ref')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'add-ref' ? 
+                   'bg-blue-600 text-white shadow-lg shadow-blue-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          🔧 Ajouter Références
+        </button>
+         <!-- Nouveau bouton Nouvelle Semaine -->
+    <button 
+      (click)="setActiveTab('new-week')"
+      class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+      [class]="activeTab() === 'new-week' ? 
+               'bg-purple-600 text-white shadow-lg shadow-purple-600/25' : 
+               'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+      📅 Nouvelle Semaine
+    </button>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="stat-card bg-gradient-to-br from-cyan-600/20 to-cyan-800/20">
+        <div class="text-3xl font-bold text-cyan-400">{{ getTotalLines() }}</div>
+        <div class="text-cyan-200">Lignes Actives</div>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-green-600/20 to-green-800/20">
+        <div class="text-3xl font-bold text-green-400">{{ getTotalReferences() }}</div>
+        <div class="text-green-200">Références Total</div>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-purple-600/20 to-purple-800/20">
+        <div class="text-3xl font-bold text-purple-400">{{ lines().length }}</div>
+        <div class="text-purple-200">Résultats</div>
+      </div>
+    </div>
+
+    <!-- Onglet: Voir les lignes -->
+    <div *ngIf="activeTab() === 'view'" class="fade-in">
+      <!-- Barre de recherche -->
+      <div class="mb-8">
+        <div class="relative max-w-2xl mx-auto">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+            placeholder="Rechercher une ligne ou référence..."
+            class="search-input w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-800/80 backdrop-blur-sm border border-gray-600/30 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 transition-all duration-300">
+          <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des lignes -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div *ngFor="let line of lines()" 
+             (click)="selectLine(line)"
+             class="line-card group cursor-pointer transform hover:scale-105 transition-all duration-300">
+          
+          <!-- Image de la ligne -->
+          <div class="line-image-container">
+            <img 
+              [src]="line.imageUrl "
+              [alt]="line.ligne"
+              class="line-image">
+            <div class="line-overlay">
+              <div class="bg-black/60 backdrop-blur-sm rounded-full px-3 py-1">
+                <span class="text-cyan-400 font-semibold">{{ line.referenceCount }} réf.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations de la ligne -->
+          <div class="line-info">
+            <h3 class="line-title">{{ line.ligne }}</h3>
+            <div class="references-container">
+              <div *ngFor="let ref of line.references.slice(0, 3)" class="reference-tag">
+                {{ ref }}
+              </div>
+              <div *ngIf="line.references.length > 3" class="reference-more">
+                +{{ line.references.length - 3 }} plus
+              </div>
+            </div>
+            <div class="line-footer">
+              <span class="text-gray-400 text-sm">
+                {{ line.lastCreated | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message vide -->
+      <div *ngIf="lines().length === 0" class="text-center py-12">
+        <div class="text-gray-400 text-lg">
+          {{ loading() ? 'Chargement...' : 'Aucune ligne trouvée' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet: Créer une ligne -->
+    <div *ngIf="activeTab() === 'create'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-green-400 mb-6">Créer une Nouvelle Ligne</h2>
+          
+          <form (ngSubmit)="onCreateLine()" class="space-y-6">
+            <!-- Nom de la ligne -->
+            <div>
+              <label class="form-label">Nom de la Ligne *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="createForm.ligne" 
+                name="ligne"
+                placeholder="Ex: Ligne A - Assemblage Principal"
+                class="form-input"
+                [class.error]="createForm.errors.ligne">
+              <div *ngIf="createForm.errors.ligne" class="form-error">
+                {{ createForm.errors.ligne }}
+              </div>
+            </div>
+
+            <!-- Références -->
+            <div>
+              <label class="form-label">Références *</label>
+              <textarea 
+                [(ngModel)]="createForm.references" 
+                name="references"
+                placeholder="Saisissez les références séparées par des virgules&#10;Ex: REF-A001, REF-A002, REF-A003"
+                rows="4"
+                class="form-input"
+                [class.error]="createForm.errors.references"></textarea>
+              <div *ngIf="createForm.errors.references" class="form-error">
+                {{ createForm.errors.references }}
+              </div>
+              <div class="text-sm text-gray-400 mt-1">
+                Séparez les références par des virgules
+              </div>
+            </div>
+
+            <!-- Upload d'image -->
+            <div>
+              <label class="form-label">Image de la Ligne</label>
+              <div class="image-upload-container">
+                <input 
+                  type="file" 
+                  (change)="onImageSelected($event)"
+                  accept="image/*"
+                  class="hidden"
+                  id="imageUpload">
+                <label for="imageUpload" class="upload-label">
+                  <svg class="w-8 h-8 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  Choisir une image
+                </label>
+                
+                <!-- Aperçu de l'image -->
+                <div *ngIf="createForm.imagePreview" class="image-preview">
+                  <img [src]="createForm.imagePreview" alt="Aperçu" class="preview-image">
+                  <button 
+                    type="button" 
+                    (click)="removeImage()"
+                    class="remove-image-btn">
+                    ×
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="createForm.errors.image" class="form-error">
+                {{ createForm.errors.image }}
+              </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <button 
+              type="submit" 
+              [disabled]="loading()"
+              class="submit-btn create-btn w-full py-4 rounded-xl font-semibold transition-all duration-300"
+              [class.opacity-50]="loading()">
+              <span class="flex items-center justify-center">
+                <span *ngIf="loading()" class="loader-small mr-2"></span>
+                {{ loading() ? 'Création en cours...' : 'Créer la Ligne' }}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet: Ajouter des références -->
+    <div *ngIf="activeTab() === 'add-ref'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-blue-400 mb-6">Ajouter des Références</h2>
+          
+          <form (ngSubmit)="onAddReferences()" class="space-y-6">
+            <!-- Ligne existante -->
+            <div>
+              <label class="form-label">Ligne Existante *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="addRefForm.ligne" 
+                name="ligne"
+                placeholder="Ex: Ligne A - Assemblage Principal"
+                class="form-input"
+                [class.error]="addRefForm.errors.ligne">
+              <div *ngIf="addRefForm.errors.ligne" class="form-error">
+                {{ addRefForm.errors.ligne }}
+              </div>
+            </div>
+
+            <!-- Nouvelles références -->
+            <div>
+              <label class="form-label">Nouvelles Références *</label>
+              <textarea 
+                [(ngModel)]="addRefForm.references" 
+                name="references"
+                placeholder="Saisissez les nouvelles références séparées par des virgules&#10;Ex: REF-A006, REF-A007, REF-A008"
+                rows="4"
+                class="form-input"
+                [class.error]="addRefForm.errors.references"></textarea>
+              <div *ngIf="addRefForm.errors.references" class="form-error">
+                {{ addRefForm.errors.references }}
+              </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <button 
+              type="submit" 
+              [disabled]="loading()"
+              class="submit-btn add-ref-btn w-full py-4 rounded-xl font-semibold transition-all duration-300"
+              [class.opacity-50]="loading()">
+              <span class="flex items-center justify-center">
+                <span *ngIf="loading()" class="loader-small mr-2"></span>
+                {{ loading() ? 'Ajout en cours...' : 'Ajouter les Références' }}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet: Nouvelle Semaine -->
+<div *ngIf="activeTab() === 'new-week'" class="fade-in">
+  <div class="max-w-2xl mx-auto">
+    <div class="creation-card">
+      <h2 class="text-2xl font-bold text-purple-400 mb-6">Créer une Nouvelle Semaine</h2>
+      
+      <form (ngSubmit)="onCreateWeek()" class="space-y-6">
+        <!-- Sélection de la semaine -->
+        <div>
+          <label class="form-label">Numéro de Semaine *</label>
+          <select 
+            [(ngModel)]="weekForm.weekNumber" 
+            name="weekNumber"
+            class="form-input"
+            [class.error]="weekForm.errors.weekNumber">
+            <option value="">Sélectionnez une semaine</option>
+            <option *ngFor="let week of availableWeeks" [value]="week">
+              Semaine {{ week }}
+            </option>
+          </select>
+          <div *ngIf="weekForm.errors.weekNumber" class="form-error">
+            {{ weekForm.errors.weekNumber }}
+          </div>
+        </div>
+
+       
+        
+
+        <!-- Boutons d'action -->
+        <div class="flex gap-4">
+          <button 
+            type="button" 
+            (click)="onCancelWeek()"
+            class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+            Annuler
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="loading()"
+            class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-purple-600 hover:bg-purple-500 text-white"
+            [class.opacity-50]="loading()">
+            <span class="flex items-center justify-center">
+              <span *ngIf="loading()" class="loader-small mr-2"></span>
+              {{ loading() ? 'Création...' : 'Créer la Semaine' }}
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal de détails -->
+  <div *ngIf="selectedLine()" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ selectedLine()!.ligne }}</h3>
+        <button (click)="closeModal()" class="modal-close">
+          ×
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Image -->
+          <div>
+            <img 
+              [src]="selectedLine()!.imageUrl || 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400'"
+              [alt]="selectedLine()!.ligne"
+              class="w-full h-64 object-cover rounded-xl">
+          </div>
+          
+          <!-- Informations -->
+          <div>
+            <div class="space-y-4">
+              <div>
+                <h4 class="text-cyan-400 font-semibold mb-2">Statistiques</h4>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="stat-item">
+                    <div class="stat-value">{{ selectedLine()!.referenceCount }}</div>
+                    <div class="stat-label">Références</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value">{{ selectedLine()!.lastCreated | date:'dd/MM/yyyy' }}</div>
+                    <div class="stat-label">Dernière mise à jour</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="text-cyan-400 font-semibold mb-2">Toutes les Références</h4>
+                <div class="references-grid">
+                  <div *ngFor="let ref of selectedLine()!.references" class="reference-tag detailed">
+                    {{ ref }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message de succès -->
+  <div *ngIf="showSuccess()" class="success-notification">
+    <div class="success-content">
+      <svg class="w-6 h-6 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      {{ successMessage() }}
+    </div>
+  </div>
+
+  <!-- Loader global -->
+  <div *ngIf="loading() && activeTab() === 'view'" class="loader-overlay">
+    <div class="loader-container">
+      <div class="industrial-loader"></div>
+      <p class="text-cyan-400 mt-4 font-semibold">Chargement des données...</p>
+    </div>
+  </div>
+</div>

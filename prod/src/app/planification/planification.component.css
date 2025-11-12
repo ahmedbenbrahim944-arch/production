@@ -1,0 +1,537 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animations de base */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Titre neon amélioré */
+.neon-title {
+  color: #00ffff;
+  text-shadow: 
+    0 0 10px #00ffff,
+    0 0 20px #00ffff,
+    0 0 40px #00ffff,
+    0 0 80px #00ffff;
+  animation: neonPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+  from {
+    text-shadow: 
+      0 0 10px #00ffff,
+      0 0 20px #00ffff,
+      0 0 40px #00ffff,
+      0 0 80px #00ffff;
+  }
+  to {
+    text-shadow: 
+      0 0 5px #00ffff,
+      0 0 10px #00ffff,
+      0 0 20px #00ffff,
+      0 0 40px #00ffff,
+      0 0 80px #00ffff,
+      0 0 90px #00ffff;
+  }
+}
+
+/* Cartes de création */
+.creation-card {
+  @apply bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-600/30 shadow-2xl;
+}
+
+/* Labels de formulaire */
+.form-label {
+  @apply block text-sm font-semibold text-cyan-300 mb-2;
+}
+
+/* Select de semaine */
+.week-select {
+  @apply w-full px-4 py-3 rounded-xl bg-gray-700/50 border border-gray-600/50 text-white transition-all duration-300;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.week-select:focus {
+  @apply outline-none border-purple-500;
+  box-shadow: 0 0 20px rgba(192, 132, 252, 0.3), inset 0 0 10px rgba(192, 132, 252, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.week-select:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Input pour la planification */
+.planif-input {
+  @apply px-2 py-1 rounded-lg bg-gray-700/50 border border-gray-600/50 text-white text-sm transition-all duration-200;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.planif-input:focus {
+  @apply outline-none border-cyan-500;
+  box-shadow: 0 0 10px rgba(0, 230, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.planif-input::placeholder {
+  @apply text-gray-500;
+}
+
+.planif-input[readonly] {
+  @apply bg-gray-800/50 cursor-not-allowed text-cyan-400;
+}
+
+/* Tableau de planification */
+table {
+  @apply border-collapse;
+}
+
+table thead th {
+  @apply sticky top-0 bg-gray-800/95 backdrop-blur-sm;
+  z-index: 10;
+}
+
+table tbody tr:hover {
+  @apply bg-gray-700/40;
+}
+
+/* Particules */
+.particle {
+  animation: industrialFloat 15s linear infinite;
+  background: radial-gradient(circle, #00ffff, transparent);
+  filter: blur(1px);
+}
+
+@keyframes industrialFloat {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Notification de succès */
+.success-notification {
+  @apply fixed top-4 right-4 z-50;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.success-content {
+  @apply bg-green-600/90 backdrop-blur-sm text-white px-6 py-4 rounded-xl shadow-2xl border border-green-400/30 flex items-center;
+}
+
+/* Loader */
+.loader-overlay {
+  @apply fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50;
+}
+
+.industrial-loader {
+  @apply w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin;
+  box-shadow: 0 0 20px rgba(0, 230, 255, 0.5);
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00bcd4, #0097a7);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00e6ff, #00bcd4);
+}
+
+/* Styles pour les cartes de ligne */
+.line-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.line-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.line-card:hover::before {
+  left: 100%;
+}
+
+.line-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 230, 255, 0.5);
+  box-shadow: 0 10px 25px rgba(0, 230, 255, 0.2);
+}
+
+/* Effet de brillance sur les cartes */
+.creation-card {
+  transition: all 0.3s ease;
+}
+
+.creation-card:hover {
+  box-shadow: 0 0 30px rgba(0, 230, 255, 0.2);
+  border-color: rgba(0, 230, 255, 0.4);
+}
+
+/* Styles pour les colonnes en lecture seule */
+td span.text-gray-500 {
+  @apply opacity-60;
+}
+
+td span.text-red-400 {
+  @apply font-semibold;
+}
+
+td span.text-green-400 {
+  @apply font-semibold;
+}
+
+/* Animation pour l'ajout de lignes */
+tbody tr {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bordures colorées pour les états */
+.planif-input:invalid {
+  @apply border-red-500;
+}
+
+.planif-input:valid:not([readonly]) {
+  @apply border-green-500/30;
+}
+
+/* Amélioration du contraste pour les inputs */
+.planif-input[type="number"]::-webkit-inner-spin-button,
+.planif-input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Style pour les en-têtes de jour */
+.creation-card h3 {
+  @apply relative inline-block;
+}
+
+.creation-card h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #00ffff, transparent);
+}
+
+/* Effet hover sur les lignes du tableau */
+tbody tr {
+  @apply relative;
+}
+
+tbody tr::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, #00ffff, #0097a7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+tbody tr:hover::before {
+  opacity: 1;
+}
+
+/* Animation pour les boutons */
+button {
+  @apply transition-all duration-300;
+}
+
+button:hover:not(:disabled) {
+  @apply transform scale-105;
+}
+
+button:active:not(:disabled) {
+  @apply transform scale-95;
+}
+
+/* Styles pour les badges de références */
+
+
+/* Styles pour les images des lignes */
+.line-card img {
+  transition: transform 0.3s ease;
+}
+
+.line-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Gradient overlay pour les images */
+.line-card .absolute.inset-0.bg-gradient-to-t {
+  background: linear-gradient(to top, rgba(17, 24, 39, 0.8), transparent);
+}
+
+/* Styles pour le bouton retour */
+button.bg-gray-600:hover {
+  background-color: #4b5563;
+  border-color: rgba(156, 163, 175, 0.5);
+}
+
+/* Styles pour les statuts actifs */
+.text-green-400 {
+  color: #34d399;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .neon-title {
+    font-size: 2rem;
+  }
+  
+  .creation-card {
+    padding: 1rem;
+  }
+  
+  table {
+    font-size: 0.75rem;
+  }
+  
+  .planif-input {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Grille responsive pour les cartes de ligne */
+  .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .line-card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Ajustement des boutons d'action */
+  .flex.gap-4 {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .flex.gap-4 button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Ajustement de l'en-tête de planification */
+  .flex.justify-between.items-center {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .flex.items-center.space-x-4 {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+
+/* Styles pour les écrans très petits */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .creation-card {
+    padding: 0.75rem;
+  }
+  
+  .neon-title {
+    font-size: 1.75rem;
+  }
+  
+  /* Ajustement des inputs dans le tableau */
+  .planif-input {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* Cache certaines colonnes moins importantes sur mobile */
+  table th:nth-child(n+7),
+  table td:nth-child(n+7) {
+    display: none;
+  }
+}
+
+/* Animation de pulse pour les cartes sélectionnées */
+.line-card.selected {
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+}
+
+/* Styles pour les états de chargement */
+.loader-container {
+  text-align: center;
+}
+
+.loader-container p {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+/* Styles pour les messages vides */
+.text-center.py-20 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+/* Amélioration de la visibilité des séparateurs */
+.border-gray-700 {
+  border-color: rgba(55, 65, 81, 0.5);
+}
+
+.border-gray-700 {
+  border-color: rgba(55, 65, 81, 0.3);
+}
+
+/* Styles pour les en-têtes de section */
+.text-2xl.font-bold {
+  margin-bottom: 1.5rem;
+}
+
+/* Styles pour les badges de compteur de références */
+.text-cyan-300.font-semibold {
+  font-weight: 600;
+}
+
+/* Styles pour les icônes SVG */
+svg {
+  flex-shrink: 0;
+}
+
+/* Optimisation des transitions */
+* {
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Styles pour le focus accessibility */
+button:focus,
+select:focus,
+input:focus {
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
+/* Styles pour les états disabled améliorés */
+button:disabled,
+select:disabled,
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Styles pour les états hover sur mobile */
+@media (hover: none) {
+  .line-card:hover {
+    transform: none;
+  }
+  
+  button:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  tbody tr:hover::before {
+    opacity: 0;
+  }
+}
+
+/* Styles d'impression */
+@media print {
+  .neon-title {
+    color: #00ffff !important;
+    text-shadow: none !important;
+    animation: none !important;
+  }
+  
+  .creation-card {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  .line-card {
+    break-inside: avoid;
+  }
+  
+  button {
+    display: none !important;
+  }
+}

@@ -1,0 +1,199 @@
+<div class="flex items-center justify-center min-h-screen text-white relative overflow-hidden">
+  <!-- Background avec overlay amélioré -->
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+       style="background-image:url('https://www.tannerag.ch/Marketing/News%20and%20Social%20Media/38748/image-thumb__38748__contentImageLarge/production-process.e47f5cea.jpg')">
+  </div>
+
+  <!-- Système de particules amélioré -->
+  <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div *ngFor="let particle of particles" 
+         class="particle absolute rounded-full bg-cyan-400/60"
+         [style.left]="particle.left"
+         [style.animation-delay]="particle.animationDelay"
+         [style.width]="particle.size"
+         [style.height]="particle.size"
+         [style.opacity]="particle.opacity">
+    </div>
+  </div>
+
+  <!-- Container principal -->
+  <div class="card-container z-10 relative">
+    <div class="flip relative w-full h-full" [class.flipped]="isFlipped()">
+      
+      <!-- Face avant - Login -->
+      <div class="face front bg-gray-900/80 backdrop-blur-sm border border-gray-600/30 flex rounded-2xl shadow-2xl">
+        <!-- Section gauche - Branding -->
+        <div class="w-1/2 bg-gradient-to-br from-cyan-800 to-cyan-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+          <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-10"></div>
+          <h1 class="neon text-4xl font-bold mb-6 text-center tracking-wider">Production</h1>
+          <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
+               class="w-28 animate-float" 
+               alt="Icone usine intelligente">
+          <p class="text-cyan-200 text-center mt-6 text-sm max-w-xs">
+            
+          </p>
+        </div>
+
+        <!-- Section droite - Formulaire -->
+        <div class="w-1/2 p-10 flex flex-col justify-center relative">
+          <div class="absolute top-4 right-4 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
+          
+          <h2 class="text-2xl font-bold text-cyan-400 mb-2">Connexion</h2>
+          <p class="text-gray-400 text-sm mb-6">Accédez à votre dashboard</p>
+
+          <form (ngSubmit)="onLogin()" class="space-y-4">
+            <div>
+              <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                     placeholder="Email professionnel" 
+                     [(ngModel)]="loginForm.email" 
+                     name="email"
+                     [class.error]="loginForm.errors.email">
+              <div *ngIf="loginForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
+                {{ loginForm.errors.email }}
+              </div>
+            </div>
+
+            <div>
+              <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                     type="password" 
+                     placeholder="Mot de passe" 
+                     [(ngModel)]="loginForm.password" 
+                     name="password"
+                     [class.error]="loginForm.errors.password">
+              <div *ngIf="loginForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
+                {{ loginForm.errors.password }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn-industrial w-full py-3 rounded-lg font-semibold transition-all duration-300">
+              <span class="flex items-center justify-center">
+                Se connecter
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
+            <p class="text-sm text-gray-400">
+              Pas de compte industriel ?
+              <span (click)="toggleFlip()" class="text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors ml-1 font-medium">
+                Créer un compte
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Face arrière - Register -->
+      <div class="face back bg-gray-900/80 backdrop-blur-sm border border-gray-600/30 flex rounded-2xl shadow-2xl">
+        <!-- Section gauche - Branding -->
+        <div class="w-1/2 bg-gradient-to-br from-indigo-800 to-purple-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+          <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-20"></div>
+          <h1 class="neon text-4xl font-bold mb-6 text-center tracking-wider">Rejoindre l'industrie </h1>
+          <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
+               class="w-28 animate-float" 
+               alt="Icone innovation industrielle">
+          <p class="text-indigo-200 text-center mt-6 text-sm max-w-xs">
+            
+          </p>
+        </div>
+
+        <!-- Section droite - Formulaire -->
+        <div class="w-1/2 p-10 flex flex-col justify-center relative">
+          <div class="absolute top-4 right-4 w-3 h-3 bg-indigo-400 rounded-full animate-pulse"></div>
+          
+          <h2 class="text-2xl font-bold text-indigo-400 mb-2">Créer un compte</h2>
+          <p class="text-gray-400 text-sm mb-6"></p>
+
+          <form (ngSubmit)="onRegister()" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                       placeholder="Prénom" 
+                       [(ngModel)]="registerForm.firstName" 
+                       name="firstName"
+                       [class.error]="registerForm.errors.firstName">
+                <div *ngIf="registerForm.errors.firstName" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ registerForm.errors.firstName }}
+                </div>
+              </div>
+              <div>
+                <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                       placeholder="Nom" 
+                       [(ngModel)]="registerForm.lastName" 
+                       name="lastName"
+                       [class.error]="registerForm.errors.lastName">
+                <div *ngIf="registerForm.errors.lastName" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ registerForm.errors.lastName }}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                     placeholder="Email professionnel" 
+                     [(ngModel)]="registerForm.email" 
+                     name="registerEmail"
+                     [class.error]="registerForm.errors.email">
+              <div *ngIf="registerForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
+                {{ registerForm.errors.email }}
+              </div>
+            </div>
+
+            <div>
+              <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                     type="password" 
+                     placeholder="Mot de passe sécurisé" 
+                     [(ngModel)]="registerForm.password" 
+                     name="registerPassword"
+                     [class.error]="registerForm.errors.password">
+              <div *ngIf="registerForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
+                {{ registerForm.errors.password }}
+              </div>
+            </div>
+
+            <div>
+              <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                     type="password" 
+                     placeholder="Confirmer le mot de passe" 
+                     [(ngModel)]="registerForm.confirm" 
+                     name="confirmPassword"
+                     [class.error]="registerForm.errors.confirm">
+              <div *ngIf="registerForm.errors.confirm" class="text-red-400 text-xs mt-1 animate-pulse">
+                {{ registerForm.errors.confirm }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn-industrial-register w-full py-3 rounded-lg font-semibold transition-all duration-300">
+              <span class="flex items-center justify-center">
+                S'inscrire
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
+            <p class="text-sm text-gray-400">
+              Déjà un compte ?
+              <span (click)="toggleFlip()" class="text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors ml-1 font-medium">
+                Se connecter
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loader amélioré -->
+<div *ngIf="loading" class="loader-bg">
+  <div class="loader-container">
+    <div class="loader"></div>
+    <p class="text-cyan-400 mt-4 font-semibold animate-pulse">Authentification en cours...</p>
+  </div>
+</div>
