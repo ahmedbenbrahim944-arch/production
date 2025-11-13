@@ -1,6 +1,8 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule , Router} from '@angular/router';
+
 
 interface ProductionLine {
   ligne: string;
@@ -40,7 +42,7 @@ interface WeekPlanification {
 @Component({
   selector: 'app-planification',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,RouterModule],
   templateUrl: './planification.component.html',
   styleUrls: ['./planification.component.css']
 })
@@ -60,7 +62,7 @@ export class PlanificationComponent {
   // Données
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
-  constructor() {
+  constructor(private router:Router) {
     console.log('Component initialized');
     this.generateParticles();
     this.loadProductionLines();
@@ -309,5 +311,8 @@ export class PlanificationComponent {
     return planif.days.reduce((weekTotal, day) => {
       return weekTotal + this.calculateDayTotal(day);
     }, 0);
+  }
+   goBack(): void {
+    this.router.navigate(['/prod']);
   }
 }

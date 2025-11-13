@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 
 interface ProductionLine {
   ligne: string;
@@ -44,7 +45,7 @@ interface WeekForm {
 @Component({
   selector: 'app-prod',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,RouterModule],
   templateUrl: './prod.component.html',
   styleUrls: ['./prod.component.css']
 })
@@ -84,6 +85,11 @@ availableWeeks: number[] = [];
   showSuccess = signal(false);
   successMessage = signal('');
   particles = signal<any[]>([]);
+
+   constructor(private router: Router) {
+    // Votre code d'initialisation existant
+  }
+   
 
   ngOnInit() {
     this.generateParticles();
@@ -319,5 +325,8 @@ private resetWeekForm() {
 
   getTotalReferences(): number {
     return this.lines().reduce((total, line) => total + line.referenceCount, 0);
+  }
+  goBackToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }

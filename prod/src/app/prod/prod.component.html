@@ -18,15 +18,27 @@
 
   <!-- Container principal -->
   <div class="relative z-10 container mx-auto px-4 py-8">
-    <!-- Header -->
-    <header class="text-center mb-12">
-      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-        Gestionnaire de Production
-      </h1>
-      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-        Interface d'administration des lignes et références de production industrielle
-      </p>
-    </header>
+  <!-- Header avec bouton de retour -->
+  <header class="text-center mb-12 relative">
+    <!-- Bouton de retour au login -->
+    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+      <button 
+        (click)="goBackToLogin()"
+        class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center shadow-lg hover:shadow-xl">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Retour Login
+      </button>
+    </div>
+    
+    <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
+      Gestionnaire de Production
+    </h1>
+    <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
+      Interface d'administration des lignes et références de production industrielle
+    </p>
+  </header>
 
     <!-- Navigation par onglets -->
     <div class="flex justify-center mb-8">
@@ -64,6 +76,14 @@
                'text-gray-300 hover:text-white hover:bg-gray-700/50'">
       📅 Nouvelle Semaine
     </button>
+    <button 
+  [routerLink]="['/planification']"
+  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+  [class]="activeTab() === 'planning' ? 
+           'bg-orange-600 text-white shadow-lg shadow-orange-600/25' : 
+           'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+  🗓️ Planification
+</button>
       </div>
     </div>
 

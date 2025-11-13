@@ -6,6 +6,9 @@ import { PlanificationComponent } from './planification/planification.component'
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'login', component: ProdComponent },
+  { path: 'planification', component: PlanificationComponent },
+  { path: 'prod', component: ProdComponent },
+  { path: 'login', component: LoginComponent },
+  
   
 ];

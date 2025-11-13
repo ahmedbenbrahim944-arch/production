@@ -16,17 +16,28 @@
     </div>
   </div>
 
-  <!-- Container principal -->
   <div class="relative z-10 container mx-auto px-4 py-8">
-    <!-- Header -->
-    <header class="text-center mb-8">
-      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-        Planification de Production
-      </h1>
-      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-        Sélectionnez une ligne pour planifier la production
-      </p>
-    </header>
+  <!-- Header avec bouton de retour -->
+  <header class="text-center mb-8 relative">
+    <!-- Bouton de retour -->
+    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+      <button 
+        (click)="goBack()"
+        class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center shadow-lg hover:shadow-xl">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour Production
+      </button>
+    </div>
+    
+    <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
+      Planification de Production
+    </h1>
+    <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
+      Sélectionnez une ligne pour planifier la production
+    </p>
+  </header>
 
     <!-- Section principale -->
     <div class="max-w-7xl mx-auto">
