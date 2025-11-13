@@ -363,7 +363,7 @@
   overflow: hidden;
 }
 
-/* Dans prod.component.css */
+/* Sélection de semaine */
 .week-select {
   @apply w-full px-4 py-3 rounded-xl bg-gray-700/50 border border-gray-600/50 text-white transition-all duration-300;
   background: rgba(255, 255, 255, 0.07);

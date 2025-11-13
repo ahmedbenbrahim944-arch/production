@@ -17,27 +17,27 @@
   </div>
 
   <div class="relative z-10 container mx-auto px-4 py-8">
-  <!-- Header avec bouton de retour -->
-  <header class="text-center mb-8 relative">
-    <!-- Bouton de retour -->
-    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
-      <button 
-        (click)="goBack()"
-        class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center shadow-lg hover:shadow-xl">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        Retour Production
-      </button>
-    </div>
-    
-    <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-      Planification de Production
-    </h1>
-    <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-      Sélectionnez une ligne pour planifier la production
-    </p>
-  </header>
+    <!-- Header avec bouton de retour -->
+    <header class="text-center mb-8 relative">
+      <!-- Bouton de retour -->
+      <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+        <button 
+          (click)="goBack()"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center shadow-lg hover:shadow-xl">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Retour Production
+        </button>
+      </div>
+      
+      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
+        Planification de Production
+      </h1>
+      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
+        Sélectionnez une ligne pour planifier la production
+      </p>
+    </header>
 
     <!-- Section principale -->
     <div class="max-w-7xl mx-auto">
@@ -156,110 +156,120 @@
             </div>
 
             <!-- Tableau des références du jour -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
+            <div class="table-wrapper">
+              <table class="production-table">
                 <thead>
-                  <tr class="border-b border-gray-700/50">
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[120px]">Référence</th>
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[80px]">OF</th>
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[100px]">Qté Planifier</th>
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[100px]">N°H Planifier</th>
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[90px]">Emballage</th>
-                    <th class="text-left py-3 px-2 text-cyan-400 font-semibold min-w-[70px]">N°OP</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[100px]">N°H Réaliser</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[80px]">Dec.Prod</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[90px]">Delta Prod</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[90px]">% Pcs Prod</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[80px]">Dec.Mag</th>
-                    <th class="text-left py-3 px-2 text-gray-500 font-semibold min-w-[110px]">Delta Prod.Mag</th>
-                    <th class="text-center py-3 px-2 min-w-[80px]">Actions</th>
+                  <tr>
+                    <th class="col-reference">Référence</th>
+                    <th class="col-of">OF</th>
+                    <th class="col-qte">Qté Planifier</th>
+                    <th class="col-nh-plan">N°H Planifier</th>
+                    <th class="col-emballage">Emballage</th>
+                    <th class="col-nop">N°OP</th>
+                    <th class="col-nh-real">N°H Réaliser</th>
+                    <th class="col-dec-prod">Dec.Prod</th>
+                    <th class="col-delta-prod">Delta Prod</th>
+                    <th class="col-pcs">% Pcs Prod</th>
+                    <th class="col-dec-mag">Dec.Mag</th>
+                    <th class="col-delta-mag">Delta Prod.Mag</th>
+                    <th class="col-actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let ref of day.references; let refIndex = index" 
-                      class="border-b border-gray-700/30 hover:bg-gray-700/30 transition-colors duration-200">
+                  <tr *ngFor="let ref of day.references; let refIndex = index">
                     
                     <!-- Référence -->
-                    <td class="py-3 px-2">
+                    <td class="col-reference">
                       <input 
                         type="text" 
                         [(ngModel)]="ref.reference"
-                        class="planif-input w-full text-green-400 font-semibold"
+                        class="planif-input input-reference"
                         placeholder="Référence">
                     </td>
                     
                     <!-- OF -->
-                    <td class="py-3 px-2">
+                    <td class="col-of">
                       <input 
                         type="text" 
                         [(ngModel)]="ref.of"
-                        class="planif-input w-full"
+                        class="planif-input input-of"
                         placeholder="OF">
                     </td>
                     
                     <!-- Qté Planifier -->
-                    <td class="py-3 px-2">
+                    <td class="col-qte">
                       <input 
                         type="number" 
                         [(ngModel)]="ref.qte_planifier"
                         (input)="onQtePlanifierChange(ref)"
-                        class="planif-input w-full"
+                        class="planif-input input-number"
                         placeholder="0">
                     </td>
                     
                     <!-- N°H Planifier (auto) -->
-                    <td class="py-3 px-2">
+                    <td class="col-nh-plan">
                       <input 
                         type="number" 
                         [(ngModel)]="ref.nh_planifier"
-                        class="planif-input w-full bg-gray-800/50"
+                        class="planif-input readonly-input input-number"
                         readonly>
                     </td>
                     
                     <!-- Emballage (default 200) -->
-                    <td class="py-3 px-2">
+                    <td class="col-emballage">
                       <input 
                         type="number" 
                         [(ngModel)]="ref.emballage"
-                        class="planif-input w-full"
+                        class="planif-input input-number"
                         placeholder="200">
                     </td>
                     
                     <!-- N°OP (auto) -->
-                    <td class="py-3 px-2">
+                    <td class="col-nop">
                       <input 
                         type="number" 
                         [(ngModel)]="ref.nop"
-                        class="planif-input w-full bg-gray-800/50"
+                        class="planif-input readonly-input input-number"
                         readonly>
                     </td>
                     
-                    <!-- Colonnes en lecture seule -->
-                    <td class="py-3 px-2">
-                      <span class="text-gray-500 block w-full text-center">{{ ref.nh_realiser }}</span>
+                    <!-- N°H Réaliser (readonly) -->
+                    <td class="col-nh-real">
+                      <div class="readonly-cell text-cyan-400">{{ ref.nh_realiser || '0' }}</div>
                     </td>
-                    <td class="py-3 px-2">
-                      <span class="text-red-400 block w-full text-center">{{ ref.dec_prod }}</span>
+                    
+                    <!-- Dec.Prod (readonly) -->
+                    <td class="col-dec-prod">
+                      <div class="readonly-cell text-red-400">{{ ref.dec_prod || '0' }}</div>
                     </td>
-                    <td class="py-3 px-2">
-                      <span class="text-gray-500 block w-full text-center">{{ ref.delta_prod }}</span>
+                    
+                    <!-- Delta Prod (readonly) -->
+                    <td class="col-delta-prod">
+                      <div class="readonly-cell text-gray-400">{{ ref.delta_prod || '0' }}</div>
                     </td>
-                    <td class="py-3 px-2">
-                      <span class="text-gray-500 block w-full text-center">{{ ref.pcs_prod }}%</span>
+                    
+                    <!-- % Pcs Prod (readonly) -->
+                    <td class="col-pcs">
+                      <div class="readonly-cell text-gray-400">{{ ref.pcs_prod || '0' }}%</div>
                     </td>
-                    <td class="py-3 px-2">
-                      <span class="text-gray-500 block w-full text-center">{{ ref.dec_mag }}</span>
+                    
+                    <!-- Dec.Mag (readonly) -->
+                    <td class="col-dec-mag">
+                      <div class="readonly-cell text-gray-400">{{ ref.dec_mag || '0' }}</div>
                     </td>
-                    <td class="py-3 px-2">
-                      <span class="text-red-400 block w-full text-center">{{ ref.delta_prod_mag }}</span>
+                    
+                    <!-- Delta Prod.Mag (readonly) -->
+                    <td class="col-delta-mag">
+                      <div class="readonly-cell text-red-400">{{ ref.delta_prod_mag || '0' }}</div>
                     </td>
                     
                     <!-- Actions -->
-                    <td class="py-3 px-2 text-center">
+                    <td class="col-actions">
                       <button 
                         (click)="removeReference(dayIndex, refIndex)"
                         [disabled]="day.references.length === 1"
-                        class="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed">
+                        class="delete-btn"
+                        title="Supprimer">
                         ×
                       </button>
                     </td>

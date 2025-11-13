@@ -31,8 +31,8 @@ interface AddReferencesForm {
     ligne?: string;
     references?: string;
   };
-
 }
+
 interface WeekForm {
   weekNumber: string;
   description: string;
@@ -42,10 +42,26 @@ interface WeekForm {
   };
 }
 
+interface User {
+  id: number;
+  nom: string;
+  motDePasse: string;
+  dateCreation: string;
+}
+
+interface UserForm {
+  nom: string;
+  motDePasse: string;
+  errors: {
+    nom?: string;
+    motDePasse?: string;
+  };
+}
+
 @Component({
   selector: 'app-prod',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './prod.component.html',
   styleUrls: ['./prod.component.css']
 })
@@ -54,7 +70,7 @@ export class ProdComponent implements OnInit {
   loading = signal(false);
   lines = signal<ProductionLine[]>([]);
   searchQuery = signal('');
-  activeTab = signal('view'); // 'view', 'create', 'add-ref'
+  activeTab = signal('view'); // 'view', 'create', 'add-ref', 'new-week', 'add-user'
   selectedLine = signal<ProductionLine | null>(null);
 
   createForm: CreateLineForm = {
@@ -72,83 +88,81 @@ export class ProdComponent implements OnInit {
   };
 
   weekForm: WeekForm = {
-  weekNumber: '',
-  description: '',
-  errors: {}
-};
+    weekNumber: '',
+    description: '',
+    errors: {}
+  };
 
-availableWeeks: number[] = [];
+  availableWeeks: number[] = [];
 
-  
+  users = signal<User[]>([]);
+  userForm: UserForm = {
+    nom: '',
+    motDePasse: '',
+    errors: {}
+  };
 
   // Animation states
   showSuccess = signal(false);
   successMessage = signal('');
   particles = signal<any[]>([]);
 
-   constructor(private router: Router) {
-    // Votre code d'initialisation existant
-  }
-   
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.generateParticles();
     this.loadSampleData();
-      this.generateAvailableWeeks();
-
+    this.generateAvailableWeeks();
+    this.loadSampleUsers();
   }
 
   private generateAvailableWeeks() {
-  // Génère les semaines de 1 à 52 pour l'année en cours
-  this.availableWeeks = Array.from({ length: 52 }, (_, i) => i + 1);
-  
-  // Vous pouvez aussi générer dynamiquement en fonction de la date actuelle
-  // const currentWeek = this.getCurrentWeekNumber();
-  // this.availableWeeks = [currentWeek, currentWeek + 1, currentWeek + 2];
-}
-
-private getCurrentWeekNumber(): number {
-  const today = new Date();
-  const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-  const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
-  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-}
-
-onCreateWeek() {
-  // Validation
-  this.weekForm.errors = {};
-  let hasErrors = false;
-
-  if (!this.weekForm.weekNumber) {
-    this.weekForm.errors.weekNumber = 'Veuillez sélectionner une semaine';
-    hasErrors = true;
+    // Génère les semaines de 1 à 52 pour l'année en cours
+    this.availableWeeks = Array.from({ length: 52 }, (_, i) => i + 1);
   }
 
-  if (hasErrors) return;
+  private getCurrentWeekNumber(): number {
+    const today = new Date();
+    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  }
 
-  this.loading.set(true);
+  onCreateWeek() {
+    // Validation
+    this.weekForm.errors = {};
+    let hasErrors = false;
 
-  // Simulation de création de semaine
-  setTimeout(() => {
-    this.showSuccessMessage(`Semaine ${this.weekForm.weekNumber} créée avec succès !`);
+    if (!this.weekForm.weekNumber) {
+      this.weekForm.errors.weekNumber = 'Veuillez sélectionner une semaine';
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    this.loading.set(true);
+
+    // Simulation de création de semaine
+    setTimeout(() => {
+      this.showSuccessMessage(`Semaine ${this.weekForm.weekNumber} créée avec succès !`);
+      this.resetWeekForm();
+      this.activeTab.set('view');
+      this.loading.set(false);
+    }, 1000);
+  }
+
+  onCancelWeek() {
     this.resetWeekForm();
     this.activeTab.set('view');
-    this.loading.set(false);
-  }, 1000);
-}
+  }
 
-onCancelWeek() {
-  this.resetWeekForm();
-  this.activeTab.set('view');
-}
-
-private resetWeekForm() {
-  this.weekForm = {
-    weekNumber: '',
-    description: '',
-    errors: {}
-  };
-}
+  private resetWeekForm() {
+    this.weekForm = {
+      weekNumber: '',
+      description: '',
+      errors: {}
+    };
+  }
 
   private generateParticles() {
     const particles = [];
@@ -164,9 +178,7 @@ private resetWeekForm() {
   }
 
   private loadSampleData() {
-    const sampleData: ProductionLine[] = [
-      
-    ];
+    const sampleData: ProductionLine[] = [];
     this.lines.set(sampleData);
   }
 
@@ -326,7 +338,71 @@ private resetWeekForm() {
   getTotalReferences(): number {
     return this.lines().reduce((total, line) => total + line.referenceCount, 0);
   }
+
   goBackToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  // Gestion des utilisateurs
+  private loadSampleUsers() {
+    const sampleUsers: User[] = [
+      { id: 1, nom: 'Admin', motDePasse: '****', dateCreation: new Date().toISOString() },
+      { id: 2, nom: 'Operateur1', motDePasse: '****', dateCreation: new Date().toISOString() }
+    ];
+    this.users.set(sampleUsers);
+  }
+
+  onAddUser() {
+    // Validation
+    this.userForm.errors = {};
+    let hasErrors = false;
+
+    if (!this.userForm.nom.trim()) {
+      this.userForm.errors.nom = 'Le nom est requis';
+      hasErrors = true;
+    }
+
+    if (!this.userForm.motDePasse.trim()) {
+      this.userForm.errors.motDePasse = 'Le mot de passe est requis';
+      hasErrors = true;
+    } else if (this.userForm.motDePasse.length < 6) {
+      this.userForm.errors.motDePasse = 'Le mot de passe doit contenir au moins 6 caractères';
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    this.loading.set(true);
+
+    // Simulation d'ajout d'utilisateur
+    setTimeout(() => {
+      const newUser: User = {
+        id: this.users().length + 1,
+        nom: this.userForm.nom,
+        motDePasse: '****', // Masquer le mot de passe
+        dateCreation: new Date().toISOString()
+      };
+
+      this.users.update(users => [...users, newUser]);
+      this.showSuccessMessage(`Utilisateur "${this.userForm.nom}" ajouté avec succès !`);
+      this.resetUserForm();
+      this.loading.set(false);
+    }, 1000);
+  }
+
+  onCancelUser() {
+    this.resetUserForm();
+  }
+
+  private resetUserForm() {
+    this.userForm = {
+      nom: '',
+      motDePasse: '',
+      errors: {}
+    };
+  }
+
+  getTotalUsers(): number {
+    return this.users().length;
   }
 }

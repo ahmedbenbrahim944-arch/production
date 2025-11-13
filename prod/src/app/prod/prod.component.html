@@ -18,27 +18,27 @@
 
   <!-- Container principal -->
   <div class="relative z-10 container mx-auto px-4 py-8">
-  <!-- Header avec bouton de retour -->
-  <header class="text-center mb-12 relative">
-    <!-- Bouton de retour au login -->
-    <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
-      <button 
-        (click)="goBackToLogin()"
-        class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center shadow-lg hover:shadow-xl">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-        </svg>
-        Retour Login
-      </button>
-    </div>
-    
-    <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-      Gestionnaire de Production
-    </h1>
-    <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-      Interface d'administration des lignes et références de production industrielle
-    </p>
-  </header>
+    <!-- Header avec bouton de retour -->
+    <header class="text-center mb-12 relative">
+      <!-- Bouton de retour au login -->
+      <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+        <button 
+          (click)="goBackToLogin()"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center shadow-lg hover:shadow-xl">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Retour Login
+        </button>
+      </div>
+      
+      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
+        Gestionnaire de Production
+      </h1>
+      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
+        Interface d'administration des lignes et références de production industrielle
+      </p>
+    </header>
 
     <!-- Navigation par onglets -->
     <div class="flex justify-center mb-8">
@@ -67,28 +67,35 @@
                    'text-gray-300 hover:text-white hover:bg-gray-700/50'">
           🔧 Ajouter Références
         </button>
-         <!-- Nouveau bouton Nouvelle Semaine -->
-    <button 
-      (click)="setActiveTab('new-week')"
-      class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
-      [class]="activeTab() === 'new-week' ? 
-               'bg-purple-600 text-white shadow-lg shadow-purple-600/25' : 
-               'text-gray-300 hover:text-white hover:bg-gray-700/50'">
-      📅 Nouvelle Semaine
-    </button>
-    <button 
-  [routerLink]="['/planification']"
-  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
-  [class]="activeTab() === 'planning' ? 
-           'bg-orange-600 text-white shadow-lg shadow-orange-600/25' : 
-           'text-gray-300 hover:text-white hover:bg-gray-700/50'">
-  🗓️ Planification
-</button>
+        <button 
+          (click)="setActiveTab('new-week')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'new-week' ? 
+                   'bg-purple-600 text-white shadow-lg shadow-purple-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          📅 Nouvelle Semaine
+        </button>
+        <button 
+          [routerLink]="['/planification']"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'planning' ? 
+                   'bg-orange-600 text-white shadow-lg shadow-orange-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          🗓️ Planification
+        </button>
+        <button 
+          (click)="setActiveTab('add-user')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'add-user' ? 
+                   'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          👤 Ajouter Utilisateur
+        </button>
       </div>
     </div>
 
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <div class="stat-card bg-gradient-to-br from-cyan-600/20 to-cyan-800/20">
         <div class="text-3xl font-bold text-cyan-400">{{ getTotalLines() }}</div>
         <div class="text-cyan-200">Lignes Actives</div>
@@ -100,6 +107,10 @@
       <div class="stat-card bg-gradient-to-br from-purple-600/20 to-purple-800/20">
         <div class="text-3xl font-bold text-purple-400">{{ lines().length }}</div>
         <div class="text-purple-200">Résultats</div>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-indigo-600/20 to-indigo-800/20">
+        <div class="text-3xl font-bold text-indigo-400">{{ getTotalUsers() }}</div>
+        <div class="text-indigo-200">Utilisateurs</div>
       </div>
     </div>
 
@@ -316,62 +327,157 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Onglet: Nouvelle Semaine -->
-<div *ngIf="activeTab() === 'new-week'" class="fade-in">
-  <div class="max-w-2xl mx-auto">
-    <div class="creation-card">
-      <h2 class="text-2xl font-bold text-purple-400 mb-6">Créer une Nouvelle Semaine</h2>
-      
-      <form (ngSubmit)="onCreateWeek()" class="space-y-6">
-        <!-- Sélection de la semaine -->
-        <div>
-          <label class="form-label">Numéro de Semaine *</label>
-          <select 
-            [(ngModel)]="weekForm.weekNumber" 
-            name="weekNumber"
-            class="form-input"
-            [class.error]="weekForm.errors.weekNumber">
-            <option value="">Sélectionnez une semaine</option>
-            <option *ngFor="let week of availableWeeks" [value]="week">
-              Semaine {{ week }}
-            </option>
-          </select>
-          <div *ngIf="weekForm.errors.weekNumber" class="form-error">
-            {{ weekForm.errors.weekNumber }}
+    <!-- Onglet: Nouvelle Semaine -->
+    <div *ngIf="activeTab() === 'new-week'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-purple-400 mb-6">Créer une Nouvelle Semaine</h2>
+          
+          <form (ngSubmit)="onCreateWeek()" class="space-y-6">
+            <!-- Sélection de la semaine -->
+            <div>
+              <label class="form-label">Numéro de Semaine *</label>
+              <select 
+                [(ngModel)]="weekForm.weekNumber" 
+                name="weekNumber"
+                class="form-input"
+                [class.error]="weekForm.errors.weekNumber">
+                <option value="">Sélectionnez une semaine</option>
+                <option *ngFor="let week of availableWeeks" [value]="week">
+                  Semaine {{ week }}
+                </option>
+              </select>
+              <div *ngIf="weekForm.errors.weekNumber" class="form-error">
+                {{ weekForm.errors.weekNumber }}
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-4">
+              <button 
+                type="button" 
+                (click)="onCancelWeek()"
+                class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="loading()"
+                class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-purple-600 hover:bg-purple-500 text-white"
+                [class.opacity-50]="loading()">
+                <span class="flex items-center justify-center">
+                  <span *ngIf="loading()" class="loader-small mr-2"></span>
+                  {{ loading() ? 'Création...' : 'Créer la Semaine' }}
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet: Ajouter Utilisateur -->
+    <div *ngIf="activeTab() === 'add-user'" class="fade-in">
+      <div class="max-w-4xl mx-auto">
+        <!-- Formulaire d'ajout -->
+        <div class="creation-card mb-8">
+          <h2 class="text-2xl font-bold text-indigo-400 mb-6">Ajouter un Utilisateur</h2>
+          
+          <form (ngSubmit)="onAddUser()" class="space-y-6">
+            <!-- Nom d'utilisateur -->
+            <div>
+              <label class="form-label">Nom d'Utilisateur *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="userForm.nom" 
+                name="nom"
+                placeholder="Ex: Operateur2"
+                class="form-input"
+                [class.error]="userForm.errors.nom">
+              <div *ngIf="userForm.errors.nom" class="form-error">
+                {{ userForm.errors.nom }}
+              </div>
+            </div>
+
+            <!-- Mot de passe -->
+            <div>
+              <label class="form-label">Mot de Passe *</label>
+              <input 
+                type="password" 
+                [(ngModel)]="userForm.motDePasse" 
+                name="motDePasse"
+                placeholder="Minimum 6 caractères"
+                class="form-input"
+                [class.error]="userForm.errors.motDePasse">
+              <div *ngIf="userForm.errors.motDePasse" class="form-error">
+                {{ userForm.errors.motDePasse }}
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-4">
+              <button 
+                type="button" 
+                (click)="onCancelUser()"
+                class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="loading()"
+                class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-indigo-600 hover:bg-indigo-500 text-white"
+                [class.opacity-50]="loading()">
+                <span class="flex items-center justify-center">
+                  <span *ngIf="loading()" class="loader-small mr-2"></span>
+                  {{ loading() ? 'Ajout en cours...' : 'Ajouter l\'Utilisateur' }}
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Liste des utilisateurs -->
+        <div class="creation-card">
+          <h3 class="text-xl font-bold text-indigo-400 mb-6">Liste des Utilisateurs</h3>
+          
+          <div class="space-y-4">
+            <div *ngFor="let user of users()" 
+                 class="bg-gray-700/50 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/70 transition-all duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-indigo-600/30 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold text-white">{{ user.nom }}</div>
+                  <div class="text-sm text-gray-400">
+                    Créé le {{ user.dateCreation | date:'dd/MM/yyyy à HH:mm' }}
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-gray-500 text-sm">{{ user.motDePasse }}</span>
+              </div>
+            </div>
+
+            <!-- Message vide -->
+            <div *ngIf="users().length === 0" class="text-center py-8 text-gray-400">
+              Aucun utilisateur trouvé
+            </div>
           </div>
         </div>
-
-       
-        
-
-        <!-- Boutons d'action -->
-        <div class="flex gap-4">
-          <button 
-            type="button" 
-            (click)="onCancelWeek()"
-            class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
-            Annuler
-          </button>
-          <button 
-            type="submit" 
-            [disabled]="loading()"
-            class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-purple-600 hover:bg-purple-500 text-white"
-            [class.opacity-50]="loading()">
-            <span class="flex items-center justify-center">
-              <span *ngIf="loading()" class="loader-small mr-2"></span>
-              {{ loading() ? 'Création...' : 'Créer la Semaine' }}
-              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-              </svg>
-            </span>
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
+
   </div>
-</div>
 
   <!-- Modal de détails -->
   <div *ngIf="selectedLine()" class="modal-overlay" (click)="closeModal()">
