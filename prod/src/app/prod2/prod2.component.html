@@ -19,25 +19,35 @@
   <div class="relative z-10 container mx-auto px-4 py-8">
     <!-- Header avec bouton de retour -->
     <header class="text-center mb-8 relative">
-      <!-- Bouton de retour -->
+      <!-- Bouton de retour au login -->
       <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
         <button 
-          (click)="goBack()"
-          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center shadow-lg hover:shadow-xl">
+          (click)="goBackToLogin()"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center shadow-lg hover:shadow-xl">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
           </svg>
-          Retour Production
+          Retour Login
         </button>
       </div>
       
       <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-        Planification de Production
+        Gestionnaire de Production
       </h1>
       <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-        Sélectionnez une ligne pour planifier la production
+        Interface de consultation des planifications
       </p>
     </header>
+
+    <!-- AppBar simple avec Voir Planification -->
+    <div class="flex justify-center mb-8">
+      <div class="bg-gray-800/80 backdrop-blur-sm rounded-2xl p-2 border border-gray-600/30">
+        <button 
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-cyan-600 text-white shadow-lg shadow-cyan-600/25">
+          🗓️ Voir Planification
+        </button>
+      </div>
+    </div>
 
     <!-- Section principale -->
     <div class="max-w-7xl mx-auto">
@@ -137,25 +147,17 @@
         <div *ngIf="weekPlanification()" class="space-y-6">
           <div *ngFor="let day of weekPlanification()!.days; let dayIndex = index" class="creation-card">
             <!-- En-tête du jour -->
-            <div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-700/50 flex-col md:flex-row gap-6 bg-gray-700/30 p-6 rounded-xl">
-  <div class="space-y-3">
-    <h3 class="text-2xl font-bold text-cyan-400 capitalize">
-      {{ dayIndex + 1 }}. {{ day.day }}
-    </h3>
-    <p class="text-lg text-gray-300">{{ day.date | date:'dd/MM/yyyy' }}</p>
-    <p class="text-lg text-purple-400 font-semibold">Production: {{ day.production }}</p>
-  </div>
-  <button 
-    (click)="addNewReference(dayIndex)"
-    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-blue-600 hover:bg-blue-500 text-white text-base flex items-center">
-    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-    </svg>
-    Ajouter Référence
-  </button>
-</div>
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700/50 flex-col md:flex-row gap-4">
+              <div>
+                <h3 class="text-xl font-bold text-cyan-400 capitalize">
+                  {{ dayIndex + 1 }}. {{ day.day }}
+                </h3>
+                <p class="text-sm text-gray-400">{{ day.date | date:'dd/MM/yyyy' }}</p>
+                <p class="text-sm text-purple-400">Production: {{ day.production }}</p>
+              </div>
+            </div>
 
-            <!-- Tableau des références du jour -->
+            <!-- Tableau des références du jour (LECTURE SEULE) -->
             <div class="table-wrapper">
               <table class="production-table">
                 <thead>
@@ -172,106 +174,69 @@
                     <th class="col-pcs">% Pcs Prod</th>
                     <th class="col-dec-mag">Dec.Mag</th>
                     <th class="col-delta-mag">Delta Prod.Mag</th>
-                    <th class="col-actions">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let ref of day.references; let refIndex = index">
+                  <tr *ngFor="let ref of day.references">
                     
                     <!-- Référence -->
                     <td class="col-reference">
-                      <input 
-                        type="text" 
-                        [(ngModel)]="ref.reference"
-                        class="planif-input input-reference"
-                        placeholder="Référence">
+                      <div class="readonly-cell text-green-400">{{ ref.reference || '-' }}</div>
                     </td>
                     
                     <!-- OF -->
                     <td class="col-of">
-                      <input 
-                        type="text" 
-                        [(ngModel)]="ref.of"
-                        class="planif-input input-of"
-                        placeholder="OF">
+                      <div class="readonly-cell text-cyan-400">{{ ref.of || '-' }}</div>
                     </td>
                     
                     <!-- Qté Planifier -->
                     <td class="col-qte">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.qte_planifier"
-                        (input)="onQtePlanifierChange(ref)"
-                        class="planif-input input-number"
-                        placeholder="0">
+                      <div class="readonly-cell text-white">{{ ref.qte_planifier || '0' }}</div>
                     </td>
                     
-                    <!-- N°H Planifier (auto) -->
+                    <!-- N°H Planifier -->
                     <td class="col-nh-plan">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.nh_planifier"
-                        class="planif-input readonly-input input-number"
-                        readonly>
+                      <div class="readonly-cell text-white">{{ ref.nh_planifier || '0' }}</div>
                     </td>
                     
-                    <!-- Emballage (default 200) -->
+                    <!-- Emballage -->
                     <td class="col-emballage">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.emballage"
-                        class="planif-input input-number"
-                        placeholder="200">
+                      <div class="readonly-cell text-white">{{ ref.emballage || '0' }}</div>
                     </td>
                     
-                    <!-- N°OP (auto) -->
+                    <!-- N°OP -->
                     <td class="col-nop">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.nop"
-                        class="planif-input readonly-input input-number"
-                        readonly>
+                      <div class="readonly-cell text-white">{{ ref.nop || '0' }}</div>
                     </td>
                     
-                    <!-- N°H Réaliser (readonly) -->
+                    <!-- N°H Réaliser -->
                     <td class="col-nh-real">
                       <div class="readonly-cell text-cyan-400">{{ ref.nh_realiser || '0' }}</div>
                     </td>
                     
-                    <!-- Dec.Prod (readonly) -->
+                    <!-- Dec.Prod -->
                     <td class="col-dec-prod">
                       <div class="readonly-cell text-red-400">{{ ref.dec_prod || '0' }}</div>
                     </td>
                     
-                    <!-- Delta Prod (readonly) -->
+                    <!-- Delta Prod -->
                     <td class="col-delta-prod">
                       <div class="readonly-cell text-gray-400">{{ ref.delta_prod || '0' }}</div>
                     </td>
                     
-                    <!-- % Pcs Prod (readonly) -->
+                    <!-- % Pcs Prod -->
                     <td class="col-pcs">
                       <div class="readonly-cell text-gray-400">{{ ref.pcs_prod || '0' }}%</div>
                     </td>
                     
-                    <!-- Dec.Mag (readonly) -->
+                    <!-- Dec.Mag -->
                     <td class="col-dec-mag">
                       <div class="readonly-cell text-gray-400">{{ ref.dec_mag || '0' }}</div>
                     </td>
                     
-                    <!-- Delta Prod.Mag (readonly) -->
+                    <!-- Delta Prod.Mag -->
                     <td class="col-delta-mag">
                       <div class="readonly-cell text-red-400">{{ ref.delta_prod_mag || '0' }}</div>
-                    </td>
-                    
-                    <!-- Actions -->
-                    <td class="col-actions">
-                      <button 
-                        (click)="removeReference(dayIndex, refIndex)"
-                        [disabled]="day.references.length === 1"
-                        class="delete-btn"
-                        title="Supprimer">
-                        ×
-                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -279,31 +244,11 @@
             </div>
           </div>
 
-          <!-- Boutons d'action -->
+          <!-- Total de la semaine -->
           <div class="creation-card">
             <div class="flex justify-between items-center flex-col md:flex-row gap-4">
               <div class="text-cyan-300">
                 <p class="text-lg font-semibold">Total semaine: {{ calculateWeekTotal() }} unités</p>
-              </div>
-              <div class="flex justify-end gap-4 flex-col md:flex-row">
-                <button 
-                  (click)="exportToExcel()"
-                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-green-600 hover:bg-green-500 text-white flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
-                  Exporter Excel
-                </button>
-                <button 
-                  (click)="savePlanification()"
-                  [disabled]="loading()"
-                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center"
-                  [class.opacity-50]="loading()">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
-                </button>
               </div>
             </div>
           </div>

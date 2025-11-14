@@ -70,13 +70,7 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.week-select:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-/* ==================== CORRECTION ALIGNEMENT TABLEAU ==================== */
-
-/* Conteneur principal du tableau */
+/* ==================== TABLEAU (LECTURE SEULE) ==================== */
 .table-wrapper {
   @apply overflow-x-auto;
   width: 100%;
@@ -85,118 +79,67 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* Tableau principal - AUGMENTATION DE LA LARGEUR TOTALE */
 .production-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: fixed; /* CRUCIAL pour l'alignement */
-  min-width: 1800px; /* AUGMENTATION de 1520px à 1800px */
+  table-layout: fixed;
+  min-width: 1400px;
 }
 
-/* LARGEURS FIXES POUR CHAQUE COLONNE - AUGMENTÉES */
-.production-table .col-reference { width: 160px; } /* +20px */
-.production-table .col-of { width: 130px; } /* +20px */
-.production-table .col-qte { width: 150px; } /* +20px */
-.production-table .col-nh-plan { width: 150px; } /* +20px */
-.production-table .col-emballage { width: 130px; } /* +20px */
-.production-table .col-nop { width: 110px; } /* +20px */
-.production-table .col-nh-real { width: 140px; } /* +20px */
-.production-table .col-dec-prod { width: 130px; } /* +20px */
-.production-table .col-delta-prod { width: 130px; } /* +20px */
-.production-table .col-pcs { width: 140px; } /* +20px */
-.production-table .col-dec-mag { width: 130px; } /* +20px */
-.production-table .col-delta-mag { width: 160px; } /* +20px */
-.production-table .col-actions { width: 110px; } /* +20px */
+/* LARGEURS FIXES POUR CHAQUE COLONNE */
+.production-table .col-reference { width: 140px; }
+.production-table .col-of { width: 110px; }
+.production-table .col-qte { width: 130px; }
+.production-table .col-nh-plan { width: 130px; }
+.production-table .col-emballage { width: 110px; }
+.production-table .col-nop { width: 90px; }
+.production-table .col-nh-real { width: 120px; }
+.production-table .col-dec-prod { width: 110px; }
+.production-table .col-delta-prod { width: 110px; }
+.production-table .col-pcs { width: 120px; }
+.production-table .col-dec-mag { width: 110px; }
+.production-table .col-delta-mag { width: 140px; }
 
-/* HEADERS - Alignement parfait avec cellules plus grandes */
+/* HEADERS */
 .production-table thead th {
   @apply sticky top-0 bg-gray-800/95 backdrop-blur-sm;
   z-index: 10;
   text-align: center;
-  padding: 18px 10px; /* AUGMENTATION du padding */
+  padding: 16px 8px;
   font-weight: 700;
   color: #22d3ee;
   border-bottom: 2px solid rgba(34, 211, 238, 0.3);
-  font-size: 0.85rem; /* Légère augmentation */
-  line-height: 1.2;
+  font-size: 0.8rem;
+  line-height: 1.1;
   vertical-align: middle;
-  height: 70px; /* AUGMENTATION de la hauteur */
+  height: 60px;
   white-space: normal;
   word-wrap: break-word;
 }
 
-/* CELLULES - Plus grandes pour meilleure visibilité */
+/* CELLULES LECTURE SEULE */
 .production-table tbody td {
-  padding: 14px 10px; /* AUGMENTATION du padding */
+  padding: 12px 8px;
   text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid rgba(55, 65, 81, 0.3);
   box-sizing: border-box;
   overflow: hidden;
-  height: 70px; /* AUGMENTATION de la hauteur */
+  height: 60px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* INPUTS - Plus grands pour remplir les cellules agrandies */
-.planif-input {
-  width: 100%;
-  padding: 12px 10px; /* AUGMENTATION du padding */
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: white;
-  font-size: 0.9rem; /* Légère augmentation */
-  text-align: center;
-  transition: all 0.2s;
-  box-sizing: border-box;
-  min-height: 48px; /* AUGMENTATION de la hauteur minimale */
-  display: block;
-  margin: 0;
-  line-height: 1.3;
-}
-
-/* Inputs de référence et OF - alignement à gauche avec plus d'espace */
-.input-reference,
-.input-of {
-  text-align: left !important;
-  padding-left: 14px !important; /* AUGMENTATION */
-  font-weight: 500;
-  color: #10b981;
-}
-
-/* Inputs numériques */
-.input-number {
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.planif-input:focus {
-  @apply outline-none border-cyan-500;
-  box-shadow: 0 0 10px rgba(0, 230, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.planif-input::placeholder {
-  @apply text-gray-500;
-}
-
-/* INPUTS EN LECTURE SEULE */
-.readonly-input {
-  @apply bg-gray-800/50 cursor-not-allowed text-cyan-400;
-}
-
-/* CELLULES EN LECTURE SEULE - Ajustées pour les cellules plus grandes */
+/* CELLULES EN LECTURE SEULE */
 .readonly-cell {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 48px; /* AUGMENTATION */
-  padding: 12px 10px; /* AUGMENTATION */
-  font-size: 0.9rem; /* Légère augmentation */
+  min-height: 42px;
+  padding: 10px 8px;
+  font-size: 0.875rem;
   font-weight: 600;
   box-sizing: border-box;
   font-variant-numeric: tabular-nums;
@@ -229,44 +172,6 @@
 .readonly-cell.text-gray-400 {
   color: #9ca3af;
   background: rgba(255, 255, 255, 0.03);
-}
-
-/* BOUTON SUPPRESSION - Plus grand pour correspondre */
-.delete-btn {
-  @apply px-4 py-3 rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors duration-200; /* AUGMENTATION padding */
-  font-size: 1.2rem; /* AUGMENTATION */
-  font-weight: bold;
-  min-width: 42px; /* AUGMENTATION */
-  min-height: 42px; /* AUGMENTATION */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-.delete-btn:disabled {
-  @apply opacity-30 cursor-not-allowed;
-}
-
-/* Lignes du tableau */
-.production-table tbody tr {
-  @apply transition-colors duration-200;
-  animation: slideIn 0.3s ease-out;
-}
-
-.production-table tbody tr:hover {
-  @apply bg-gray-700/40;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 /* ==================== PARTICULES ==================== */
@@ -370,31 +275,8 @@
   }
   
   .production-table {
-    min-width: 1400px; /* AUGMENTATION pour mobile */
-    font-size: 0.8rem; /* Légère augmentation */
-  }
-  
-  .production-table thead th {
-    padding: 14px 8px;
-    font-size: 0.8rem;
-    height: 60px;
-  }
-  
-  .production-table tbody td {
-    padding: 10px 8px;
-    height: 60px;
-  }
-  
-  .planif-input {
-    padding: 8px 6px;
-    font-size: 0.8rem;
-    min-height: 40px;
-  }
-  
-  .readonly-cell {
-    min-height: 40px;
-    padding: 8px 6px;
-    font-size: 0.8rem;
+    min-width: 1200px;
+    font-size: 0.75rem;
   }
 }
 
@@ -410,39 +292,5 @@
   
   .neon-title {
     font-size: 1.75rem;
-  }
-  
-  .production-table {
-    min-width: 1200px;
-  }
-  
-  .production-table thead th {
-    padding: 12px 6px;
-    font-size: 0.75rem;
-    height: 55px;
-  }
-  
-  .production-table tbody td {
-    padding: 8px 6px;
-    height: 55px;
-  }
-  
-  .planif-input {
-    padding: 6px 4px;
-    font-size: 0.75rem;
-    min-height: 38px;
-  }
-  
-  .readonly-cell {
-    min-height: 38px;
-    padding: 6px 4px;
-    font-size: 0.75rem;
-  }
-  
-  .delete-btn {
-    padding: 8px 12px;
-    font-size: 1rem;
-    min-width: 36px;
-    min-height: 36px;
   }
 }
