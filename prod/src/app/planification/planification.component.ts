@@ -1,8 +1,7 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule , Router} from '@angular/router';
-
+import { RouterModule, Router } from '@angular/router';
 
 interface ProductionLine {
   ligne: string;
@@ -42,7 +41,7 @@ interface WeekPlanification {
 @Component({
   selector: 'app-planification',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './planification.component.html',
   styleUrls: ['./planification.component.css']
 })
@@ -51,29 +50,27 @@ export class PlanificationComponent {
   loading = signal(false);
   selectedLigne = signal<ProductionLine | null>(null);
   selectedWeek = signal<number | null>(null);
-  
   availableLines = signal<ProductionLine[]>([]);
   weekPlanification = signal<WeekPlanification | null>(null);
-  
   showSuccess = signal(false);
   successMessage = signal('');
   particles = signal<any[]>([]);
+  isEditing = signal(false);
 
   // Données
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
-  constructor(private router:Router) {
-    console.log('Component initialized');
+  constructor(private router: Router) {
     this.generateParticles();
     this.loadProductionLines();
   }
 
   private generateParticles() {
-    const particles = Array.from({ length: 25 }, () => ({
+    const particles = Array.from({ length: 20 }, () => ({
       left: `${Math.random() * 100}%`,
-      size: `${Math.random() * 8 + 2}px`,
-      animationDelay: `${Math.random() * 15}s`,
-      opacity: `${Math.random() * 0.4 + 0.1}`
+      size: `${Math.random() * 6 + 2}px`,
+      animationDelay: `${Math.random() * 10}s`,
+      opacity: `${Math.random() * 0.3 + 0.1}`
     }));
     this.particles.set(particles);
   }
@@ -137,35 +134,24 @@ export class PlanificationComponent {
 
   // Obtenir les dates d'une semaine spécifique
   private getWeekDates(year: number, weekNumber: number): any {
-    // Premier jour de l'année
     const firstDayOfYear = new Date(year, 0, 1);
     const daysToFirstMonday = (8 - firstDayOfYear.getDay()) % 7;
     
-    // Premier lundi de l'année
     const firstMonday = new Date(firstDayOfYear);
     firstMonday.setDate(firstDayOfYear.getDate() + daysToFirstMonday);
     
-    // Début de la semaine demandée
     const weekStart = new Date(firstMonday);
     weekStart.setDate(firstMonday.getDate() + (weekNumber - 1) * 7);
     
-    // Fin de la semaine (samedi)
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 5); // Du lundi au samedi
+    weekEnd.setDate(weekStart.getDate() + 5);
     
     return {
       number: weekNumber,
       startDate: weekStart,
       endDate: weekEnd,
-      display: `Semaine ${weekNumber} (${this.formatDate(weekStart)} - ${this.formatDate(weekEnd)})`
+      display: `S${weekNumber}`
     };
-  }
-
-  private formatDate(date: Date): string {
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit'
-    });
   }
 
   onLigneSelected(line: ProductionLine) {
@@ -173,16 +159,17 @@ export class PlanificationComponent {
     this.selectedLigne.set(line);
     this.selectedWeek.set(null);
     this.weekPlanification.set(null);
+    this.isEditing.set(false);
   }
 
-  onWeekSelected(event: any) {
-    const weekNumber = Number(event.target.value);
+  onWeekSelected(weekNumber: number) {
     console.log('Week selected:', weekNumber);
     const line = this.selectedLigne();
     
     if (line && weekNumber) {
       this.selectedWeek.set(weekNumber);
       this.loadWeekPlanification(weekNumber, line);
+      this.isEditing.set(false);
     }
   }
 
@@ -212,90 +199,43 @@ export class PlanificationComponent {
       });
       this.loading.set(false);
       console.log('Week planification loaded');
-    }, 800);
+    }, 600);
   }
 
   private createReferencesForLine(line: ProductionLine): ReferenceProduction[] {
     return line.references.map((reference, index) => ({
       reference: reference,
       of: index === 0 ? '067625' : '',
-      qte_planifier: index === 0 ? 4000 : 0,
-      nh_planifier: index === 0 ? 78 : 0,
+      qte_planifier: index === 0 ? 4000 : Math.floor(Math.random() * 2000),
+      nh_planifier: index === 0 ? 78 : Math.floor(Math.random() * 50),
       emballage: 200,
-      nop: index === 0 ? 10 : 0,
-      nh_realiser: 0,
-      dec_prod: index === 0 ? -4000 : 0,
-      delta_prod: 0,
-      pcs_prod: 0,
-      dec_mag: 0,
-      delta_prod_mag: index === 0 ? -4000 : 0
+      nop: index === 0 ? 10 : Math.floor(Math.random() * 8),
+      nh_realiser: Math.floor(Math.random() * 40),
+      dec_prod: index === 0 ? -4000 : Math.floor(Math.random() * -2000),
+      delta_prod: Math.floor(Math.random() * 1000),
+      pcs_prod: Math.floor(Math.random() * 100),
+      dec_mag: Math.floor(Math.random() * -500),
+      delta_prod_mag: index === 0 ? -4000 : Math.floor(Math.random() * -1000)
     }));
-  }
-
-  onQtePlanifierChange(ref: ReferenceProduction): void {
-    if (ref.qte_planifier > 0) {
-      ref.nh_planifier = Math.round((ref.qte_planifier / 100) * 2);
-      ref.nop = Math.ceil(ref.nh_planifier / 8);
-    } else {
-      ref.nh_planifier = 0;
-      ref.nop = 0;
-    }
-  }
-
-  addNewReference(dayIndex: number): void {
-    const planif = this.weekPlanification();
-    if (planif) {
-      const newRef = this.createEmptyReference();
-      planif.days[dayIndex].references.push(newRef);
-    }
-  }
-
-  private createEmptyReference(): ReferenceProduction {
-    return {
-      reference: '',
-      of: '',
-      qte_planifier: 0,
-      nh_planifier: 0,
-      emballage: 200,
-      nop: 0,
-      nh_realiser: 0,
-      dec_prod: 0,
-      delta_prod: 0,
-      pcs_prod: 0,
-      dec_mag: 0,
-      delta_prod_mag: 0
-    };
-  }
-
-  removeReference(dayIndex: number, refIndex: number): void {
-    const planif = this.weekPlanification();
-    if (planif && planif.days[dayIndex].references.length > 1) {
-      planif.days[dayIndex].references.splice(refIndex, 1);
-    }
-  }
-
-  savePlanification(): void {
-    this.loading.set(true);
-    setTimeout(() => {
-      this.showSuccessMessage('Planification enregistrée avec succès !');
-      this.loading.set(false);
-    }, 1000);
-  }
-
-  exportToExcel(): void {
-    this.showSuccessMessage('Export Excel en cours...');
-  }
-
-  private showSuccessMessage(message: string) {
-    this.successMessage.set(message);
-    this.showSuccess.set(true);
-    setTimeout(() => this.showSuccess.set(false), 3000);
   }
 
   backToLines(): void {
     this.selectedLigne.set(null);
     this.selectedWeek.set(null);
     this.weekPlanification.set(null);
+    this.isEditing.set(false);
+  }
+
+  goBackToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  // Activer/désactiver le mode édition
+  toggleEditMode(): void {
+    this.isEditing.set(!this.isEditing());
+    if (!this.isEditing()) {
+      this.showSuccessMessage('Modifications enregistrées avec succès');
+    }
   }
 
   // Méthode pour calculer le total par jour
@@ -312,7 +252,22 @@ export class PlanificationComponent {
       return weekTotal + this.calculateDayTotal(day);
     }, 0);
   }
-   goBack(): void {
-    this.router.navigate(['/prod']);
+
+  private showSuccessMessage(message: string) {
+    this.successMessage.set(message);
+    this.showSuccess.set(true);
+    setTimeout(() => this.showSuccess.set(false), 3000);
+  }
+
+  // Méthode pour mettre à jour une valeur
+  updateValue(day: ProductionDay, refIndex: number, field: keyof ReferenceProduction, value: any): void {
+    if (this.weekPlanification()) {
+      const updatedPlanif = { ...this.weekPlanification()! };
+      const dayIndex = updatedPlanif.days.indexOf(day);
+      
+      if (dayIndex !== -1) {
+        this.weekPlanification.set(updatedPlanif);
+      }
+    }
   }
 }

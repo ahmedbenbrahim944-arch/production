@@ -1,6 +1,6 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
+<div class="full-screen-layout text-white relative overflow-hidden">
   <!-- Background avec particules -->
-  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
        style="background-image: url('https://www.tannerag.ch/Marketing/News%20and%20Social%20Media/38748/image-thumb__38748__contentImageLarge/production-process.e47f5cea.jpg')">
   </div>
 
@@ -16,77 +16,58 @@
     </div>
   </div>
 
-  <div class="relative z-10 container mx-auto px-4 py-8">
-    <!-- Header avec bouton de retour -->
-    <header class="text-center mb-8 relative">
-      <!-- Bouton de retour -->
-      <div class="absolute left-0 top-1/2 transform -translate-y-1/2">
+  <div class="relative z-10 h-screen flex flex-col">
+    <!-- Header principal -->
+    <header class="header-industrial py-4 px-6">
+      <div class="flex justify-between items-center">
+        <!-- Bouton de retour -->
         <button 
-          (click)="goBack()"
-          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center shadow-lg hover:shadow-xl">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          (click)="goBackToLogin()"
+          class="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center text-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
           </svg>
-          Retour Production
+          Retour Login
         </button>
+
+        <!-- Titre principal -->
+        <div class="text-center">
+          <h1 class="text-2xl font-bold text-cyan-400">PDP SERAF</h1>
+          <p class="text-cyan-200 text-sm">PLANIFICATION ADMIN</p>
+        </div>
+
+        <!-- Espace vide pour l'alignement -->
+        <div class="w-24"></div>
       </div>
-      
-      <h1 class="neon-title text-5xl font-bold mb-4 tracking-wider">
-        Planification de Production
-      </h1>
-      <p class="text-cyan-200 text-xl max-w-2xl mx-auto">
-        Sélectionnez une ligne pour planifier la production
-      </p>
     </header>
 
-    <!-- Section principale -->
-    <div class="max-w-7xl mx-auto">
+    <!-- Contenu principal -->
+    <div class="flex-1 flex overflow-hidden">
       
       <!-- Affichage des lignes de production (quand aucune ligne n'est sélectionnée) -->
-      <div *ngIf="!selectedLigne()" class="fade-in">
-        <div class="creation-card">
-          <h2 class="text-2xl font-bold text-cyan-400 mb-6">Lignes de Production Disponibles</h2>
+      <div *ngIf="!selectedLigne()" class="flex-1 p-6 overflow-auto">
+        <div class="max-w-7xl mx-auto">
+          <h2 class="text-xl font-bold text-cyan-400 mb-6 text-center">PLANIFICATION DES LIGNES</h2>
           
           <!-- Grille des lignes -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
             <div *ngFor="let line of availableLines()" 
                  (click)="onLigneSelected(line)"
-                 class="line-card bg-gray-700/50 rounded-xl p-4 border border-gray-600/30 cursor-pointer transition-all duration-300 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/20">
+                 class="line-card-large rounded-xl p-4 cursor-pointer">
               
-              <!-- Image de la ligne -->
-              <div class="relative h-32 mb-3 rounded-lg overflow-hidden">
+              <!-- Image principale de la ligne -->
+              <div class="relative h-48 mb-4 rounded-xl overflow-hidden">
                 <img [src]="line.imageUrl" 
                      [alt]="line.ligne" 
-                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                     class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                <div class="absolute bottom-2 left-3">
-                  <span class="text-white font-bold text-lg">{{ line.ligne }}</span>
+                <div class="absolute bottom-3 left-4">
+                  <span class="text-white font-bold text-xl">{{ line.ligne }}</span>
                 </div>
-              </div>
-              
-              <!-- Informations de la ligne -->
-              <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-cyan-300 font-semibold">{{ line.referenceCount }} références</span>
-                  <span class="text-green-400 text-sm flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
+                <div class="absolute top-3 right-3">
+                  <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                     Active
                   </span>
-                </div>
-                
-                <!-- Références principales -->
-                <div class="text-xs text-gray-400">
-                  <div class="flex flex-wrap gap-1">
-                    <span *ngFor="let ref of line.references.slice(0, 4)" 
-                          class="bg-gray-600/50 px-2 py-1 rounded">
-                      {{ ref }}
-                    </span>
-                    <span *ngIf="line.references.length > 4" class="bg-gray-600/50 px-2 py-1 rounded">
-                      +{{ line.references.length - 4 }}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -95,227 +76,201 @@
       </div>
 
       <!-- Affichage de la planification (quand une ligne est sélectionnée) -->
-      <div *ngIf="selectedLigne()" class="fade-in">
+      <div *ngIf="selectedLigne()" class="flex-1 flex">
         
-        <!-- Configuration de la semaine -->
-        <div class="creation-card mb-6">
-          <div class="flex justify-between items-center flex-col md:flex-row gap-4">
-            <div class="flex items-center space-x-4">
-              <button 
-                (click)="backToLines()"
-                class="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Retour aux lignes
-              </button>
+        <!-- Sidebar des semaines -->
+        <div class="weeks-sidebar h-full overflow-y-auto custom-scrollbar">
+          <div class="p-4">
+            <!-- Bouton retour -->
+            <button 
+              (click)="backToLines()"
+              class="w-full mb-6 px-4 py-3 rounded-lg font-semibold transition-all duration-300 bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center text-sm">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+              Retour aux lignes
+            </button>
+
+            <!-- Informations de la ligne -->
+            <div class="mb-6 p-4 bg-cyan-900/20 rounded-lg border border-cyan-700/30">
+              <h3 class="font-bold text-cyan-400 text-xl mb-2">{{ selectedLigne()!.ligne }}</h3>
+              <p class="text-gray-300 text-sm">{{ selectedLigne()!.referenceCount }} références disponibles</p>
+            </div>
+
+            <!-- Liste des semaines -->
+            <h4 class="text-cyan-300 font-semibold mb-4 text-sm uppercase tracking-wider">Semaines disponibles</h4>
+            <div class="space-y-2">
+              <div *ngFor="let week of getAvailableWeeks()" 
+                   (click)="onWeekSelected(week.number)"
+                   [class.active]="selectedWeek() === week.number"
+                   class="week-item p-3 rounded-lg cursor-pointer border border-gray-600/30">
+                <div class="font-bold text-white text-lg">Semaine {{ week.number }}</div>
+                <div class="text-gray-400 text-xs mt-1">{{ week.startDate | date:'dd/MM' }} - {{ week.endDate | date:'dd/MM' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu des jours -->
+        <div class="flex-1 p-6 overflow-auto custom-scrollbar">
+          <!-- En-tête de la semaine sélectionnée avec bouton d'édition -->
+          <div *ngIf="weekPlanification()" class="mb-6">
+            <div class="flex justify-between items-center">
               <div>
-                <h2 class="text-2xl font-bold text-cyan-400">
-                  {{ selectedLigne()!.ligne }}
+                <h2 class="text-2xl font-bold text-cyan-400 mb-2">
+                  PLANIFICATION > {{ selectedLigne()!.ligne }}
                 </h2>
-                <p class="text-gray-400 mt-1">{{ selectedLigne()!.referenceCount }} références disponibles</p>
+                <p class="text-gray-400">Semaine {{ selectedWeek() }}</p>
               </div>
-            </div>
-
-            <!-- Sélection de la semaine -->
-            <div class="w-full md:max-w-md">
-              <label class="form-label">Sélectionner la Semaine *</label>
-              <select 
-                [value]="selectedWeek()"
-                (change)="onWeekSelected($event)"
-                class="week-select">
-                <option [value]="null">Sélectionner une semaine</option>
-                <option *ngFor="let week of getAvailableWeeks()" [value]="week.number">
-                  {{ week.display }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tableau de planification (visible seulement quand une semaine est sélectionnée) -->
-        <div *ngIf="weekPlanification()" class="space-y-6">
-          <div *ngFor="let day of weekPlanification()!.days; let dayIndex = index" class="creation-card">
-            <!-- En-tête du jour -->
-            <div class="flex justify-between items-center mb-8 pb-6 border-b border-gray-700/50 flex-col md:flex-row gap-6 bg-gray-700/30 p-6 rounded-xl">
-  <div class="space-y-3">
-    <h3 class="text-2xl font-bold text-cyan-400 capitalize">
-      {{ dayIndex + 1 }}. {{ day.day }}
-    </h3>
-    <p class="text-lg text-gray-300">{{ day.date | date:'dd/MM/yyyy' }}</p>
-    <p class="text-lg text-purple-400 font-semibold">Production: {{ day.production }}</p>
-  </div>
-  <button 
-    (click)="addNewReference(dayIndex)"
-    class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-blue-600 hover:bg-blue-500 text-white text-base flex items-center">
-    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-    </svg>
-    Ajouter Référence
-  </button>
-</div>
-
-            <!-- Tableau des références du jour -->
-            <div class="table-wrapper">
-              <table class="production-table">
-                <thead>
-                  <tr>
-                    <th class="col-reference">Référence</th>
-                    <th class="col-of">OF</th>
-                    <th class="col-qte">Qté Planifier</th>
-                    <th class="col-nh-plan">N°H Planifier</th>
-                    <th class="col-emballage">Emballage</th>
-                    <th class="col-nop">N°OP</th>
-                    <th class="col-nh-real">N°H Réaliser</th>
-                    <th class="col-dec-prod">Dec.Prod</th>
-                    <th class="col-delta-prod">Delta Prod</th>
-                    <th class="col-pcs">% Pcs Prod</th>
-                    <th class="col-dec-mag">Dec.Mag</th>
-                    <th class="col-delta-mag">Delta Prod.Mag</th>
-                    <th class="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let ref of day.references; let refIndex = index">
-                    
-                    <!-- Référence -->
-                    <td class="col-reference">
-                      <input 
-                        type="text" 
-                        [(ngModel)]="ref.reference"
-                        class="planif-input input-reference"
-                        placeholder="Référence">
-                    </td>
-                    
-                    <!-- OF -->
-                    <td class="col-of">
-                      <input 
-                        type="text" 
-                        [(ngModel)]="ref.of"
-                        class="planif-input input-of"
-                        placeholder="OF">
-                    </td>
-                    
-                    <!-- Qté Planifier -->
-                    <td class="col-qte">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.qte_planifier"
-                        (input)="onQtePlanifierChange(ref)"
-                        class="planif-input input-number"
-                        placeholder="0">
-                    </td>
-                    
-                    <!-- N°H Planifier (auto) -->
-                    <td class="col-nh-plan">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.nh_planifier"
-                        class="planif-input readonly-input input-number"
-                        readonly>
-                    </td>
-                    
-                    <!-- Emballage (default 200) -->
-                    <td class="col-emballage">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.emballage"
-                        class="planif-input input-number"
-                        placeholder="200">
-                    </td>
-                    
-                    <!-- N°OP (auto) -->
-                    <td class="col-nop">
-                      <input 
-                        type="number" 
-                        [(ngModel)]="ref.nop"
-                        class="planif-input readonly-input input-number"
-                        readonly>
-                    </td>
-                    
-                    <!-- N°H Réaliser (readonly) -->
-                    <td class="col-nh-real">
-                      <div class="readonly-cell text-cyan-400">{{ ref.nh_realiser || '0' }}</div>
-                    </td>
-                    
-                    <!-- Dec.Prod (readonly) -->
-                    <td class="col-dec-prod">
-                      <div class="readonly-cell text-red-400">{{ ref.dec_prod || '0' }}</div>
-                    </td>
-                    
-                    <!-- Delta Prod (readonly) -->
-                    <td class="col-delta-prod">
-                      <div class="readonly-cell text-gray-400">{{ ref.delta_prod || '0' }}</div>
-                    </td>
-                    
-                    <!-- % Pcs Prod (readonly) -->
-                    <td class="col-pcs">
-                      <div class="readonly-cell text-gray-400">{{ ref.pcs_prod || '0' }}%</div>
-                    </td>
-                    
-                    <!-- Dec.Mag (readonly) -->
-                    <td class="col-dec-mag">
-                      <div class="readonly-cell text-gray-400">{{ ref.dec_mag || '0' }}</div>
-                    </td>
-                    
-                    <!-- Delta Prod.Mag (readonly) -->
-                    <td class="col-delta-mag">
-                      <div class="readonly-cell text-red-400">{{ ref.delta_prod_mag || '0' }}</div>
-                    </td>
-                    
-                    <!-- Actions -->
-                    <td class="col-actions">
-                      <button 
-                        (click)="removeReference(dayIndex, refIndex)"
-                        [disabled]="day.references.length === 1"
-                        class="delete-btn"
-                        title="Supprimer">
-                        ×
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              
+              <!-- Bouton d'édition -->
+              <button 
+                (click)="toggleEditMode()"
+                [class.bg-green-600]="!isEditing()"
+                [class.bg-blue-600]="isEditing()"
+                class="px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-white flex items-center">
+                <svg *ngIf="!isEditing()" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                <svg *ngIf="isEditing()" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ isEditing() ? 'Enregistrer' : 'Modifier' }}
+              </button>
             </div>
           </div>
 
-          <!-- Boutons d'action -->
-          <div class="creation-card">
-            <div class="flex justify-between items-center flex-col md:flex-row gap-4">
-              <div class="text-cyan-300">
-                <p class="text-lg font-semibold">Total semaine: {{ calculateWeekTotal() }} unités</p>
+          <!-- Affichage des jours -->
+          <div *ngIf="weekPlanification()" class="days-stacked">
+            <div *ngFor="let day of weekPlanification()!.days; let dayIndex = index" class="day-card-stacked">
+              <!-- En-tête du jour -->
+              <div class="day-header-stacked">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h3 class="text-xl font-bold text-cyan-400 capitalize">
+                      {{ dayIndex + 1 }}. {{ day.day }}
+                    </h3>
+                    <p class="text-sm text-gray-400">{{ day.date | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-purple-400 font-semibold">Production: {{ day.production | number }}</p>
+                    <p class="text-xs text-gray-400">Total: {{ calculateDayTotal(day) | number }}</p>
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-end gap-4 flex-col md:flex-row">
-                <button 
-                  (click)="exportToExcel()"
-                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-green-600 hover:bg-green-500 text-white flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
-                  Exporter Excel
-                </button>
-                <button 
-                  (click)="savePlanification()"
-                  [disabled]="loading()"
-                  class="px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center"
-                  [class.opacity-50]="loading()">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
-                </button>
+
+              <!-- Tableau des références -->
+              <div class="p-4">
+                <div class="overflow-x-auto rounded-lg border border-gray-600/30">
+                  <table class="simple-production-table">
+                    <thead>
+                      <tr>
+                        <th class="col-ref">Référence</th>
+                        <th class="col-of">OF</th>
+                        <th class="col-qte">QTE PLANIFIER</th>
+                        <th class="col-nh">N°H Planifier</th>
+                        <th class="col-emb">EMBALLAGE</th>
+                        <th class="col-nop">N°OP</th>
+                        <th class="col-real">N°H Realiser</th>
+                        <th class="col-dec">DEC.PROD</th>
+                        <th class="col-delta">DELTA PROD</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let ref of day.references; let refIndex = index">
+                        <!-- Référence (lecture seule) -->
+                        <td class="col-ref">
+                          <span class="value-neutral font-medium">{{ ref.reference || '-' }}</span>
+                        </td>
+                        
+                        <!-- OF (éditable) -->
+                        <td class="col-of">
+                          <input *ngIf="isEditing()" 
+                                 [value]="ref.of"
+                                 (input)="updateValue(day, refIndex, 'of', $any($event.target).value)"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm">
+                          <span *ngIf="!isEditing()" class="value-neutral">{{ ref.of || '-' }}</span>
+                        </td>
+                        
+                        <!-- QTE PLANIFIER (éditable) -->
+                        <td class="col-qte">
+                          <input *ngIf="isEditing()" 
+                                 type="number"
+                                 [value]="ref.qte_planifier"
+                                 (input)="updateValue(day, refIndex, 'qte_planifier', +$any($event.target).value)"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm">
+                          <span *ngIf="!isEditing()" class="value-neutral font-semibold">{{ ref.qte_planifier || '0' }}</span>
+                        </td>
+                        
+                        <!-- N°H Planifier (éditable) -->
+                        <td class="col-nh">
+                          <input *ngIf="isEditing()" 
+                                 type="number"
+                                 [value]="ref.nh_planifier"
+                                 (input)="updateValue(day, refIndex, 'nh_planifier', +$any($event.target).value)"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm">
+                          <span *ngIf="!isEditing()" class="value-neutral">{{ ref.nh_planifier || '0' }}</span>
+                        </td>
+                        
+                        <!-- EMBALLAGE (éditable) -->
+                        <td class="col-emb">
+                          <input *ngIf="isEditing()" 
+                                 type="number"
+                                 [value]="ref.emballage"
+                                 (input)="updateValue(day, refIndex, 'emballage', +$any($event.target).value)"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm">
+                          <span *ngIf="!isEditing()" class="value-neutral">{{ ref.emballage || '0' }}</span>
+                        </td>
+                        
+                        <!-- N°OP (éditable) -->
+                        <td class="col-nop">
+                          <input *ngIf="isEditing()" 
+                                 type="number"
+                                 [value]="ref.nop"
+                                 (input)="updateValue(day, refIndex, 'nop', +$any($event.target).value)"
+                                 class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-white text-sm">
+                          <span *ngIf="!isEditing()" class="value-neutral">{{ ref.nop || '0' }}</span>
+                        </td>
+                        
+                        <!-- N°H Realiser (lecture seule) -->
+                        <td class="col-real">
+                          <span class="value-neutral">{{ ref.nh_realiser || '0' }}</span>
+                        </td>
+                        
+                        <!-- DEC.PROD (lecture seule) -->
+                        <td class="col-dec">
+                          <span [class.value-positive]="ref.dec_prod >= 0" 
+                                [class.value-negative]="ref.dec_prod < 0"
+                                class="font-semibold">
+                            {{ ref.dec_prod || '0' }}
+                          </span>
+                        </td>
+                        
+                        <!-- DELTA PROD (lecture seule) -->
+                        <td class="col-delta">
+                          <span [class.value-positive]="ref.delta_prod >= 0" 
+                                [class.value-negative]="ref.delta_prod < 0"
+                                class="font-semibold">
+                            {{ ref.delta_prod || '0' }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Message pour sélectionner une semaine -->
-        <div *ngIf="selectedLigne() && !weekPlanification()" class="text-center py-20">
-          <div class="text-gray-400 text-lg">
-            <svg class="w-20 h-20 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            <p>Sélectionnez une semaine pour voir la planification</p>
+          <!-- Message pour sélectionner une semaine -->
+          <div *ngIf="selectedLigne() && !weekPlanification()" class="h-full flex items-center justify-center">
+            <div class="text-center text-gray-400">
+              <svg class="w-20 h-20 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-lg mb-2">Sélectionnez une semaine</p>
+              <p class="text-sm text-gray-500">pour voir la planification</p>
+            </div>
           </div>
         </div>
       </div>

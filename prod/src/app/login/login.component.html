@@ -23,65 +23,109 @@
       <!-- Face avant - Login -->
       <div class="face front bg-gray-900/80 backdrop-blur-sm border border-gray-600/30 flex rounded-2xl shadow-2xl">
         <!-- Section gauche - Branding -->
-        <div class="w-1/2 bg-gradient-to-br from-cyan-800 to-cyan-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+        <div class="w-2/5 bg-gradient-to-br from-cyan-800 to-cyan-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-10"></div>
           <h1 class="neon text-4xl font-bold mb-6 text-center tracking-wider">Production</h1>
           <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
                class="w-28 animate-float" 
                alt="Icone usine intelligente">
           <p class="text-cyan-200 text-center mt-6 text-sm max-w-xs">
-            
-          </p>
+                    </p>
         </div>
 
-        <!-- Section droite - Formulaire -->
-        <div class="w-1/2 p-10 flex flex-col justify-center relative">
-          <div class="absolute top-4 right-4 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-          
-          <h2 class="text-2xl font-bold text-cyan-400 mb-2">Connexion</h2>
-          <p class="text-gray-400 text-sm mb-6">Accédez à votre dashboard</p>
+        <!-- Section droite - Formulaire et Clavier -->
+        <div class="w-3/5 p-6 flex gap-6">
+          <!-- Formulaire de connexion -->
+          <div class="flex-1 flex flex-col justify-center">
+            <div class="absolute top-4 right-4 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
+            
+            <h2 class="text-2xl font-bold text-cyan-400 mb-2">Connexion</h2>
+            <p class="text-gray-400 text-sm mb-6">Accédez à votre dashboard</p>
 
-          <form (ngSubmit)="onLogin()" class="space-y-4">
-            <div>
-              <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                     placeholder="Email professionnel" 
-                     [(ngModel)]="loginForm.email" 
-                     name="email"
-                     [class.error]="loginForm.errors.email">
-              <div *ngIf="loginForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
-                {{ loginForm.errors.email }}
+            <form (ngSubmit)="onLogin()" class="space-y-4">
+              <div>
+                <div class="relative">
+                  <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                         placeholder="Mtaricule" 
+                         [(ngModel)]="loginForm.email" 
+                         name="email"
+                         [class.error]="loginForm.errors.email"
+                         [class.active]="currentInputField === 'email'"
+                         (click)="openNumpad('email')"
+                         readonly>
+                </div>
+                <div *ngIf="loginForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ loginForm.errors.email }}
+                </div>
+              </div>
+
+              <div>
+                <div class="relative">
+                  <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                         type="password" 
+                         placeholder="Mot de passe" 
+                         [(ngModel)]="loginForm.password" 
+                         name="password"
+                         [class.error]="loginForm.errors.password"
+                         [class.active]="currentInputField === 'password'"
+                         (click)="openNumpad('password')"
+                         readonly>
+                </div>
+                <div *ngIf="loginForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ loginForm.errors.password }}
+                </div>
+              </div>
+
+              <button type="submit" class="btn-industrial w-full py-3 rounded-lg font-semibold transition-all duration-300 mt-4">
+                <span class="flex items-center justify-center">
+                  Se connecter
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                  </svg>
+                </span>
+              </button>
+            </form>
+
+            <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
+              <p class="text-sm text-gray-400">
+                Pas de compte industriel ?
+                <span (click)="toggleFlip()" class="text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors ml-1 font-medium">
+                  Créer un compte
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Clavier numérique intégré -->
+          <div class="w-48 flex flex-col justify-center">
+            <div class="numpad-integrated bg-gray-800/80 backdrop-blur-md border border-cyan-500/30 rounded-xl p-4 shadow-2xl">
+              <div class="text-center mb-3">
+                <div class="text-cyan-400 text-sm font-semibold"></div>
+                <div class="text-cyan-300 text-xs mt-1">{{ getCurrentFieldName() }}</div>
+              </div>
+              
+              <!-- Affichage de la valeur -->
+              <div class="numpad-display-integrated bg-gray-900/90 border border-cyan-400/30 rounded-lg p-3 mb-3">
+                <div class="text-white text-center font-mono text-sm min-h-6 break-all">
+                  {{ numpadValue || '&nbsp;' }}
+                </div>
+              </div>
+              
+              <!-- Clavier -->
+              <div class="numpad-grid-integrated grid grid-cols-3 gap-2">
+                <button *ngFor="let button of numpadButtons" 
+                        (click)="onNumpadButtonClick(button)"
+                        class="numpad-btn-integrated bg-gray-700/80 hover:bg-cyan-600/80 border border-gray-600/50 hover:border-cyan-400/50 text-white rounded-lg p-2 font-bold text-sm transition-all duration-200 active:scale-95">
+                  {{ button }}
+                </button>
+              </div>
+              
+              <div class="mt-3 text-center text-xs text-gray-400">
+                <p>* = Effacer</p>
+                <p># = Suivant</p>
+                <p class="mt-1">Clavier physique activé</p>
               </div>
             </div>
-
-            <div>
-              <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                     type="password" 
-                     placeholder="Mot de passe" 
-                     [(ngModel)]="loginForm.password" 
-                     name="password"
-                     [class.error]="loginForm.errors.password">
-              <div *ngIf="loginForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
-                {{ loginForm.errors.password }}
-              </div>
-            </div>
-
-            <button type="submit" class="btn-industrial w-full py-3 rounded-lg font-semibold transition-all duration-300">
-              <span class="flex items-center justify-center">
-                Se connecter
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                </svg>
-              </span>
-            </button>
-          </form>
-
-          <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
-            <p class="text-sm text-gray-400">
-              Pas de compte industriel ?
-              <span (click)="toggleFlip()" class="text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors ml-1 font-medium">
-                Créer un compte
-              </span>
-            </p>
           </div>
         </div>
       </div>
@@ -89,100 +133,150 @@
       <!-- Face arrière - Register -->
       <div class="face back bg-gray-900/80 backdrop-blur-sm border border-gray-600/30 flex rounded-2xl shadow-2xl">
         <!-- Section gauche - Branding -->
-        <div class="w-1/2 bg-gradient-to-br from-indigo-800 to-purple-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+        <div class="w-2/5 bg-gradient-to-br from-indigo-800 to-purple-900 flex flex-col justify-center items-center p-8 relative overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-20"></div>
-          <h1 class="neon text-4xl font-bold mb-6 text-center tracking-wider">Rejoindre l'industrie </h1>
+          <h1 class="neon text-4xl font-bold mb-6 text-center tracking-wider">Rejoindre l'industrie</h1>
           <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
                class="w-28 animate-float" 
                alt="Icone innovation industrielle">
           <p class="text-indigo-200 text-center mt-6 text-sm max-w-xs">
-            
+            Pavé numérique intégré
           </p>
         </div>
 
-        <!-- Section droite - Formulaire -->
-        <div class="w-1/2 p-10 flex flex-col justify-center relative">
-          <div class="absolute top-4 right-4 w-3 h-3 bg-indigo-400 rounded-full animate-pulse"></div>
-          
-          <h2 class="text-2xl font-bold text-indigo-400 mb-2">Créer un compte</h2>
-          <p class="text-gray-400 text-sm mb-6"></p>
+        <!-- Section droite - Formulaire et Clavier -->
+        <div class="w-3/5 p-6 flex gap-6">
+          <!-- Formulaire d'inscription -->
+          <div class="flex-1 flex flex-col justify-center">
+            <div class="absolute top-4 right-4 w-3 h-3 bg-indigo-400 rounded-full animate-pulse"></div>
+            
+            <h2 class="text-2xl font-bold text-indigo-400 mb-2">Créer un compte</h2>
+            <p class="text-gray-400 text-sm mb-6">Rejoignez notre plateforme industrielle</p>
 
-          <form (ngSubmit)="onRegister()" class="space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                       placeholder="Prénom" 
-                       [(ngModel)]="registerForm.firstName" 
-                       name="firstName"
-                       [class.error]="registerForm.errors.firstName">
-                <div *ngIf="registerForm.errors.firstName" class="text-red-400 text-xs mt-1 animate-pulse">
-                  {{ registerForm.errors.firstName }}
+            <form (ngSubmit)="onRegister()" class="space-y-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                         placeholder="Prénom" 
+                         [(ngModel)]="registerForm.firstName" 
+                         name="firstName"
+                         [class.error]="registerForm.errors.firstName"
+                         [class.active]="currentInputField === 'firstName'"
+                         (click)="openNumpad('firstName')"
+                         readonly>
+                  <div *ngIf="registerForm.errors.firstName" class="text-red-400 text-xs mt-1 animate-pulse">
+                    {{ registerForm.errors.firstName }}
+                  </div>
+                </div>
+                <div>
+                  <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                         placeholder="Nom" 
+                         [(ngModel)]="registerForm.lastName" 
+                         name="lastName"
+                         [class.error]="registerForm.errors.lastName"
+                         [class.active]="currentInputField === 'lastName'"
+                         (click)="openNumpad('lastName')"
+                         readonly>
+                  <div *ngIf="registerForm.errors.lastName" class="text-red-400 text-xs mt-1 animate-pulse">
+                    {{ registerForm.errors.lastName }}
+                  </div>
                 </div>
               </div>
+
               <div>
                 <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                       placeholder="Nom" 
-                       [(ngModel)]="registerForm.lastName" 
-                       name="lastName"
-                       [class.error]="registerForm.errors.lastName">
-                <div *ngIf="registerForm.errors.lastName" class="text-red-400 text-xs mt-1 animate-pulse">
-                  {{ registerForm.errors.lastName }}
+                       placeholder="Email professionnel" 
+                       [(ngModel)]="registerForm.email" 
+                       name="registerEmail"
+                       [class.error]="registerForm.errors.email"
+                       [class.active]="currentInputField === 'registerEmail'"
+                       (click)="openNumpad('registerEmail')"
+                       readonly>
+                <div *ngIf="registerForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ registerForm.errors.email }}
                 </div>
               </div>
-            </div>
 
-            <div>
-              <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                     placeholder="Email professionnel" 
-                     [(ngModel)]="registerForm.email" 
-                     name="registerEmail"
-                     [class.error]="registerForm.errors.email">
-              <div *ngIf="registerForm.errors.email" class="text-red-400 text-xs mt-1 animate-pulse">
-                {{ registerForm.errors.email }}
+              <div>
+                <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                       type="password" 
+                       placeholder="Mot de passe sécurisé" 
+                       [(ngModel)]="registerForm.password" 
+                       name="registerPassword"
+                       [class.error]="registerForm.errors.password"
+                       [class.active]="currentInputField === 'registerPassword'"
+                       (click)="openNumpad('registerPassword')"
+                       readonly>
+                <div *ngIf="registerForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ registerForm.errors.password }}
+                </div>
+              </div>
+
+              <div>
+                <input class="input-industrial w-full rounded-lg px-4 py-3" 
+                       type="password" 
+                       placeholder="Confirmer le mot de passe" 
+                       [(ngModel)]="registerForm.confirm" 
+                       name="confirmPassword"
+                       [class.error]="registerForm.errors.confirm"
+                       [class.active]="currentInputField === 'confirmPassword'"
+                       (click)="openNumpad('confirmPassword')"
+                       readonly>
+                <div *ngIf="registerForm.errors.confirm" class="text-red-400 text-xs mt-1 animate-pulse">
+                  {{ registerForm.errors.confirm }}
+                </div>
+              </div>
+
+              <button type="submit" class="btn-industrial-register w-full py-3 rounded-lg font-semibold transition-all duration-300 mt-4">
+                <span class="flex items-center justify-center">
+                  S'inscrire
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                </span>
+              </button>
+            </form>
+
+            <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
+              <p class="text-sm text-gray-400">
+                Déjà un compte ?
+                <span (click)="toggleFlip()" class="text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors ml-1 font-medium">
+                  Se connecter
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Clavier numérique intégré -->
+          <div class="w-48 flex flex-col justify-center">
+            <div class="numpad-integrated bg-gray-800/80 backdrop-blur-md border border-indigo-500/30 rounded-xl p-4 shadow-2xl">
+              <div class="text-center mb-3">
+                <div class="text-indigo-400 text-sm font-semibold"></div>
+                <div class="text-indigo-300 text-xs mt-1">{{ getCurrentFieldName() }}</div>
+              </div>
+              
+              <!-- Affichage de la valeur -->
+              <div class="numpad-display-integrated bg-gray-900/90 border border-indigo-400/30 rounded-lg p-3 mb-3">
+                <div class="text-white text-center font-mono text-sm min-h-6 break-all">
+                  {{ numpadValue || '&nbsp;' }}
+                </div>
+              </div>
+              
+              <!-- Clavier -->
+              <div class="numpad-grid-integrated grid grid-cols-3 gap-2">
+                <button *ngFor="let button of numpadButtons" 
+                        (click)="onNumpadButtonClick(button)"
+                        class="numpad-btn-integrated bg-gray-700/80 hover:bg-indigo-600/80 border border-gray-600/50 hover:border-indigo-400/50 text-white rounded-lg p-2 font-bold text-sm transition-all duration-200 active:scale-95">
+                  {{ button }}
+                </button>
+              </div>
+              
+              <div class="mt-3 text-center text-xs text-gray-400">
+                <p>* = Effacer</p>
+                <p># = Suivant</p>
+                <p class="mt-1">Clavier physique activé</p>
               </div>
             </div>
-
-            <div>
-              <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                     type="password" 
-                     placeholder="Mot de passe sécurisé" 
-                     [(ngModel)]="registerForm.password" 
-                     name="registerPassword"
-                     [class.error]="registerForm.errors.password">
-              <div *ngIf="registerForm.errors.password" class="text-red-400 text-xs mt-1 animate-pulse">
-                {{ registerForm.errors.password }}
-              </div>
-            </div>
-
-            <div>
-              <input class="input-industrial w-full rounded-lg px-4 py-3" 
-                     type="password" 
-                     placeholder="Confirmer le mot de passe" 
-                     [(ngModel)]="registerForm.confirm" 
-                     name="confirmPassword"
-                     [class.error]="registerForm.errors.confirm">
-              <div *ngIf="registerForm.errors.confirm" class="text-red-400 text-xs mt-1 animate-pulse">
-                {{ registerForm.errors.confirm }}
-              </div>
-            </div>
-
-            <button type="submit" class="btn-industrial-register w-full py-3 rounded-lg font-semibold transition-all duration-300">
-              <span class="flex items-center justify-center">
-                S'inscrire
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-              </span>
-            </button>
-          </form>
-
-          <div class="text-center mt-6 pt-6 border-t border-gray-700/50">
-            <p class="text-sm text-gray-400">
-              Déjà un compte ?
-              <span (click)="toggleFlip()" class="text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors ml-1 font-medium">
-                Se connecter
-              </span>
-            </p>
           </div>
         </div>
       </div>
