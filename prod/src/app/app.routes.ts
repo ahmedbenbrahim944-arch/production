@@ -8,8 +8,9 @@ import { Prod2Component } from './prod2/prod2.component';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'planification', component: PlanificationComponent },
-  { path: 'prod', component: Prod2Component },
+  { path: 'prod2', component: Prod2Component },
   { path: 'login', component: LoginComponent },
+  { path: 'prod', component: ProdComponent },
   
   
 ];

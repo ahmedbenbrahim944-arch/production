@@ -65,11 +65,11 @@ export class Prod2Component {
   }
 
   private generateParticles() {
-    const particles = Array.from({ length: 25 }, () => ({
+    const particles = Array.from({ length: 20 }, () => ({
       left: `${Math.random() * 100}%`,
-      size: `${Math.random() * 8 + 2}px`,
-      animationDelay: `${Math.random() * 15}s`,
-      opacity: `${Math.random() * 0.4 + 0.1}`
+      size: `${Math.random() * 6 + 2}px`,
+      animationDelay: `${Math.random() * 10}s`,
+      opacity: `${Math.random() * 0.3 + 0.1}`
     }));
     this.particles.set(particles);
   }
@@ -153,15 +153,8 @@ export class Prod2Component {
       number: weekNumber,
       startDate: weekStart,
       endDate: weekEnd,
-      display: `Semaine ${weekNumber} (${this.formatDate(weekStart)} - ${this.formatDate(weekEnd)})`
+      display: `S${weekNumber}`
     };
-  }
-
-  private formatDate(date: Date): string {
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit'
-    });
   }
 
   onLigneSelected(line: ProductionLine) {
@@ -171,8 +164,7 @@ export class Prod2Component {
     this.weekPlanification.set(null);
   }
 
-  onWeekSelected(event: any) {
-    const weekNumber = Number(event.target.value);
+  onWeekSelected(weekNumber: number) {
     console.log('Week selected:', weekNumber);
     const line = this.selectedLigne();
     
@@ -208,23 +200,23 @@ export class Prod2Component {
       });
       this.loading.set(false);
       console.log('Week planification loaded');
-    }, 800);
+    }, 600);
   }
 
   private createReferencesForLine(line: ProductionLine): ReferenceProduction[] {
     return line.references.map((reference, index) => ({
       reference: reference,
       of: index === 0 ? '067625' : '',
-      qte_planifier: index === 0 ? 4000 : 0,
-      nh_planifier: index === 0 ? 78 : 0,
+      qte_planifier: index === 0 ? 4000 : Math.floor(Math.random() * 2000),
+      nh_planifier: index === 0 ? 78 : Math.floor(Math.random() * 50),
       emballage: 200,
-      nop: index === 0 ? 10 : 0,
-      nh_realiser: 0,
-      dec_prod: index === 0 ? -4000 : 0,
-      delta_prod: 0,
-      pcs_prod: 0,
-      dec_mag: 0,
-      delta_prod_mag: index === 0 ? -4000 : 0
+      nop: index === 0 ? 10 : Math.floor(Math.random() * 8),
+      nh_realiser: Math.floor(Math.random() * 40),
+      dec_prod: index === 0 ? -4000 : Math.floor(Math.random() * -2000),
+      delta_prod: Math.floor(Math.random() * 1000),
+      pcs_prod: Math.floor(Math.random() * 100),
+      dec_mag: Math.floor(Math.random() * -500),
+      delta_prod_mag: index === 0 ? -4000 : Math.floor(Math.random() * -1000)
     }));
   }
 
@@ -251,11 +243,5 @@ export class Prod2Component {
     return planif.days.reduce((weekTotal, day) => {
       return weekTotal + this.calculateDayTotal(day);
     }, 0);
-  }
-
-  private showSuccessMessage(message: string) {
-    this.successMessage.set(message);
-    this.showSuccess.set(true);
-    setTimeout(() => this.showSuccess.set(false), 3000);
   }
 }
