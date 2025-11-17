@@ -8,15 +8,23 @@
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
-/* ==================== CARTES DE LIGNES AGRANDIES ==================== */
+/* ==================== HEADER ==================== */
+.header-industrial {
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 2px solid rgba(6, 182, 212, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* ==================== CARTES DE LIGNES - GRANDES ==================== */
 .line-card-large {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  height: 380px; /* Augmenté la hauteur */
+  height: 400px;
   background: rgba(30, 41, 59, 0.9);
-  border: 2px solid rgba(71, 85, 105, 0.4);
+  border: 3px solid rgba(71, 85, 105, 0.4);
   border-radius: 16px;
+  cursor: pointer;
 }
 
 .line-card-large:hover {
@@ -25,15 +33,99 @@
   box-shadow: 0 20px 40px rgba(6, 182, 212, 0.4);
 }
 
+.image-container-large {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
 .line-card-large img {
   transition: transform 0.4s ease;
-  height: 280px; /* Image principale plus grande */
-  object-fit: cover;
+  height: 100%;
   width: 100%;
+  object-fit: cover;
 }
 
 .line-card-large:hover img {
   transform: scale(1.08);
+}
+
+.line-overlay-large {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, 
+    rgba(15, 23, 42, 0.98) 0%, 
+    rgba(15, 23, 42, 0.8) 40%, 
+    transparent 100%);
+  padding: 3rem 1.5rem 1.5rem 1.5rem;
+}
+
+.line-name-large {
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+}
+
+.status-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge-active {
+  background: rgba(16, 185, 129, 0.95);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-badge-inactive {
+  background: rgba(239, 68, 68, 0.95);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== SEARCH BAR ==================== */
+.search-container {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+.search-icon {
+  color: #06b6d4;
 }
 
 /* ==================== SIDEBAR DES SEMAINES ==================== */
@@ -59,160 +151,86 @@
   border-left-color: rgb(6, 182, 212);
 }
 
-/* ==================== JOURS EMPILÉS VERTICALEMENT ==================== */
-.days-stacked {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-}
-
-.day-card-stacked {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  border-radius: 12px;
-  min-height: auto;
-}
-
-.day-header-stacked {
-  background: rgba(15, 23, 42, 0.9);
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  padding: 1rem 1.5rem;
-  border-radius: 12px 12px 0 0;
-}
-
-/* ==================== TABLEAU AVEC LIGNES ENTRE LES CHAMPS ==================== */
-.simple-production-table {
-  width: 100%;
+/* ==================== TABLEAU HEBDOMADAIRE ==================== */
+.week-planning-table {
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.8rem;
-  background: rgba(15, 23, 42, 0.5);
+  font-size: 0.9rem;
 }
 
-.simple-production-table th {
-  background: rgba(30, 41, 59, 0.9);
-  padding: 12px 8px;
+.week-planning-table th {
+  background: rgba(30, 41, 59, 0.95);
+  padding: 16px 12px;
   font-weight: 600;
   color: #e2e8f0;
   border-bottom: 2px solid rgba(6, 182, 212, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
-  font-size: 0.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 15;
 }
 
-.simple-production-table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
-  white-space: nowrap;
-  position: relative;
-}
-
-/* Lignes de séparation entre les lignes */
-.simple-production-table tr:not(:last-child) td {
+.week-planning-table td {
+  padding: 8px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  vertical-align: top;
+  min-width: 200px;
 }
 
-/* Lignes verticales entre les colonnes */
-.simple-production-table th:not(:last-child),
-.simple-production-table td:not(:last-child) {
-  border-right: 1px solid rgba(71, 85, 105, 0.2);
+.week-planning-table tbody tr:hover {
+  background: rgba(51, 65, 85, 0.2);
 }
 
-.simple-production-table tr:hover {
-  background: rgba(51, 65, 85, 0.3);
+/* ==================== MINI TABLEAU DANS CHAQUE CELLULE ==================== */
+.day-entry-table {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 8px;
+  padding: 6px;
+  min-width: 180px;
 }
 
-/* Colonnes optimisées */
-.simple-production-table .col-ref { min-width: 120px; }
-.simple-production-table .col-of { min-width: 100px; }
-.simple-production-table .col-qte { min-width: 100px; }
-.simple-production-table .col-nh { min-width: 80px; }
-.simple-production-table .col-emb { min-width: 80px; }
-.simple-production-table .col-nop { min-width: 60px; }
-.simple-production-table .col-real { min-width: 80px; }
-.simple-production-table .col-dec { min-width: 80px; }
-.simple-production-table .col-delta { min-width: 80px; }
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-/* Couleurs */
+.mini-table td {
+  padding: 8px 12px !important;
+  border: none !important;
+  min-width: auto !important;
+  font-size: 1rem;
+}
+
+.mini-table tr {
+  transition: background-color 0.2s ease;
+}
+
+.mini-table tr:hover {
+  background: rgba(71, 85, 105, 0.15);
+}
+
+/* Taille de police augmentée pour les chiffres */
+.mini-table tbody span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mini-table input {
+  font-size: 1rem;
+}
+
+/* ==================== COULEURS ==================== */
 .value-positive { color: #10b981; }
 .value-negative { color: #ef4444; }
 .value-neutral { color: #94a3b8; }
 
-/* ==================== HEADER COMME L'IMAGE ==================== */
-.header-industrial {
-  background: rgba(15, 23, 42, 0.95);
-  border-bottom: 2px solid rgba(6, 182, 212, 0.5);
-  backdrop-filter: blur(10px);
-}
-
-/* ==================== GRILLE D'IMAGES SIMPLES ==================== */
-.images-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 12px;
-  width: 100%;
-}
-
-.small-image {
-  width: 100%;
-  height: 70px; /* Images petites agrandies */
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-}
-
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 1536px) {
-  .line-card-large {
-    height: 360px;
-  }
-  
-  .line-card-large img {
-    height: 260px;
-  }
-}
-
-@media (max-width: 1280px) {
-  .line-card-large {
-    height: 340px;
-  }
-  
-  .line-card-large img {
-    height: 240px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .line-card-large {
-    height: 320px;
-  }
-  
-  .line-card-large img {
-    height: 220px;
-  }
-}
-
-@media (max-width: 768px) {
-  .weeks-sidebar {
-    width: 220px;
-  }
-  
-  .line-card-large {
-    height: 300px;
-  }
-  
-  .line-card-large img {
-    height: 200px;
-  }
-}
-
-/* Scrollbar personnalisée */
+/* ==================== SCROLLBAR ==================== */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -228,7 +246,7 @@
   background: rgba(148, 163, 184, 0.7);
 }
 
-/* Animation des particules */
+/* ==================== ANIMATIONS ==================== */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -236,4 +254,96 @@
 
 .particle {
   animation: float 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================== MESSAGE DE SUCCÈS ==================== */
+.success-notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.success-content {
+  background: rgba(16, 185, 129, 0.9);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== LOADER ==================== */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loader-container {
+  text-align: center;
+}
+
+.industrial-loader {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(6, 182, 212, 0.3);
+  border-top: 3px solid #06b6d4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1536px) {
+  .line-card-large { height: 380px; }
+  .week-planning-table td { min-width: 180px; }
+}
+
+@media (max-width: 1280px) {
+  .line-card-large { height: 360px; }
+  .week-planning-table td { min-width: 160px; }
+}
+
+@media (max-width: 1024px) {
+  .line-card-large { height: 340px; }
+  .weeks-sidebar { width: 220px; }
+  .mini-table td {
+    font-size: 0.9rem;
+  }
+  .line-name-large {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .weeks-sidebar { width: 200px; }
+  .line-card-large { height: 300px; }
+  .week-planning-table { font-size: 0.75rem; }
+  .day-entry-table { min-width: 150px; }
+  .mini-table td {
+    font-size: 0.85rem;
+    padding: 6px 8px !important;
+  }
+  .line-name-large {
+    font-size: 1.2rem;
+  }
+  .status-badge {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+  }
 }

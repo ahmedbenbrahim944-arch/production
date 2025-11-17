@@ -31,13 +31,90 @@ export class LoginComponent implements OnInit, OnDestroy {
     errors: { firstName: '', lastName: '', email: '', password: '', confirm: '' }
   };
 
-  // Clavier numérique intégré
+  // Clavier simplifié - chiffres de 1 à 9 avec 0 et boutons spéciaux
   numpadButtons = [
-    '7', '8', '9',
-    '4', '5', '6', 
     '1', '2', '3',
-    '*', '0', '#'
+    '4', '5', '6', 
+    '7', '8', '9',
+    '⌫', '0', '✓'
   ];
+
+  private isNumericInput(value: string): boolean {
+    return /^\d*$/.test(value);
+  }
+
+  validateLogin(): boolean {
+    let isValid = true;
+    this.loginForm.errors = { email: '', password: '' };
+
+    if (!this.loginForm.email) {
+      this.loginForm.errors.email = 'Matricule requis';
+      isValid = false;
+    } else if (!this.isNumericInput(this.loginForm.email)) {
+      this.loginForm.errors.email = 'Uniquement des chiffres autorisés';
+      isValid = false;
+    } else if (this.loginForm.email.length < 4) {
+      this.loginForm.errors.email = 'Minimum 4 chiffres';
+      isValid = false;
+    }
+
+    if (!this.loginForm.password) {
+      this.loginForm.errors.password = 'Mot de passe requis';
+      isValid = false;
+    } else if (!this.isNumericInput(this.loginForm.password)) {
+      this.loginForm.errors.password = 'Uniquement des chiffres autorisés';
+      isValid = false;
+    } else if (this.loginForm.password.length < 6) {
+      this.loginForm.errors.password = 'Minimum 6 chiffres';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  validateRegister(): boolean {
+    let isValid = true;
+    this.registerForm.errors = { firstName: '', lastName: '', email: '', password: '', confirm: '' };
+
+    if (!this.registerForm.firstName) {
+      this.registerForm.errors.firstName = 'Prénom requis';
+      isValid = false;
+    }
+
+    if (!this.registerForm.lastName) {
+      this.registerForm.errors.lastName = 'Nom requis';
+      isValid = false;
+    }
+
+    if (!this.registerForm.email) {
+      this.registerForm.errors.email = 'Matricule requis';
+      isValid = false;
+    } else if (!this.isNumericInput(this.registerForm.email)) {
+      this.registerForm.errors.email = 'Uniquement des chiffres autorisés';
+      isValid = false;
+    } else if (this.registerForm.email.length < 4) {
+      this.registerForm.errors.email = 'Minimum 4 chiffres';
+      isValid = false;
+    }
+
+    if (!this.registerForm.password) {
+      this.registerForm.errors.password = 'Mot de passe requis';
+      isValid = false;
+    } else if (!this.isNumericInput(this.registerForm.password)) {
+      this.registerForm.errors.password = 'Uniquement des chiffres autorisés';
+      isValid = false;
+    } else if (this.registerForm.password.length < 6) {
+      this.registerForm.errors.password = 'Minimum 6 chiffres';
+      isValid = false;
+    }
+
+    if (this.registerForm.password !== this.registerForm.confirm) {
+      this.registerForm.errors.confirm = 'Les mots de passe ne correspondent pas';
+      isValid = false;
+    }
+
+    return isValid;
+  }
 
   ngOnInit() {
     this.createParticles();
@@ -58,13 +135,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Écoute des touches du clavier physique
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     const key = event.key;
     
-    // Gestion des touches numériques du pavé numérique
-    if (this.isNumericKey(key) || key === '*' || key === '#' || key === 'Backspace' || key === 'Enter') {
+    if (this.isNumericKey(key) || key === 'Backspace' || key === 'Delete' || key === 'Enter') {
       event.preventDefault();
     }
 
@@ -72,13 +147,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.onNumpadButtonClick(key);
     }
     else if (key === 'Backspace' || key === 'Delete') {
-      this.onNumpadButtonClick('*');
+      this.onNumpadButtonClick('⌫');
     }
     else if (key === 'Enter') {
-      this.onNumpadButtonClick('#');
-    }
-    else if (key === '*' || key === '#') {
-      this.onNumpadButtonClick(key);
+      this.onNumpadButtonClick('✓');
     }
   }
 
@@ -89,7 +161,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   toggleFlip() { 
     this.flipped = !this.flipped;
     this.clearErrors();
-    // Réinitialiser le champ actif
     this.currentInputField = this.flipped ? 'firstName' : 'email';
     this.numpadValue = this.getCurrentFieldValue();
   }
@@ -99,7 +170,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registerForm.errors = { firstName: '', lastName: '', email: '', password: '', confirm: '' };
   }
 
-  // Méthodes pour le clavier numérique
   openNumpad(field: string) {
     this.currentInputField = field;
     this.numpadValue = this.getCurrentFieldValue();
@@ -153,15 +223,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onNumpadButtonClick(button: string) {
-    if (button === '*') {
+    if (button === '⌫') {
       // Effacer le dernier caractère
       this.numpadValue = this.numpadValue.slice(0, -1);
-    } else if (button === '#') {
+    } else if (button === '✓') {
       // Valider et passer au champ suivant
       this.setCurrentFieldValue(this.numpadValue);
       this.goToNextField();
     } else {
-      // Ajouter le caractère
+      // Ajouter le chiffre
       this.numpadValue += button;
     }
     this.setCurrentFieldValue(this.numpadValue);
@@ -177,72 +247,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (currentIndex < fields.length - 1) {
       this.openNumpad(fields[currentIndex + 1]);
     }
-  }
-
-  validateLogin(): boolean {
-    let isValid = true;
-    this.loginForm.errors = { email: '', password: '' };
-
-    if (!this.loginForm.email) {
-      this.loginForm.errors.email = 'Email requis';
-      isValid = false;
-    } else if (!this.isValidEmail(this.loginForm.email)) {
-      this.loginForm.errors.email = 'Format email invalide';
-      isValid = false;
-    }
-
-    if (!this.loginForm.password) {
-      this.loginForm.errors.password = 'Mot de passe requis';
-      isValid = false;
-    } else if (this.loginForm.password.length < 6) {
-      this.loginForm.errors.password = 'Minimum 6 caractères';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  validateRegister(): boolean {
-    let isValid = true;
-    this.registerForm.errors = { firstName: '', lastName: '', email: '', password: '', confirm: '' };
-
-    if (!this.registerForm.firstName) {
-      this.registerForm.errors.firstName = 'Prénom requis';
-      isValid = false;
-    }
-
-    if (!this.registerForm.lastName) {
-      this.registerForm.errors.lastName = 'Nom requis';
-      isValid = false;
-    }
-
-    if (!this.registerForm.email) {
-      this.registerForm.errors.email = 'Email requis';
-      isValid = false;
-    } else if (!this.isValidEmail(this.registerForm.email)) {
-      this.registerForm.errors.email = 'Format email invalide';
-      isValid = false;
-    }
-
-    if (!this.registerForm.password) {
-      this.registerForm.errors.password = 'Mot de passe requis';
-      isValid = false;
-    } else if (this.registerForm.password.length < 8) {
-      this.registerForm.errors.password = 'Minimum 8 caractères';
-      isValid = false;
-    }
-
-    if (this.registerForm.password !== this.registerForm.confirm) {
-      this.registerForm.errors.confirm = 'Les mots de passe ne correspondent pas';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 
   showLoader() {
@@ -270,11 +274,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   getCurrentFieldName(): string {
     const fieldNames: {[key: string]: string} = {
-      'email': 'Email',
+      'email': 'Matricule',
       'password': 'Mot de passe',
       'firstName': 'Prénom',
       'lastName': 'Nom',
-      'registerEmail': 'Email',
+      'registerEmail': 'Matricule',
       'registerPassword': 'Mot de passe',
       'confirmPassword': 'Confirmation'
     };

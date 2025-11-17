@@ -17,73 +17,93 @@
   </div>
 
   <div class="relative z-10 h-screen flex flex-col">
-    <!-- Header principal comme l'image -->
+    <!-- Header principal -->
     <header class="header-industrial py-4 px-6">
       <div class="flex justify-between items-center">
-        <!-- Bouton de retour -->
         <button 
           (click)="goBackToLogin()"
-          class="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center text-sm">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="px-6 py-3 rounded-lg font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
           </svg>
           Retour Login
         </button>
 
-        <!-- Titre principal -->
         <div class="text-center">
-          <h1 class="text-2xl font-bold text-cyan-400">PDP SERAF</h1>
-          <p class="text-cyan-200 text-sm">PROGRAMME SEMAINE</p>
+          <h1 class="text-3xl font-bold text-cyan-400">PDP SERAF</h1>
+          <p class="text-cyan-200">PLANIFICATION ADMIN</p>
         </div>
 
-        <!-- Espace vide pour l'alignement -->
-        <div class="w-24"></div>
+        <div class="w-40"></div>
       </div>
     </header>
 
     <!-- Contenu principal -->
     <div class="flex-1 flex overflow-hidden">
       
-      <!-- Affichage des lignes de production (quand aucune ligne n'est sélectionnée) -->
+      <!-- Affichage des lignes de production -->
       <div *ngIf="!selectedLigne()" class="flex-1 p-6 overflow-auto">
-        <div class="max-w-7xl mx-auto">
-          <h2 class="text-xl font-bold text-cyan-400 mb-6 text-center">PROGRAMME SEMAINE</h2>
+        <div class="max-w-[95%] mx-auto">
+          <h2 class="text-2xl font-bold text-cyan-400 mb-8 text-center">PLANIFICATION DES LIGNES</h2>
           
-          <!-- Grille des lignes SIMPLIFIÉES -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-            <div *ngFor="let line of availableLines()" 
+          <!-- Barre de recherche des lignes -->
+          <div class="mb-6 max-w-md mx-auto">
+            <div class="search-container p-3 rounded-lg">
+              <div class="flex items-center">
+                <svg class="w-5 h-5 search-icon mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input 
+                  type="text" 
+                  [value]="searchLineQuery()"
+                  (input)="onSearchLineChange($event)"
+                  placeholder="Rechercher une ligne..." 
+                  class="search-input flex-1">
+                <button 
+                  *ngIf="searchLineQuery()"
+                  (click)="clearLineSearch()"
+                  class="ml-2 text-gray-400 hover:text-white transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="filteredLines().length === 0" class="text-center text-gray-400 py-8">
+            <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-lg">Aucune ligne trouvée</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div *ngFor="let line of filteredLines()" 
                  (click)="onLigneSelected(line)"
-                 class="line-card-simple rounded-xl p-4 cursor-pointer">
-              
-              <!-- Image principale de la ligne -->
-              <div class="relative h-48 mb-4 rounded-xl overflow-hidden">
-                <img [src]="line.imageUrl" 
-                     [alt]="line.ligne" 
-                     class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                <div class="absolute bottom-3 left-4">
-                  <span class="text-white font-bold text-xl">{{ line.ligne }}</span>
+                 class="line-card-large rounded-xl cursor-pointer">
+              <div class="image-container-large">
+                <img [src]="line.imageUrl" [alt]="line.ligne">
+                <div class="line-overlay-large">
+                  <div class="line-name-large">{{ line.ligne }}</div>
                 </div>
-                <div class="absolute top-3 right-3">
-                  <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                    Active
-                  </span>
+                <div [class.status-badge-active]="line.isActive" 
+                     [class.status-badge-inactive]="!line.isActive"
+                     class="status-badge">
+                  {{ line.isActive ? 'Activer' : 'Non' }}
                 </div>
               </div>
-              
-            
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Affichage de la planification (quand une ligne est sélectionnée) -->
+      <!-- Affichage de la planification -->
       <div *ngIf="selectedLigne()" class="flex-1 flex">
         
         <!-- Sidebar des semaines -->
         <div class="weeks-sidebar h-full overflow-y-auto custom-scrollbar">
           <div class="p-4">
-            <!-- Bouton retour -->
             <button 
               (click)="backToLines()"
               class="w-full mb-6 px-4 py-3 rounded-lg font-semibold transition-all duration-300 bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center text-sm">
@@ -93,13 +113,11 @@
               Retour aux lignes
             </button>
 
-            <!-- Informations de la ligne -->
             <div class="mb-6 p-4 bg-cyan-900/20 rounded-lg border border-cyan-700/30">
               <h3 class="font-bold text-cyan-400 text-xl mb-2">{{ selectedLigne()!.ligne }}</h3>
               <p class="text-gray-300 text-sm">{{ selectedLigne()!.referenceCount }} références disponibles</p>
             </div>
 
-            <!-- Liste des semaines -->
             <h4 class="text-cyan-300 font-semibold mb-4 text-sm uppercase tracking-wider">Semaines disponibles</h4>
             <div class="space-y-2">
               <div *ngFor="let week of getAvailableWeeks()" 
@@ -113,98 +131,147 @@
           </div>
         </div>
 
-        <!-- Contenu des jours EMPILÉS VERTICALEMENT -->
+        <!-- Contenu de la semaine -->
         <div class="flex-1 p-6 overflow-auto custom-scrollbar">
-          <!-- En-tête de la semaine sélectionnée -->
           <div *ngIf="weekPlanification()" class="mb-6">
-            <h2 class="text-2xl font-bold text-cyan-400 mb-2">
-              PROGRAMME SEMAINE > {{ selectedLigne()!.ligne }}
-            </h2>
-            <p class="text-gray-400">Semaine {{ selectedWeek() }}</p>
-          </div>
-
-          <!-- Affichage des jours EMPILÉS VERTICALEMENT -->
-          <div *ngIf="weekPlanification()" class="days-stacked">
-            <div *ngFor="let day of weekPlanification()!.days; let dayIndex = index" class="day-card-stacked">
-              <!-- En-tête du jour -->
-              <div class="day-header-stacked">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <h3 class="text-xl font-bold text-cyan-400 capitalize">
-                      {{ dayIndex + 1 }}. {{ day.day }}
-                    </h3>
-                    <p class="text-sm text-gray-400">{{ day.date | date:'dd/MM/yyyy' }}</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="text-sm text-purple-400 font-semibold">Production: {{ day.production | number }}</p>
-                    <p class="text-xs text-gray-400">Total: {{ calculateDayTotal(day) | number }}</p>
-                  </div>
-                </div>
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-2xl font-bold text-cyan-400 mb-2">
+                  {{ selectedLigne()!.ligne }} - Semaine {{ selectedWeek() }}
+                </h2>
+                <p class="text-gray-400">{{ filteredWeekPlanification()!.startDate | date:'dd/MM/yyyy' }} au {{ filteredWeekPlanification()!.endDate | date:'dd/MM/yyyy' }}</p>
               </div>
-
-              <!-- Tableau simplifié des références AVEC LIGNES -->
-              <div class="p-4">
-                <div class="overflow-x-auto rounded-lg border border-gray-600/30">
-                  <table class="simple-production-table">
-                    <thead>
-                      <tr>
-                        <th class="col-ref">Référence</th>
-                        <th class="col-of">OF</th>
-                        <th class="col-qte">QTE PLANIFIER</th>
-                        <th class="col-nh">N°H Planifier</th>
-                        <th class="col-emb">EMBALLAGE</th>
-                        <th class="col-nop">N°OP</th>
-                        <th class="col-real">N°H Realiser</th>
-                        <th class="col-dec">DEC.PROD</th>
-                        <th class="col-delta">DELTA PROD</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let ref of day.references; let last = last">
-                        <td class="col-ref">
-                          <span class="value-neutral font-medium">{{ ref.reference || '-' }}</span>
-                        </td>
-                        <td class="col-of">
-                          <span class="value-neutral">{{ ref.of || '-' }}</span>
-                        </td>
-                        <td class="col-qte">
-                          <span class="value-neutral font-semibold">{{ ref.qte_planifier || '0' }}</span>
-                        </td>
-                        <td class="col-nh">
-                          <span class="value-neutral">{{ ref.nh_planifier || '0' }}</span>
-                        </td>
-                        <td class="col-emb">
-                          <span class="value-neutral">{{ ref.emballage || '0' }}</span>
-                        </td>
-                        <td class="col-nop">
-                          <span class="value-neutral">{{ ref.nop || '0' }}</span>
-                        </td>
-                        <td class="col-real">
-                          <span class="value-neutral">{{ ref.nh_realiser || '0' }}</span>
-                        </td>
-                        <td class="col-dec">
-                          <span [class.value-positive]="ref.dec_prod >= 0" 
-                                [class.value-negative]="ref.dec_prod < 0"
-                                class="font-semibold">
-                            {{ ref.dec_prod || '0' }}
-                          </span>
-                        </td>
-                        <td class="col-delta">
-                          <span [class.value-positive]="ref.delta_prod >= 0" 
-                                [class.value-negative]="ref.delta_prod < 0"
-                                class="font-semibold">
-                            {{ ref.delta_prod || '0' }}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+              
+              <div class="flex items-center space-x-4">
+                <div class="search-container p-3 rounded-lg w-64">
+                  <div class="flex items-center">
+                    <svg class="w-5 h-5 search-icon mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input 
+                      type="text" 
+                      [value]="searchReferenceQuery()"
+                      (input)="onSearchReferenceChange($event)"
+                      placeholder="Rechercher référence..." 
+                      class="search-input flex-1">
+                    <button 
+                      *ngIf="searchReferenceQuery()"
+                      (click)="clearReferenceSearch()"
+                      class="ml-2 text-gray-400 hover:text-white transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
+                
+                <button 
+                  (click)="toggleEditMode()"
+                  [class.bg-green-600]="!isEditing()"
+                  [class.bg-blue-600]="isEditing()"
+                  class="px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-white flex items-center">
+                  <svg *ngIf="!isEditing()" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  <svg *ngIf="isEditing()" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {{ isEditing() ? 'Enregistrer' : 'Modifier' }}
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Message pour sélectionner une semaine -->
+          <!-- Tableau de planification hebdomadaire -->
+          <div *ngIf="filteredWeekPlanification()" class="overflow-x-auto rounded-lg border border-gray-600/30 bg-slate-900/50">
+            <table class="week-planning-table w-full">
+              <thead>
+                <tr>
+                  <th class="sticky left-0 z-20 bg-slate-800 border-r-2 border-cyan-500/50">RÉFÉRENCES</th>
+                  <th *ngFor="let day of weekDays; let i = index" class="text-center">
+                    <div class="font-bold text-cyan-400 capitalize mb-1 text-base">{{ day }}</div>
+                    <div class="text-xs text-gray-400">{{ getDayDate(i) | date:'dd/MM' }}</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let ref of filteredWeekPlanification()!.references" class="border-b border-gray-700/50 hover:bg-slate-800/30">
+                  <!-- Colonne référence (fixe) -->
+                  <td class="sticky left-0 z-10 bg-slate-800 border-r-2 border-cyan-500/30 font-semibold text-cyan-300 whitespace-nowrap px-4">
+                    {{ ref.reference }}
+                  </td>
+                  
+                  <!-- Colonnes pour chaque jour -->
+                  <td *ngFor="let day of weekDays" class="text-center p-2 align-top">
+                    <div *ngIf="getDayEntry(ref, day)" class="day-entry-table">
+                      <table class="mini-table w-full">
+                        <tbody>
+                          <!-- Ligne OF -->
+                          <!-- Ligne OF - NON ÉDITABLE -->
+<tr class="border-b border-gray-700/30">
+  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">OF</td>
+  <td class="text-right py-2 px-3">
+    <span class="text-white font-mono text-sm">{{ getDayEntry(ref, day)!.of }}</span>
+  </td>
+</tr>
+
+<!-- Ligne Quantité (C) - NON ÉDITABLE -->
+<tr class="border-b border-gray-700/30">
+  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">C</td>
+  <td class="text-right py-2 px-3">
+    <span class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.quantite }}</span>
+  </td>
+</tr>
+
+<!-- Ligne Modification (M) - ÉDITABLE -->
+<tr class="border-b border-gray-700/30">
+  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">M</td>
+  <td class="text-right py-2 px-3">
+    <input *ngIf="isFieldEditable('modification')" 
+           type="number"
+           [value]="getDayEntry(ref, day)!.modification"
+           (input)="updateDayEntry(ref, day, 'modification', $any($event.target).value)"
+           class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
+    <span *ngIf="!isFieldEditable('modification')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.modification }}</span>
+  </td>
+</tr>
+
+<!-- Ligne Rendement (R) - ÉDITABLE -->
+<tr class="border-b border-gray-700/30">
+  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">R</td>
+  <td class="text-right py-2 px-3">
+    <input *ngIf="isFieldEditable('rendement')" 
+           type="number"
+           [value]="getDayEntry(ref, day)!.rendement"
+           (input)="updateDayEntry(ref, day, 'rendement', $any($event.target).value)"
+           class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
+    <span *ngIf="!isFieldEditable('rendement')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.rendement }}</span>
+  </td>
+</tr>
+                          
+                          <!-- Ligne Delta (Δ) -->
+                          <tr>
+                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">Δ</td>
+                            <td class="text-right py-2 px-3">
+                              <span [class.text-green-400]="getDayEntry(ref, day)!.delta >= 70"
+                                    [class.text-yellow-400]="getDayEntry(ref, day)!.delta >= 50 && getDayEntry(ref, day)!.delta < 70"
+                                    [class.text-orange-400]="getDayEntry(ref, day)!.delta >= 20 && getDayEntry(ref, day)!.delta < 50"
+                                    [class.text-red-400]="getDayEntry(ref, day)!.delta < 20"
+                                    class="font-bold text-base">
+                                {{ getDayEntry(ref, day)!.delta }}%
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div *ngIf="!getDayEntry(ref, day)" class="text-gray-600 text-xs py-6">-</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <div *ngIf="selectedLigne() && !weekPlanification()" class="h-full flex items-center justify-center">
             <div class="text-center text-gray-400">
               <svg class="w-20 h-20 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,6 +283,16 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Message de succès -->
+  <div *ngIf="showSuccess()" class="success-notification">
+    <div class="success-content">
+      <svg class="w-6 h-6 mr-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      {{ successMessage() }}
     </div>
   </div>
 
