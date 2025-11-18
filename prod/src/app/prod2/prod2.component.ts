@@ -13,10 +13,12 @@ interface ProductionLine {
 
 interface DayEntry {
   of: string;
-  quantite: number;
-  modification: number;
-  rendement: number;
-  delta: number;
+  nbOperateurs: number;
+  c: number;       // Quantité planifiée
+  m: number;       // Modification
+  dp: number;      // Déclaration production
+  dm: number;      // Déclaration magasin
+  delta: number;   // Delta en %
 }
 
 interface ReferenceProduction {
@@ -36,6 +38,25 @@ interface WeekPlanification {
   startDate: Date;
   endDate: Date;
   references: ReferenceProduction[];
+}
+
+interface ReferenceDetail {
+  reference: string;
+  [key: string]: string | DayDetail | undefined;
+  lundi?: DayDetail;
+  mardi?: DayDetail;
+  mercredi?: DayDetail;
+  jeudi?: DayDetail;
+  vendredi?: DayDetail;
+  samedi?: DayDetail;
+}
+
+interface DayDetail {
+  qPro: number;        // Quantité total planifiée
+  nbBac: number;       // Nombre de bac
+  tPiece: number;      // Temps de pièce (secondes)
+  tProdH: number;      // Temps de production (heures)
+  tProdMin: number;    // Temps de production (minutes)
 }
 
 @Component({
@@ -58,6 +79,7 @@ export class Prod2Component {
   isEditing = signal(false);
   searchLineQuery = signal('');
   searchReferenceQuery = signal('');
+  selectedReferenceDetails = signal<ReferenceDetail | null>(null);
 
   // Données
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
@@ -80,48 +102,6 @@ export class Prod2Component {
   private loadProductionLines() {
     console.log('Loading production lines...');
     const lines: ProductionLine[] = [
-      {
-        ligne: 'L04:RXT1',
-        referenceCount: 13,
-        imageUrl: 'assets/images/unnamed.jpg',
-        references: ['RA5246801', 'RA5246802', 'RA5246803', 'RA5246804', 'RA5246805', 'RA5246806', 'RA5246811', 'RA5246814', 'RA5246815', 'RA5246822', 'RA5246823', 'RA5246827', 'RA5246828'],
-        isActive: true
-      },
-      {
-        ligne: 'L07:COM A1',
-        referenceCount: 4,
-        imageUrl: 'assets/images/unnamed (1).jpg',
-        references: ['COM001', 'COM002', 'COM003', 'COM004'],
-        isActive: true
-      },
-      {
-        ligne: 'L09:COMXT2',
-        referenceCount: 8,
-        imageUrl: 'assets/images/unnamed (2).jpg',
-        references: ['COMXT001', 'COMXT002', 'COMXT003', 'COMXT004', 'COMXT005', 'COMXT006', 'COMXT007', 'COMXT008'],
-        isActive: false
-      },
-      {
-        ligne: 'L10:RS3',
-        referenceCount: 6,
-        imageUrl: 'assets/images/unnamed (3).jpg',
-        references: ['RS3001', 'RS3002', 'RS3003', 'RS3004', 'RS3005', 'RS3006'],
-        isActive: true
-      },
-      {
-        ligne: 'L14:CD XT1',
-        referenceCount: 10,
-        imageUrl: 'assets/images/unnamed (4).jpg',
-        references: ['CDXT001', 'CDXT002', 'CDXT003', 'CDXT004', 'CDXT005', 'CDXT006', 'CDXT007', 'CDXT008', 'CDXT009', 'CDXT010'],
-        isActive: true
-      },
-      {
-        ligne: 'L15:MTSA3',
-        referenceCount: 10,
-        imageUrl: 'assets/images/unnamed (5).jpg',
-        references: ['MTSA001', 'MTSA002', 'MTSA003', 'MTSA004', 'MTSA005', 'MTSA006', 'MTSA007', 'MTSA008', 'MTSA009', 'MTSA010'],
-        isActive: false
-      },
       {
         ligne: 'L04:RXT1',
         referenceCount: 13,
@@ -235,6 +215,7 @@ export class Prod2Component {
     this.selectedWeek.set(null);
     this.weekPlanification.set(null);
     this.isEditing.set(false);
+    this.selectedReferenceDetails.set(null);
   }
 
   onWeekSelected(weekNumber: number) {
@@ -245,6 +226,7 @@ export class Prod2Component {
       this.selectedWeek.set(weekNumber);
       this.loadWeekPlanification(weekNumber, line);
       this.isEditing.set(false);
+      this.selectedReferenceDetails.set(null);
     }
   }
 
@@ -262,14 +244,16 @@ export class Prod2Component {
         this.weekDays.forEach(day => {
           const hasData = Math.random() > 0.3; // 70% de chance d'avoir des données
           if (hasData) {
-            const quantite = Math.floor(Math.random() * 2000) + 500;
-            const rendement = Math.floor(Math.random() * quantite * 0.3);
+            const c = Math.floor(Math.random() * 2000) + 500;
+            const dp = Math.floor(Math.random() * c * 0.9);
             const dayEntry: DayEntry = {
-              of: index === 0 && day === 'lundi' ? '067532' : `OF${Math.floor(Math.random() * 90000) + 10000}`,
-              quantite: quantite,
-              modification: Math.floor(Math.random() * 200),
-              rendement: rendement,
-              delta: Math.round(((rendement / quantite) * 100))
+              of: index === 0 && day === 'lundi' ? '06753' : `0${Math.floor(Math.random() * 90000) + 10000}`,
+              nbOperateurs: Math.floor(Math.random() * 20) + 10,
+              c: c,
+              m: Math.floor(Math.random() * 200),
+              dp: dp,
+              dm: Math.floor(Math.random() * c * 0.9),
+              delta: Math.round(((dp / c) * 100))
             };
             refData[day] = dayEntry;
           }
@@ -295,6 +279,7 @@ export class Prod2Component {
     this.selectedWeek.set(null);
     this.weekPlanification.set(null);
     this.isEditing.set(false);
+    this.selectedReferenceDetails.set(null);
   }
 
   goBackToLogin(): void {
@@ -302,10 +287,52 @@ export class Prod2Component {
   }
 
   toggleEditMode(): void {
-    this.isEditing.set(!this.isEditing());
-    if (!this.isEditing()) {
+    const currentEditingState = this.isEditing();
+    
+    if (!currentEditingState) {
+      // Mode édition activé
+      this.addEntriesToAllDaysAndReferences();
+    }
+    
+    this.isEditing.set(!currentEditingState);
+    
+    if (currentEditingState) {
+      // Mode édition désactivé - Enregistrement
       this.showSuccessMessage('Modifications enregistrées avec succès');
     }
+  }
+
+  private addEntriesToAllDaysAndReferences(): void {
+    const planif = this.weekPlanification();
+    if (!planif) return;
+
+    const updatedPlanif = { ...planif };
+    
+    updatedPlanif.references = updatedPlanif.references.map((ref, index) => {
+      const updatedRef = { ...ref };
+      
+      this.weekDays.forEach(day => {
+        if (!updatedRef[day]) {
+          const c = 1000;
+          const dp = 750;
+          const dayEntry: DayEntry = {
+            of: `0${Math.floor(Math.random() * 90000) + 10000}`,
+            nbOperateurs: 17,
+            c: c,
+            m: 0,
+            dp: dp,
+            dm: 500,
+            delta: Math.round(((dp / c) * 100))
+          };
+          updatedRef[day] = dayEntry;
+        }
+      });
+      
+      return updatedRef;
+    });
+
+    this.weekPlanification.set(updatedPlanif);
+    this.showSuccessMessage('Entrées ajoutées à tous les jours et références');
   }
 
   onSearchLineChange(event: Event): void {
@@ -332,13 +359,7 @@ export class Prod2Component {
     setTimeout(() => this.showSuccess.set(false), 3000);
   }
 
-  // MODIFICATION : L'utilisateur peut seulement modifier M et R
   updateDayEntry(reference: ReferenceProduction, day: string, field: string, value: any): void {
-    // Vérifier que seul M ou R peut être modifié
-    if (field !== 'modification' && field !== 'rendement') {
-      return;
-    }
-
     if (this.weekPlanification()) {
       const updatedPlanif = { ...this.weekPlanification()! };
       const refIndex = updatedPlanif.references.findIndex(r => r.reference === reference.reference);
@@ -346,10 +367,12 @@ export class Prod2Component {
       if (refIndex !== -1) {
         const dayEntry = updatedPlanif.references[refIndex][day] as DayEntry | undefined;
         if (dayEntry) {
-          (dayEntry as any)[field] = +value;
+          (dayEntry as any)[field] = field === 'of' ? value : +value;
           
-          // Recalculer delta si modification ou rendement change
-          dayEntry.delta = Math.round((dayEntry.rendement / dayEntry.quantite) * 100);
+          // Recalculer delta si c ou dp change
+          if (field === 'c' || field === 'dp') {
+            dayEntry.delta = Math.round((dayEntry.dp / dayEntry.c) * 100);
+          }
         }
         this.weekPlanification.set(updatedPlanif);
       }
@@ -369,8 +392,70 @@ export class Prod2Component {
     return ref[day] as DayEntry | undefined;
   }
 
-  // Nouvelle méthode pour vérifier si un champ est éditable
-  isFieldEditable(field: string): boolean {
-    return this.isEditing() && (field === 'modification' || field === 'rendement');
+  // Nouvelle méthode pour afficher les détails d'une référence
+  showReferenceDetails(ref: ReferenceProduction): void {
+    console.log('Showing details for reference:', ref.reference);
+    
+    // Générer des données de détail pour la référence
+    const referenceDetail: ReferenceDetail = {
+      reference: ref.reference
+    };
+    
+    // Générer des données pour chaque jour
+    this.weekDays.forEach(day => {
+      const dayEntry = ref[day] as DayEntry | undefined;
+      if (dayEntry) {
+        const qPro = dayEntry.c;
+        const nbBac = Math.ceil(qPro / 50); // 50 pièces par bac
+        const tPiece = Math.floor(Math.random() * 30) + 10; // 10-40 secondes par pièce
+        const totalSeconds = qPro * tPiece;
+        const tProdH = Math.floor(totalSeconds / 3600);
+        const tProdMin = Math.floor((totalSeconds % 3600) / 60);
+        
+        const dayDetail: DayDetail = {
+          qPro: qPro,
+          nbBac: nbBac,
+          tPiece: tPiece,
+          tProdH: tProdH,
+          tProdMin: tProdMin
+        };
+        
+        referenceDetail[day] = dayDetail;
+      }
+    });
+    
+    this.selectedReferenceDetails.set(referenceDetail);
+  }
+
+  // Retour au planning de la semaine
+  backToWeekPlanning(): void {
+    this.selectedReferenceDetails.set(null);
+  }
+
+  // Obtenir la valeur d'un détail pour un jour spécifique
+  getReferenceDetailValue(day: string, field: string): string {
+    const detail = this.selectedReferenceDetails();
+    if (!detail) return '-';
+    
+    const dayDetail = detail[day] as DayDetail | undefined;
+    if (!dayDetail) return '-';
+    
+    return dayDetail[field as keyof DayDetail].toString();
+  }
+
+  // Obtenir le total pour un champ spécifique
+  getTotalReferenceDetail(field: string): string {
+    const detail = this.selectedReferenceDetails();
+    if (!detail) return '-';
+    
+    let total = 0;
+    this.weekDays.forEach(day => {
+      const dayDetail = detail[day] as DayDetail | undefined;
+      if (dayDetail) {
+        total += dayDetail[field as keyof DayDetail] as number;
+      }
+    });
+    
+    return total.toString();
   }
 }

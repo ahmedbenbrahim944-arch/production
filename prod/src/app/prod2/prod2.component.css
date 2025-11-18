@@ -151,99 +151,182 @@
   border-left-color: rgb(6, 182, 212);
 }
 
-/* ==================== TABLEAU HEBDOMADAIRE ==================== */
+/* ==================== TABLEAU HEBDOMADAIRE - STYLE SOMBRE ==================== */
 .week-planning-table {
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 0.9rem;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.8);
 }
 
+/* En-têtes du tableau - Style sombre */
 .week-planning-table th {
   background: rgba(30, 41, 59, 0.95);
-  padding: 16px 12px;
+  padding: 22px 18px;
   font-weight: 600;
   color: #e2e8f0;
-  border-bottom: 2px solid rgba(6, 182, 212, 0.5);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  white-space: nowrap;
+  font-size: 1.1rem;
   position: sticky;
   top: 0;
   z-index: 15;
 }
 
+/* Cellules du tableau */
 .week-planning-table td {
-  padding: 8px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  vertical-align: top;
+  padding: 18px 14px;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  vertical-align: middle;
   min-width: 200px;
-}
-
-.week-planning-table tbody tr:hover {
-  background: rgba(51, 65, 85, 0.2);
-}
-
-/* ==================== MINI TABLEAU DANS CHAQUE CELLULE ==================== */
-.day-entry-table {
+  font-size: 1.15rem;
   background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  border-radius: 8px;
-  padding: 6px;
-  min-width: 180px;
+  color: #e2e8f0;
 }
 
-.mini-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Effet hover sur les lignes */
+.week-planning-table tbody tr:hover td {
+  background: rgba(30, 41, 59, 0.7);
 }
 
-.mini-table td {
-  padding: 8px 12px !important;
-  border: none !important;
-  min-width: auto !important;
-  font-size: 1rem;
+/* Alternance de couleur pour les lignes - fond sombre */
+.week-planning-table tbody tr:nth-child(10n+1),
+.week-planning-table tbody tr:nth-child(10n+2),
+.week-planning-table tbody tr:nth-child(10n+3),
+.week-planning-table tbody tr:nth-child(10n+4),
+.week-planning-table tbody tr:nth-child(10n+5) {
+  background: rgba(15, 23, 42, 0.6);
 }
 
-.mini-table tr {
-  transition: background-color 0.2s ease;
+.week-planning-table tbody tr:nth-child(10n+6),
+.week-planning-table tbody tr:nth-child(10n+7),
+.week-planning-table tbody tr:nth-child(10n+8),
+.week-planning-table tbody tr:nth-child(10n+9),
+.week-planning-table tbody tr:nth-child(10n+10) {
+  background: rgba(20, 30, 50, 0.6);
 }
 
-.mini-table tr:hover {
-  background: rgba(71, 85, 105, 0.15);
-}
-
-/* Taille de police augmentée pour les chiffres */
-.mini-table tbody span {
-  font-size: 1rem;
+/* Style pour les cellules sticky (première colonne) */
+.week-planning-table .sticky-cell {
+  background: rgba(30, 41, 59, 0.95);
   font-weight: 600;
+  font-size: 1.2rem;
+  color: #06b6d4;
+  position: sticky;
+  left: 0;
+  z-index: 10;
 }
 
-.mini-table input {
+/* Style pour les inputs */
+.week-planning-table input {
+  font-size: 0.95rem !important;
+  font-weight: 600;
+  padding: 6px 8px !important;
+  background: rgba(30, 41, 59, 0.8) !important;
+  border: 1px solid rgba(71, 85, 105, 0.6) !important;
+  border-radius: 4px;
+  color: #e2e8f0;
+  text-align: center;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.week-planning-table input:focus {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(6, 182, 212, 0.8) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+/* Style pour cellules compactes */
+.compact-cell {
+  padding: 12px 10px !important;
+  min-width: 180px !important;
+}
+
+/* Style pour les valeurs affichées */
+.value-display {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  padding: 8px 0;
+}
+
+/* Style pour les pourcentages delta - Plus grands et plus visibles */
+.delta-value {
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+  padding: 10px 0 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Couleurs pour les deltas - style sombre */
+.delta-excellent {
+  color: #10b981 !important;
+}
+
+.delta-good {
+  color: #f59e0b !important;
+}
+
+.delta-average {
+  color: #f97316 !important;
+}
+
+.delta-poor {
+  color: #ef4444 !important;
+}
+
+/* Style pour les en-têtes de jours */
+.day-header {
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  padding: 22px 14px !important;
+  color: #06b6d4 !important;
+}
+
+.day-header .nb-operateurs {
   font-size: 1rem;
+  margin-top: 10px;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
-/* ==================== COULEURS ==================== */
-.value-positive { color: #10b981; }
-.value-negative { color: #ef4444; }
-.value-neutral { color: #94a3b8; }
+/* Style pour les références */
+.reference-cell {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #06b6d4 !important;
+  letter-spacing: 0.5px;
+}
+
+/* Bordures sombres */
+.week-planning-table th,
+.week-planning-table td {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(71, 85, 105, 0.5);
+}
 
 /* ==================== SCROLLBAR ==================== */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.5);
+  background: #f1f5f9;
+  border-radius: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.5);
-  border-radius: 3px;
+  background: #cbd5e1;
+  border-radius: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: #94a3b8;
 }
 
 /* ==================== ANIMATIONS ==================== */
@@ -270,7 +353,7 @@
 }
 
 .success-content {
-  background: rgba(16, 185, 129, 0.9);
+  background: rgba(16, 185, 129, 0.95);
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
@@ -317,13 +400,20 @@
 @media (max-width: 1280px) {
   .line-card-large { height: 380px; }
   .week-planning-table td { min-width: 160px; }
+  .week-planning-table th,
+  .week-planning-table td {
+    font-size: 1rem;
+    padding: 16px 12px;
+  }
 }
 
 @media (max-width: 1024px) {
   .line-card-large { height: 350px; }
   .weeks-sidebar { width: 220px; }
-  .mini-table td {
-    font-size: 0.9rem;
+  .week-planning-table th,
+  .week-planning-table td {
+    font-size: 0.95rem;
+    padding: 14px 10px;
   }
   .line-name-large {
     font-size: 1.7rem;
@@ -333,11 +423,11 @@
 @media (max-width: 768px) {
   .weeks-sidebar { width: 200px; }
   .line-card-large { height: 320px; }
-  .week-planning-table { font-size: 0.75rem; }
-  .day-entry-table { min-width: 150px; }
-  .mini-table td {
-    font-size: 0.85rem;
-    padding: 6px 8px !important;
+  .week-planning-table { font-size: 0.9rem; }
+  .week-planning-table th,
+  .week-planning-table td {
+    font-size: 0.9rem;
+    padding: 12px 8px;
   }
   .line-name-large {
     font-size: 1.4rem;
@@ -359,4 +449,80 @@
   .grid-cols-3 {
     grid-template-columns: 1fr;
   }
+}
+/* ==================== TABLEAU DES DÉTAILS DE RÉFÉRENCE ==================== */
+.reference-details-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.reference-details-table th {
+  background: rgba(30, 41, 59, 0.95);
+  padding: 18px 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.reference-details-table td {
+  padding: 16px 12px;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  vertical-align: middle;
+  font-size: 1.1rem;
+  background: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.reference-details-table tr:last-child {
+  border-top: 3px solid #06b6d4;
+  font-weight: 700;
+}
+
+.reference-details-table tr:last-child td {
+  background: rgba(6, 182, 212, 0.1);
+  font-size: 1.2rem;
+}
+
+/* Style pour les cellules cliquables */
+.reference-cell {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.reference-cell:hover {
+  background: rgba(6, 182, 212, 0.3) !important;
+}
+/* ==================== STYLES POUR LE TABLEAU MODIFIÉ ==================== */
+
+/* Style pour les dates dans les en-têtes */
+.day-header .date-display {
+  font-size: 0.85rem;
+  margin-top: 5px;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+/* Style pour la ligne de séparation NB OP */
+.nb-op-row {
+  background: rgba(30, 41, 59, 0.95) !important;
+}
+
+/* Ajustement pour les cellules avec rowspan */
+.week-planning-table th[rowspan="2"] {
+  vertical-align: middle;
+}
+
+/* Style pour maintenir l'alignement */
+.week-planning-table thead tr:first-child th {
+  border-bottom: none;
+}
+
+.week-planning-table thead tr:last-child th {
+  border-top: 1px solid rgba(71, 85, 105, 0.5);
 }

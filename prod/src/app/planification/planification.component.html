@@ -99,7 +99,7 @@
       </div>
 
       <!-- Affichage de la planification -->
-      <div *ngIf="selectedLigne()" class="flex-1 flex">
+      <div *ngIf="selectedLigne() && !selectedReferenceDetails()" class="flex-1 flex">
         
         <!-- Sidebar des semaines -->
         <div class="weeks-sidebar h-full overflow-y-auto custom-scrollbar">
@@ -182,100 +182,139 @@
             </div>
           </div>
 
-          <!-- Tableau de planification hebdomadaire -->
-          <div *ngIf="filteredWeekPlanification()" class="overflow-x-auto rounded-lg border border-gray-600/30 bg-slate-900/50">
+          <!-- Tableau de planification hebdomadaire MODIFIÉ -->
+          <div *ngIf="filteredWeekPlanification()" class="overflow-x-auto rounded-xl border-2 border-gray-700 bg-slate-900/60 shadow-2xl">
             <table class="week-planning-table w-full">
               <thead>
                 <tr>
-                  <th class="sticky left-0 z-20 bg-slate-800 border-r-2 border-cyan-500/50">RÉFÉRENCES</th>
-                  <th *ngFor="let day of weekDays; let i = index" class="text-center">
-                    <div class="font-bold text-cyan-400 capitalize mb-1 text-base">{{ day }}</div>
-                    <div class="text-xs text-gray-400">{{ getDayDate(i) | date:'dd/MM' }}</div>
-                  </th>
+                  <th class="sticky left-0 z-20 sticky-cell border-2 border-gray-700" rowspan="2">Références</th>
+                  <th class="text-center border-2 border-gray-700" rowspan="2">C/R</th>
+                  <th class="text-center border-2 border-gray-700" rowspan="2">OF</th>
+                  <ng-container *ngFor="let day of weekDays; let i = index">
+                    <th class="text-center border-2 border-gray-700 day-header" colspan="2">
+                      <div class="font-bold text-cyan-400 capitalize text-base">{{ day }}</div>
+                      <div class="text-sm text-gray-300 mt-1">{{ getDayDate(i) | date:'dd/MM' }}</div>
+                    </th>
+                  </ng-container>
+                </tr>
+                <tr>
+                  <!-- Ligne vide pour l'espacement -->
+                  <ng-container *ngFor="let day of weekDays">
+                    <th class="text-center border-2 border-gray-700 day-header">
+                      <div class="flex justify-between px-2">
+                        <span class="text-sm text-gray-300">NB OP</span>
+                        <span class="text-sm text-white font-bold nb-operateurs">
+                          <ng-container *ngIf="filteredWeekPlanification()!.references.length > 0 && getDayEntry(filteredWeekPlanification()!.references[0], day)">
+                            {{ getDayEntry(filteredWeekPlanification()!.references[0], day)!.nbOperateurs }}
+                          </ng-container>
+                          <ng-container *ngIf="!filteredWeekPlanification()!.references.length || !getDayEntry(filteredWeekPlanification()!.references[0], day)">
+                            -
+                          </ng-container>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="text-center border-2 border-gray-700 day-header">
+                      <!-- Colonne vide pour maintenir la structure -->
+                    </th>
+                  </ng-container>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let ref of filteredWeekPlanification()!.references" class="border-b border-gray-700/50 hover:bg-slate-800/30">
-                  <!-- Colonne référence (fixe) -->
-                  <td class="sticky left-0 z-10 bg-slate-800 border-r-2 border-cyan-500/30 font-semibold text-cyan-300 whitespace-nowrap px-4">
-                    {{ ref.reference }}
-                  </td>
+                <ng-container *ngFor="let ref of filteredWeekPlanification()!.references">
+                  <!-- Ligne C -->
+                  <tr class="border-b border-gray-700/50">
+                    <td (click)="showReferenceDetails(ref)" class="sticky left-0 z-10 sticky-cell border-2 border-gray-700 font-semibold reference-cell whitespace-nowrap px-4 py-4 cursor-pointer hover:bg-cyan-900/30 transition-colors" rowspan="5">
+                      {{ ref.reference }}
+                    </td>
+                    <td class="text-center font-bold text-white border-2 border-gray-700 py-4">C</td>
+                    <td class="text-center font-mono text-white border-2 border-gray-700 py-4" rowspan="5">
+                      <ng-container *ngIf="getDayEntry(ref, 'lundi')">
+                        <input *ngIf="isEditing()" 
+                               [value]="getDayEntry(ref, 'lundi')!.of"
+                               (input)="updateDayEntry(ref, 'lundi', 'of', $any($event.target).value)"
+                               class="w-28 bg-gray-700/50 border border-cyan-500/40 rounded px-3 py-2 text-white text-base text-center font-mono">
+                        <span *ngIf="!isEditing()" class="text-white font-mono text-lg value-display">{{ getDayEntry(ref, 'lundi')!.of }}</span>
+                      </ng-container>
+                    </td>
+                    <ng-container *ngFor="let day of weekDays">
+                      <td class="text-center border-2 border-gray-700 py-4" colspan="2">
+                        <input *ngIf="isEditing() && getDayEntry(ref, day)" 
+                               type="number"
+                               [value]="getDayEntry(ref, day)!.c"
+                               (input)="updateDayEntry(ref, day, 'c', $any($event.target).value)"
+                               class="w-full bg-gray-700/50 border border-cyan-500/40 rounded px-3 py-2 text-white text-lg text-center font-bold">
+                        <span *ngIf="!isEditing() && getDayEntry(ref, day)" class="text-white font-bold text-lg value-display">{{ getDayEntry(ref, day)!.c }}</span>
+                        <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-base">-</span>
+                      </td>
+                    </ng-container>
+                  </tr>
                   
-                  <!-- Colonnes pour chaque jour -->
-                  <td *ngFor="let day of weekDays" class="text-center p-2 align-top">
-                    <div *ngIf="getDayEntry(ref, day)" class="day-entry-table">
-                      <table class="mini-table w-full">
-                        <tbody>
-                          <!-- Ligne OF -->
-                          <tr class="border-b border-gray-700/30">
-                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">OF</td>
-                            <td class="text-right py-2 px-3">
-                              <input *ngIf="isEditing()" 
-                                     [value]="getDayEntry(ref, day)!.of"
-                                     (input)="updateDayEntry(ref, day, 'of', $any($event.target).value)"
-                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-sm text-right font-mono">
-                              <span *ngIf="!isEditing()" class="text-white font-mono text-sm">{{ getDayEntry(ref, day)!.of }}</span>
-                            </td>
-                          </tr>
-                          
-                          <!-- Ligne Quantité (C) -->
-                          <tr class="border-b border-gray-700/30">
-                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">C</td>
-                            <td class="text-right py-2 px-3">
-                              <input *ngIf="isEditing()" 
-                                     type="number"
-                                     [value]="getDayEntry(ref, day)!.quantite"
-                                     (input)="updateDayEntry(ref, day, 'quantite', $any($event.target).value)"
-                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
-                              <span *ngIf="!isEditing()" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.quantite }}</span>
-                            </td>
-                          </tr>
-                          
-                          <!-- Ligne Modification (M) -->
-                          <tr class="border-b border-gray-700/30">
-                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">M</td>
-                            <td class="text-right py-2 px-3">
-                              <input *ngIf="isEditing()" 
-                                     type="number"
-                                     [value]="getDayEntry(ref, day)!.modification"
-                                     (input)="updateDayEntry(ref, day, 'modification', $any($event.target).value)"
-                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
-                              <span *ngIf="!isEditing()" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.modification }}</span>
-                            </td>
-                          </tr>
-                          
-                          <!-- Ligne Rendement (R) -->
-                          <tr class="border-b border-gray-700/30">
-                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">R</td>
-                            <td class="text-right py-2 px-3">
-                              <input *ngIf="isEditing()" 
-                                     type="number"
-                                     [value]="getDayEntry(ref, day)!.rendement"
-                                     (input)="updateDayEntry(ref, day, 'rendement', $any($event.target).value)"
-                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
-                              <span *ngIf="!isEditing()" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.rendement }}</span>
-                            </td>
-                          </tr>
-                          
-                          <!-- Ligne Delta (Δ) -->
-                          <tr>
-                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">Δ</td>
-                            <td class="text-right py-2 px-3">
-                              <span [class.text-green-400]="getDayEntry(ref, day)!.delta >= 70"
-                                    [class.text-yellow-400]="getDayEntry(ref, day)!.delta >= 50 && getDayEntry(ref, day)!.delta < 70"
-                                    [class.text-orange-400]="getDayEntry(ref, day)!.delta >= 20 && getDayEntry(ref, day)!.delta < 50"
-                                    [class.text-red-400]="getDayEntry(ref, day)!.delta < 20"
-                                    class="font-bold text-base">
-                                {{ getDayEntry(ref, day)!.delta }}%
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div *ngIf="!getDayEntry(ref, day)" class="text-gray-600 text-xs py-6">-</div>
-                  </td>
-                </tr>
+                  <!-- Ligne M -->
+                  <tr class="border-b border-gray-700/50">
+                    <td class="text-center font-bold text-white border-2 border-gray-700 py-4">M</td>
+                    <ng-container *ngFor="let day of weekDays">
+                      <td class="text-center border-2 border-gray-700 py-4" colspan="2">
+                        <input *ngIf="isEditing() && getDayEntry(ref, day)" 
+                               type="number"
+                               [value]="getDayEntry(ref, day)!.m"
+                               (input)="updateDayEntry(ref, day, 'm', $any($event.target).value)"
+                               class="w-full bg-gray-700/50 border border-cyan-500/40 rounded px-3 py-2 text-white text-lg text-center font-bold">
+                        <span *ngIf="!isEditing() && getDayEntry(ref, day)" class="text-white font-bold text-lg value-display">{{ getDayEntry(ref, day)!.m }}</span>
+                        <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-base">-</span>
+                      </td>
+                    </ng-container>
+                  </tr>
+                  
+                  <!-- Ligne DP -->
+                  <tr class="border-b border-gray-700/50">
+                    <td class="text-center font-bold text-white border-2 border-gray-700 py-4">DP</td>
+                    <ng-container *ngFor="let day of weekDays">
+                      <td class="text-center border-2 border-gray-700 py-4" colspan="2">
+                        <input *ngIf="isEditing() && getDayEntry(ref, day)" 
+                               type="number"
+                               [value]="getDayEntry(ref, day)!.dp"
+                               (input)="updateDayEntry(ref, day, 'dp', $any($event.target).value)"
+                               class="w-full bg-gray-700/50 border border-cyan-500/40 rounded px-3 py-2 text-white text-lg text-center font-bold">
+                        <span *ngIf="!isEditing() && getDayEntry(ref, day)" class="text-white font-bold text-lg value-display">{{ getDayEntry(ref, day)!.dp }}</span>
+                        <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-base">-</span>
+                      </td>
+                    </ng-container>
+                  </tr>
+                  
+                  <!-- Ligne DM -->
+                  <tr class="border-b border-gray-700/50">
+                    <td class="text-center font-bold text-white border-2 border-gray-700 py-4">DM</td>
+                    <ng-container *ngFor="let day of weekDays">
+                      <td class="text-center border-2 border-gray-700 py-4" colspan="2">
+                        <input *ngIf="isEditing() && getDayEntry(ref, day)" 
+                               type="number"
+                               [value]="getDayEntry(ref, day)!.dm"
+                               (input)="updateDayEntry(ref, day, 'dm', $any($event.target).value)"
+                               class="w-full bg-gray-700/50 border border-cyan-500/40 rounded px-3 py-2 text-white text-lg text-center font-bold">
+                        <span *ngIf="!isEditing() && getDayEntry(ref, day)" class="text-white font-bold text-lg value-display">{{ getDayEntry(ref, day)!.dm }}</span>
+                        <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-base">-</span>
+                      </td>
+                    </ng-container>
+                  </tr>
+                  
+                  <!-- Ligne Delta -->
+                  <tr class="border-b-2 border-gray-700">
+                    <td class="text-center font-bold text-cyan-400 border-2 border-gray-700 py-4">∆</td>
+                    <ng-container *ngFor="let day of weekDays">
+                      <td class="text-center border-2 border-gray-700 py-4" colspan="2">
+                        <span *ngIf="getDayEntry(ref, day)"
+                              [class.delta-excellent]="getDayEntry(ref, day)!.delta >= 70"
+                              [class.delta-good]="getDayEntry(ref, day)!.delta >= 50 && getDayEntry(ref, day)!.delta < 70"
+                              [class.delta-average]="getDayEntry(ref, day)!.delta >= 20 && getDayEntry(ref, day)!.delta < 50"
+                              [class.delta-poor]="getDayEntry(ref, day)!.delta < 20"
+                              class="font-bold delta-value">
+                          {{ getDayEntry(ref, day)!.delta }}%
+                        </span>
+                        <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-base">-</span>
+                      </td>
+                    </ng-container>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>
@@ -289,6 +328,111 @@
               <p class="text-sm text-gray-500">pour voir la planification</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Affichage des détails de référence -->
+      <div *ngIf="selectedReferenceDetails()" class="flex-1 p-6 overflow-auto">
+        <div class="mb-6">
+          <button 
+            (click)="backToWeekPlanning()"
+            class="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-gray-700 hover:bg-gray-600 text-white flex items-center text-sm mb-4">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Retour au planning
+          </button>
+
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-2xl font-bold text-cyan-400 mb-2">
+                Détails de la référence {{ selectedReferenceDetails()!.reference }}
+              </h2>
+              <p class="text-gray-400">{{ selectedLigne()!.ligne }} - Semaine {{ selectedWeek() }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau des détails de référence -->
+        <div class="overflow-x-auto rounded-xl border-2 border-gray-700 bg-slate-900/60 shadow-2xl">
+          <table class="week-planning-table w-full">
+            <thead>
+              <tr>
+                <th class="text-center border-2 border-gray-700">Jour</th>
+                <th class="text-center border-2 border-gray-700">Q. Pro</th>
+                <th class="text-center border-2 border-gray-700">N° de Bac</th>
+                <th class="text-center border-2 border-gray-700">T pièce (sec)</th>
+                <th class="text-center border-2 border-gray-700" colspan="2">T.Prod</th>
+              </tr>
+              <tr>
+                <th class="text-center border-2 border-gray-700"></th>
+                <th class="text-center border-2 border-gray-700"></th>
+                <th class="text-center border-2 border-gray-700"></th>
+                <th class="text-center border-2 border-gray-700"></th>
+                <th class="text-center border-2 border-gray-700">H</th>
+                <th class="text-center border-2 border-gray-700">MIN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let day of weekDays">
+                <td class="text-center font-bold text-cyan-400 border-2 border-gray-700 py-4 capitalize">{{ day }}</td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-lg value-display">
+                    {{ getReferenceDetailValue(day, 'qPro') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-lg value-display">
+                    {{ getReferenceDetailValue(day, 'nbBac') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-lg value-display">
+                    {{ getReferenceDetailValue(day, 'tPiece') }}s
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-lg value-display">
+                    {{ getReferenceDetailValue(day, 'tProdH') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-lg value-display">
+                    {{ getReferenceDetailValue(day, 'tProdMin') }}
+                  </span>
+                </td>
+              </tr>
+              <!-- Ligne Total -->
+              <tr class="border-t-2 border-cyan-500">
+                <td class="text-center font-bold text-cyan-400 border-2 border-gray-700 py-4">Total</td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-xl value-display">
+                    {{ getTotalReferenceDetail('qPro') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-xl value-display">
+                    {{ getTotalReferenceDetail('nbBac') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-xl value-display">
+                    {{ getTotalReferenceDetail('tPiece') }}s
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-xl value-display">
+                    {{ getTotalReferenceDetail('tProdH') }}
+                  </span>
+                </td>
+                <td class="text-center border-2 border-gray-700 py-4">
+                  <span class="text-white font-bold text-xl value-display">
+                    {{ getTotalReferenceDetail('tProdMin') }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
