@@ -4,8 +4,8 @@
 
 /* Container et flip */
 .card-container { 
-  width: 2000px; 
-  height: 850px; 
+  width: 2200px; 
+  height: 950px; 
   perspective: 1500px; 
 }
 
@@ -41,14 +41,14 @@
   border: 2px solid rgba(255, 255, 255, 0.25); 
   color: white; 
   transition: all 0.3s ease;
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
-  min-height: 60px;
+  min-height: 70px;
 }
 
 .input-industrial::placeholder {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .input-industrial:focus { 
@@ -149,7 +149,7 @@
     0 0 60px #00ffff,
     0 0 100px #00ffff;
   animation: neon-pulse 2s ease-in-out infinite alternate;
-  font-size: 3.5rem;
+  font-size: 4.5rem;
 }
 
 @keyframes neon-pulse {
@@ -218,11 +218,11 @@
 }
 
 .loader {
-  width: 90px;
-  height: 90px;
-  border: 5px solid transparent;
-  border-top: 5px solid #00ffff;
-  border-right: 5px solid #00ffff;
+  width: 110px;
+  height: 110px;
+  border: 6px solid transparent;
+  border-top: 6px solid #00ffff;
+  border-right: 6px solid #00ffff;
   border-bottom: 5px solid transparent;
   border-radius: 50%;
   animation: spin 1.2s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
@@ -340,31 +340,31 @@
 /* Responsive pour très grands écrans */
 @media (min-width: 1920px) {
   .card-container {
-    width: 1400px;
-    height: 750px;
+    width: 1600px;
+    height: 850px;
   }
   
   .neon {
-    font-size: 4rem;
+    font-size: 5rem;
   }
   
   .numpad-btn-large {
-    min-height: 6rem !important;
-    font-size: 2rem !important;
+    min-height: 7rem !important;
+    font-size: 2.2rem !important;
   }
   
   .input-industrial {
-    font-size: 20px;
-    min-height: 70px;
+    font-size: 24px;
+    min-height: 80px;
   }
 }
 
 /* Responsive pour tablettes */
 @media (max-width: 1024px) {
   .card-container {
-    width: 95%;
+    width: 98%;
     height: auto;
-    min-height: 600px;
+    min-height: 700px;
   }
   
   .face {
@@ -394,7 +394,7 @@
   }
   
   .neon {
-    font-size: 2.5rem;
+    font-size: 3.5rem;
   }
   
   .numpad-large {
@@ -402,13 +402,13 @@
   }
   
   .numpad-btn-large {
-    min-height: 3.5rem !important;
-    font-size: 1.3rem !important;
+    min-height: 5rem !important;
+    font-size: 1.8rem !important;
   }
   
   .input-industrial {
-    font-size: 16px;
-    min-height: 55px;
+    font-size: 20px;
+    min-height: 65px;
   }
   
   .value-display {
@@ -429,8 +429,10 @@
   
   .btn-industrial,
   .btn-industrial-register {
-    font-size: 16px;
-    min-height: 55px;
+     padding: 1.2rem 3rem;
+  border-radius: 18px;
+  font-size: 22px;
+  min-height: 75px;
   }
 }
 

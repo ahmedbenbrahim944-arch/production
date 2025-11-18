@@ -16,41 +16,41 @@
     </div>
   </div>
 
-  <!-- Container principal -->
+  <!-- Container principal AGRANDI -->
   <div class="card-container z-10 relative">
     <div class="flip relative w-full h-full" [class.flipped]="isFlipped()">
       
       <!-- Face avant - Login -->
       <div class="face front bg-gray-900/85 backdrop-blur-md border border-gray-600/40 flex rounded-2xl shadow-2xl">
         <!-- Section gauche - Branding -->
-        <div class="w-2/5 bg-gradient-to-br from-cyan-800 to-cyan-900 flex flex-col justify-center items-center p-10 relative overflow-hidden">
+        <div class="w-2/5 bg-gradient-to-br from-cyan-800 to-cyan-900 flex flex-col justify-center items-center p-12 relative overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-10 bg-center bg-no-repeat"></div>
-          <h1 class="neon text-5xl font-bold mb-8 text-center tracking-wider">INDUSTRIE 4.0</h1>
+          <h1 class="neon text-6xl font-bold mb-10 text-center tracking-wider">SERAF TUNISIE</h1>
           <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
-               class="w-36 h-36 animate-float" 
-               alt="Icone usine intelligente">
-          <p class="text-cyan-200 text-center mt-8 text-lg max-w-xs font-medium">
-            Système de contrôle industriel intelligent
+               class="w-48 h-48 animate-float" 
+               alt="Icone Seraf Tunisie">
+          <p class="text-cyan-200 text-center mt-10 text-xl max-w-xs font-medium">
+            Plateforme d'authentification sécurisée
           </p>
-          <div class="mt-6 flex items-center space-x-2">
-            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span class="text-green-400 text-sm">Système en ligne</span>
+          <div class="mt-8 flex items-center space-x-2">
+            <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+            <span class="text-green-400 text-lg">Système en ligne</span>
           </div>
         </div>
 
         <!-- Section droite - Formulaire et Clavier -->
-        <div class="w-3/5 p-8 flex gap-8">
+        <div class="w-3/5 p-10 flex gap-10">
           <!-- Formulaire de connexion -->
           <div class="flex-1 flex flex-col justify-center">
-            <div class="absolute top-6 right-6 w-4 h-4 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
+            <div class="absolute top-8 right-8 w-5 h-5 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
             
-            <h2 class="text-3xl font-bold text-cyan-400 mb-4">CONNEXION</h2>
-            <p class="text-gray-300 text-lg mb-8">Accédez à votre dashboard de production</p>
+            <h2 class="text-4xl font-bold text-cyan-400 mb-6">CONNEXION</h2>
+            <p class="text-gray-300 text-xl mb-10">Accédez à votre espace personnel</p>
 
-            <form (ngSubmit)="onLogin()" class="space-y-6">
+            <form (ngSubmit)="onLogin()" class="space-y-8">
               <div>
                 <div class="relative">
-                  <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                  <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                          placeholder="Matricule (ex: 1234)" 
                          [(ngModel)]="loginForm.email" 
                          name="email"
@@ -59,14 +59,14 @@
                          (click)="openNumpad('email')"
                          readonly>
                 </div>
-                <div *ngIf="loginForm.errors.email" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                <div *ngIf="loginForm.errors.email" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                   {{ loginForm.errors.email }}
                 </div>
               </div>
 
               <div>
                 <div class="relative">
-                  <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                  <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                          type="password" 
                          placeholder="Mot de passe (6 chiffres min)" 
                          [(ngModel)]="loginForm.password" 
@@ -76,25 +76,25 @@
                          (click)="openNumpad('password')"
                          readonly>
                 </div>
-                <div *ngIf="loginForm.errors.password" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                <div *ngIf="loginForm.errors.password" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                   {{ loginForm.errors.password }}
                 </div>
               </div>
 
-              <button type="submit" class="btn-industrial w-full py-4 rounded-xl font-bold text-xl transition-all duration-300 mt-6 shadow-lg">
+              <button type="submit" class="btn-industrial w-full py-5 rounded-xl font-bold text-2xl transition-all duration-300 mt-8 shadow-lg">
                 <span class="flex items-center justify-center">
                   SE CONNECTER
-                  <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-8 h-8 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                   </svg>
                 </span>
               </button>
             </form>
 
-            <div class="text-center mt-8 pt-8 border-t border-gray-600/50">
-              <p class="text-base text-gray-300">
-                Pas de compte industriel ?
-                <span (click)="toggleFlip()" class="text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors ml-2 font-bold text-lg">
+            <div class="text-center mt-10 pt-10 border-t border-gray-600/50">
+              <p class="text-lg text-gray-300">
+                Pas de compte ?
+                <span (click)="toggleFlip()" class="text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors ml-2 font-bold text-xl">
                   Créer un compte
                 </span>
               </p>
@@ -103,22 +103,22 @@
 
           <!-- Clavier numérique AGRANDI -->
           <div class="w-96 flex flex-col justify-center">
-            <div class="numpad-large bg-gray-800/70 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-gray-600/30">
+            <div class="numpad-large bg-gray-800/70 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-gray-600/30">
               
               <!-- Indicateur du champ actif -->
-              <div class="current-field-indicator mb-4">
-                <div class="current-field-text">
+              <div class="current-field-indicator mb-6">
+                <div class="current-field-text text-xl">
                   {{ getCurrentFieldName() }}
                 </div>
               </div>
               
               <!-- Afficheur de valeur -->
-              <div class="value-display mb-6">
+              <div class="value-display mb-8 text-2xl">
                 {{ numpadValue || '---' }}
               </div>
               
               <!-- Clavier avec boutons AGRANDIS -->
-              <div class="grid grid-cols-3 gap-3">
+              <div class="grid grid-cols-3 gap-4">
                 <button *ngFor="let button of numpadButtons" 
                         (click)="onNumpadButtonClick(button)"
                         class="numpad-btn-large text-white rounded-xl font-bold transition-all duration-150"
@@ -130,8 +130,8 @@
               </div>
               
               <!-- Instructions -->
-              <div class="mt-4 text-center">
-                <p class="text-gray-400 text-sm">
+              <div class="mt-6 text-center">
+                <p class="text-gray-400 text-base">
                   Cliquez sur les champs ou utilisez le clavier physique
                 </p>
               </div>
@@ -143,34 +143,34 @@
       <!-- Face arrière - Register -->
       <div class="face back bg-gray-900/85 backdrop-blur-md border border-gray-600/40 flex rounded-2xl shadow-2xl">
         <!-- Section gauche - Branding -->
-        <div class="w-2/5 bg-gradient-to-br from-indigo-800 to-purple-900 flex flex-col justify-center items-center p-10 relative overflow-hidden">
+        <div class="w-2/5 bg-gradient-to-br from-indigo-800 to-purple-900 flex flex-col justify-center items-center p-12 relative overflow-hidden">
           <div class="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3712/3712190.png')] opacity-20 bg-center bg-no-repeat"></div>
-          <h1 class="neon text-5xl font-bold mb-8 text-center tracking-wider">INSCRIPTION</h1>
+          <h1 class="neon text-6xl font-bold mb-10 text-center tracking-wider">SERAF TUNISIE</h1>
           <img src="https://cdn-icons-png.flaticon.com/512/3712/3712190.png" 
-               class="w-36 h-36 animate-float" 
-               alt="Icone innovation industrielle">
-          <p class="text-indigo-200 text-center mt-8 text-lg max-w-xs font-medium">
-            Système d'authentification sécurisé
+               class="w-48 h-48 animate-float" 
+               alt="Icone Seraf Tunisie">
+          <p class="text-indigo-200 text-center mt-10 text-xl max-w-xs font-medium">
+            Inscription sécurisée
           </p>
-          <div class="mt-6 flex items-center space-x-2">
-            <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-            <span class="text-blue-400 text-sm">Inscription sécurisée</span>
+          <div class="mt-8 flex items-center space-x-2">
+            <div class="w-4 h-4 bg-blue-400 rounded-full animate-pulse"></div>
+            <span class="text-blue-400 text-lg">Inscription sécurisée</span>
           </div>
         </div>
 
         <!-- Section droite - Formulaire et Clavier -->
-        <div class="w-3/5 p-8 flex gap-8">
+        <div class="w-3/5 p-10 flex gap-10">
           <!-- Formulaire d'inscription -->
           <div class="flex-1 flex flex-col justify-center">
-            <div class="absolute top-6 right-6 w-4 h-4 bg-indigo-400 rounded-full animate-pulse shadow-lg shadow-indigo-400/50"></div>
+            <div class="absolute top-8 right-8 w-5 h-5 bg-indigo-400 rounded-full animate-pulse shadow-lg shadow-indigo-400/50"></div>
             
-            <h2 class="text-3xl font-bold text-indigo-400 mb-4">CRÉER UN COMPTE</h2>
-            <p class="text-gray-300 text-lg mb-8">Rejoignez notre plateforme industrielle</p>
+            <h2 class="text-4xl font-bold text-indigo-400 mb-6">CRÉER UN COMPTE</h2>
+            <p class="text-gray-300 text-xl mb-10">Rejoignez notre plateforme</p>
 
-            <form (ngSubmit)="onRegister()" class="space-y-6">
-              <div class="grid grid-cols-2 gap-4">
+            <form (ngSubmit)="onRegister()" class="space-y-8">
+              <div class="grid grid-cols-2 gap-6">
                 <div>
-                  <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                  <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                          placeholder="Prénom" 
                          [(ngModel)]="registerForm.firstName" 
                          name="firstName"
@@ -178,12 +178,12 @@
                          [class.active]="currentInputField === 'firstName'"
                          (click)="openNumpad('firstName')"
                          readonly>
-                  <div *ngIf="registerForm.errors.firstName" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                  <div *ngIf="registerForm.errors.firstName" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                     {{ registerForm.errors.firstName }}
                   </div>
                 </div>
                 <div>
-                  <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                  <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                          placeholder="Nom" 
                          [(ngModel)]="registerForm.lastName" 
                          name="lastName"
@@ -191,14 +191,14 @@
                          [class.active]="currentInputField === 'lastName'"
                          (click)="openNumpad('lastName')"
                          readonly>
-                  <div *ngIf="registerForm.errors.lastName" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                  <div *ngIf="registerForm.errors.lastName" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                     {{ registerForm.errors.lastName }}
                   </div>
                 </div>
               </div>
 
               <div>
-                <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                        placeholder="Matricule (ex: 1234)" 
                        [(ngModel)]="registerForm.email" 
                        name="registerEmail"
@@ -206,13 +206,13 @@
                        [class.active]="currentInputField === 'registerEmail'"
                        (click)="openNumpad('registerEmail')"
                        readonly>
-                <div *ngIf="registerForm.errors.email" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                <div *ngIf="registerForm.errors.email" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                   {{ registerForm.errors.email }}
                 </div>
               </div>
 
               <div>
-                <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                        type="password" 
                        placeholder="Mot de passe (6 chiffres min)" 
                        [(ngModel)]="registerForm.password" 
@@ -221,13 +221,13 @@
                        [class.active]="currentInputField === 'registerPassword'"
                        (click)="openNumpad('registerPassword')"
                        readonly>
-                <div *ngIf="registerForm.errors.password" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                <div *ngIf="registerForm.errors.password" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                   {{ registerForm.errors.password }}
                 </div>
               </div>
 
               <div>
-                <input class="input-industrial w-full rounded-xl px-5 py-4 text-lg" 
+                <input class="input-industrial w-full rounded-xl px-6 py-5 text-xl" 
                        type="password" 
                        placeholder="Confirmer le mot de passe" 
                        [(ngModel)]="registerForm.confirm" 
@@ -236,25 +236,25 @@
                        [class.active]="currentInputField === 'confirmPassword'"
                        (click)="openNumpad('confirmPassword')"
                        readonly>
-                <div *ngIf="registerForm.errors.confirm" class="text-red-400 text-sm mt-2 animate-pulse font-medium">
+                <div *ngIf="registerForm.errors.confirm" class="text-red-400 text-lg mt-3 animate-pulse font-medium">
                   {{ registerForm.errors.confirm }}
                 </div>
               </div>
 
-              <button type="submit" class="btn-industrial-register w-full py-4 rounded-xl font-bold text-xl transition-all duration-300 mt-6 shadow-lg">
+              <button type="submit" class="btn-industrial-register w-full py-5 rounded-xl font-bold text-2xl transition-all duration-300 mt-8 shadow-lg">
                 <span class="flex items-center justify-center">
                   S'INSCRIRE
-                  <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-8 h-8 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                   </svg>
                 </span>
               </button>
             </form>
 
-            <div class="text-center mt-8 pt-8 border-t border-gray-600/50">
-              <p class="text-base text-gray-300">
+            <div class="text-center mt-10 pt-10 border-t border-gray-600/50">
+              <p class="text-lg text-gray-300">
                 Déjà un compte ?
-                <span (click)="toggleFlip()" class="text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors ml-2 font-bold text-lg">
+                <span (click)="toggleFlip()" class="text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors ml-2 font-bold text-xl">
                   Se connecter
                 </span>
               </p>
@@ -263,22 +263,22 @@
 
           <!-- Clavier numérique AGRANDI -->
           <div class="w-96 flex flex-col justify-center">
-            <div class="numpad-large bg-gray-800/70 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-gray-600/30">
+            <div class="numpad-large bg-gray-800/70 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-gray-600/30">
               
               <!-- Indicateur du champ actif -->
-              <div class="current-field-indicator mb-4">
-                <div class="current-field-text">
+              <div class="current-field-indicator mb-6">
+                <div class="current-field-text text-xl">
                   {{ getCurrentFieldName() }}
                 </div>
               </div>
               
               <!-- Afficheur de valeur -->
-              <div class="value-display mb-6">
+              <div class="value-display mb-8 text-2xl">
                 {{ numpadValue || '---' }}
               </div>
               
               <!-- Clavier avec boutons AGRANDIS -->
-              <div class="grid grid-cols-3 gap-3">
+              <div class="grid grid-cols-3 gap-4">
                 <button *ngFor="let button of numpadButtons" 
                         (click)="onNumpadButtonClick(button)"
                         class="numpad-btn-large text-white rounded-xl font-bold transition-all duration-150"
@@ -290,8 +290,8 @@
               </div>
               
               <!-- Instructions -->
-              <div class="mt-4 text-center">
-                <p class="text-gray-400 text-sm">
+              <div class="mt-6 text-center">
+                <p class="text-gray-400 text-base">
                   Cliquez sur les champs ou utilisez le clavier physique
                 </p>
               </div>
@@ -307,6 +307,6 @@
 <div *ngIf="loading" class="loader-bg">
   <div class="loader-container">
     <div class="loader"></div>
-    <p class="text-cyan-400 mt-6 font-bold text-xl animate-pulse">AUTHENTIFICATION EN COURS...</p>
+    <p class="text-cyan-400 mt-8 font-bold text-2xl animate-pulse">AUTHENTIFICATION EN COURS...</p>
   </div>
 </div>

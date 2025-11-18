@@ -17,24 +17,21 @@
   </div>
 
   <div class="relative z-10 h-screen flex flex-col">
-    <!-- Header principal -->
-    <header class="header-industrial py-4 px-6">
+    <!-- Header principal simplifié -->
+    <header class="header-industrial py-3 px-6">
       <div class="flex justify-between items-center">
         <button 
           (click)="goBackToLogin()"
-          class="px-6 py-3 rounded-lg font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-red-600 hover:bg-red-500 text-white flex items-center text-sm">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
           </svg>
-          Retour Login
+          Retour
         </button>
 
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-cyan-400">PDP SERAF</h1>
-          <p class="text-cyan-200">PLANIFICATION ADMIN</p>
-        </div>
+        
 
-        <div class="w-40"></div>
+        <div class="w-32"></div>
       </div>
     </header>
 
@@ -42,13 +39,12 @@
     <div class="flex-1 flex overflow-hidden">
       
       <!-- Affichage des lignes de production -->
-      <div *ngIf="!selectedLigne()" class="flex-1 p-6 overflow-auto">
+      <div *ngIf="!selectedLigne()" class="flex-1 p-4 overflow-auto">
         <div class="max-w-[95%] mx-auto">
-          <h2 class="text-2xl font-bold text-cyan-400 mb-8 text-center">PLANIFICATION DES LIGNES</h2>
           
-          <!-- Barre de recherche des lignes -->
-          <div class="mb-6 max-w-md mx-auto">
-            <div class="search-container p-3 rounded-lg">
+          <!-- Barre de recherche -->
+          <div class="mb-6 flex justify-center">
+            <div class="search-container p-3 rounded-lg w-96">
               <div class="flex items-center">
                 <svg class="w-5 h-5 search-icon mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -78,7 +74,8 @@
             <p class="text-lg">Aucune ligne trouvée</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Grille avec 3 images par ligne -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div *ngFor="let line of filteredLines()" 
                  (click)="onLigneSelected(line)"
                  class="line-card-large rounded-xl cursor-pointer">
@@ -86,11 +83,12 @@
                 <img [src]="line.imageUrl" [alt]="line.ligne">
                 <div class="line-overlay-large">
                   <div class="line-name-large">{{ line.ligne }}</div>
+                  <div class="text-cyan-200 text-sm mt-2">{{ line.referenceCount }} références</div>
                 </div>
                 <div [class.status-badge-active]="line.isActive" 
                      [class.status-badge-inactive]="!line.isActive"
                      class="status-badge">
-                  {{ line.isActive ? 'Activer' : 'Non' }}
+                  {{ line.isActive ? 'Active' : 'Inactive' }}
                 </div>
               </div>
             </div>
@@ -206,48 +204,47 @@
                     <div *ngIf="getDayEntry(ref, day)" class="day-entry-table">
                       <table class="mini-table w-full">
                         <tbody>
-                          <!-- Ligne OF -->
                           <!-- Ligne OF - NON ÉDITABLE -->
-<tr class="border-b border-gray-700/30">
-  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">OF</td>
-  <td class="text-right py-2 px-3">
-    <span class="text-white font-mono text-sm">{{ getDayEntry(ref, day)!.of }}</span>
-  </td>
-</tr>
+                          <tr class="border-b border-gray-700/30">
+                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">OF</td>
+                            <td class="text-right py-2 px-3">
+                              <span class="text-white font-mono text-sm">{{ getDayEntry(ref, day)!.of }}</span>
+                            </td>
+                          </tr>
 
-<!-- Ligne Quantité (C) - NON ÉDITABLE -->
-<tr class="border-b border-gray-700/30">
-  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">C</td>
-  <td class="text-right py-2 px-3">
-    <span class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.quantite }}</span>
-  </td>
-</tr>
+                          <!-- Ligne Quantité (C) - NON ÉDITABLE -->
+                          <tr class="border-b border-gray-700/30">
+                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">C</td>
+                            <td class="text-right py-2 px-3">
+                              <span class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.quantite }}</span>
+                            </td>
+                          </tr>
 
-<!-- Ligne Modification (M) - ÉDITABLE -->
-<tr class="border-b border-gray-700/30">
-  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">M</td>
-  <td class="text-right py-2 px-3">
-    <input *ngIf="isFieldEditable('modification')" 
-           type="number"
-           [value]="getDayEntry(ref, day)!.modification"
-           (input)="updateDayEntry(ref, day, 'modification', $any($event.target).value)"
-           class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
-    <span *ngIf="!isFieldEditable('modification')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.modification }}</span>
-  </td>
-</tr>
+                          <!-- Ligne Modification (M) - ÉDITABLE -->
+                          <tr class="border-b border-gray-700/30">
+                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">M</td>
+                            <td class="text-right py-2 px-3">
+                              <input *ngIf="isFieldEditable('modification')" 
+                                     type="number"
+                                     [value]="getDayEntry(ref, day)!.modification"
+                                     (input)="updateDayEntry(ref, day, 'modification', $any($event.target).value)"
+                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
+                              <span *ngIf="!isFieldEditable('modification')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.modification }}</span>
+                            </td>
+                          </tr>
 
-<!-- Ligne Rendement (R) - ÉDITABLE -->
-<tr class="border-b border-gray-700/30">
-  <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">R</td>
-  <td class="text-right py-2 px-3">
-    <input *ngIf="isFieldEditable('rendement')" 
-           type="number"
-           [value]="getDayEntry(ref, day)!.rendement"
-           (input)="updateDayEntry(ref, day, 'rendement', $any($event.target).value)"
-           class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
-    <span *ngIf="!isFieldEditable('rendement')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.rendement }}</span>
-  </td>
-</tr>
+                          <!-- Ligne Rendement (R) - ÉDITABLE -->
+                          <tr class="border-b border-gray-700/30">
+                            <td class="text-left text-gray-300 py-2 px-3 font-medium text-sm w-12">R</td>
+                            <td class="text-right py-2 px-3">
+                              <input *ngIf="isFieldEditable('rendement')" 
+                                     type="number"
+                                     [value]="getDayEntry(ref, day)!.rendement"
+                                     (input)="updateDayEntry(ref, day, 'rendement', $any($event.target).value)"
+                                     class="w-full bg-gray-700/50 border border-gray-600 rounded px-2 py-1 text-white text-base text-right font-semibold">
+                              <span *ngIf="!isFieldEditable('rendement')" class="text-white font-semibold text-base">{{ getDayEntry(ref, day)!.rendement }}</span>
+                            </td>
+                          </tr>
                           
                           <!-- Ligne Delta (Δ) -->
                           <tr>
