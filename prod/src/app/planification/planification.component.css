@@ -151,182 +151,283 @@
   border-left-color: rgb(6, 182, 212);
 }
 
-/* ==================== TABLEAU HEBDOMADAIRE - STYLE SOMBRE ==================== */
+/* ==================== TABLEAU HEBDOMADAIRE - STYLE AMÉLIORÉ ==================== */
 .week-planning-table {
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.95);
+  font-size: 1.4rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* En-têtes du tableau - Style sombre */
+/* En-têtes du tableau */
 .week-planning-table th {
-  background: rgba(30, 41, 59, 0.95);
-  padding: 22px 18px;
-  font-weight: 600;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  padding: 20px 16px;
+  font-weight: 700;
   color: #e2e8f0;
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  border: 3px solid rgba(71, 85, 105, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   position: sticky;
   top: 0;
   z-index: 15;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Cellules du tableau */
 .week-planning-table td {
-  padding: 18px 14px;
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  padding: 16px 12px;
+  border: 3px solid rgba(71, 85, 105, 0.5);
   vertical-align: middle;
-  min-width: 200px;
-  font-size: 1.15rem;
-  background: rgba(15, 23, 42, 0.6);
+  min-width: 180px;
+  font-size: 1.2rem;
+  background: rgba(15, 23, 42, 0.7);
   color: #e2e8f0;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Colonnes compactes pour les premières colonnes */
+.week-planning-table td:nth-child(1) {
+  min-width: 100px !important;
+  max-width: 120px !important;
+  padding: 16px 10px !important;
+  font-size: 1.2rem !important;
+}
+
+.week-planning-table td:nth-child(2) {
+  min-width: 80px !important;
+  max-width: 100px !important;
+  padding: 16px 8px !important;
+  font-size: 1.4rem !important;
+}
+
+.week-planning-table td:nth-child(3) {
+  min-width: 140px !important;
+  max-width: 140px !important;
+  padding: 24px 16px !important;
+  font-size: 1.4rem !important;
 }
 
 /* Effet hover sur les lignes */
 .week-planning-table tbody tr:hover td {
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(30, 41, 59, 0.9);
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
 }
 
-/* Alternance de couleur pour les lignes - fond sombre */
-.week-planning-table tbody tr:nth-child(10n+1),
-.week-planning-table tbody tr:nth-child(10n+2),
-.week-planning-table tbody tr:nth-child(10n+3),
-.week-planning-table tbody tr:nth-child(10n+4),
-.week-planning-table tbody tr:nth-child(10n+5) {
-  background: rgba(15, 23, 42, 0.6);
+/* Alternance de couleur pour les lignes */
+.week-planning-table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.8);
 }
 
-.week-planning-table tbody tr:nth-child(10n+6),
-.week-planning-table tbody tr:nth-child(10n+7),
-.week-planning-table tbody tr:nth-child(10n+8),
-.week-planning-table tbody tr:nth-child(10n+9),
-.week-planning-table tbody tr:nth-child(10n+10) {
-  background: rgba(20, 30, 50, 0.6);
+.week-planning-table tbody tr:nth-child(odd) {
+  background: rgba(20, 30, 50, 0.8);
 }
 
-/* Style pour les cellules sticky (première colonne) */
+/* Style pour les cellules sticky */
 .week-planning-table .sticky-cell {
-  background: rgba(30, 41, 59, 0.95);
-  font-weight: 600;
-  font-size: 1.2rem;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  font-weight: 700;
+  font-size: 1.5rem;
   color: #06b6d4;
   position: sticky;
   left: 0;
   z-index: 10;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  border-right: 4px solid rgba(6, 182, 212, 0.5);
 }
 
 /* Style pour les inputs */
 .week-planning-table input {
-  font-size: 0.95rem !important;
+  font-size: 1.4rem !important;
   font-weight: 600;
-  padding: 6px 8px !important;
-  background: rgba(30, 41, 59, 0.8) !important;
-  border: 1px solid rgba(71, 85, 105, 0.6) !important;
-  border-radius: 4px;
-  color: #e2e8f0;
+  padding: 12px 16px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 3px solid rgba(71, 85, 105, 0.7) !important;
+  border-radius: 8px;
+  color: #000000 !important;
   text-align: center;
   width: 100%;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  min-height: 60px;
 }
 
 .week-planning-table input:focus {
-  background: rgba(30, 41, 59, 0.9) !important;
-  border-color: rgba(6, 182, 212, 0.8) !important;
+  background: rgba(255, 255, 255, 1) !important;
+  border-color: rgba(6, 182, 212, 0.9) !important;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
-}
-
-/* Style pour cellules compactes */
-.compact-cell {
-  padding: 12px 10px !important;
-  min-width: 180px !important;
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.3);
+  transform: scale(1.02);
 }
 
 /* Style pour les valeurs affichées */
 .value-display {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
+  padding: 14px 0;
   color: #e2e8f0;
-  padding: 8px 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Style pour les pourcentages delta - Plus grands et plus visibles */
+/* Style pour les pourcentages delta */
 .delta-value {
-  font-size: 1.4rem !important;
-  font-weight: 700 !important;
-  padding: 10px 0 !important;
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  padding: 16px 0 !important;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Couleurs pour les deltas - style sombre */
-.delta-excellent {
-  color: #10b981 !important;
+/* Barre de progression pour les deltas */
+.delta-value::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  border-radius: 3px;
 }
 
-.delta-good {
-  color: #f59e0b !important;
-}
+.delta-excellent::before { background: linear-gradient(to right, #10b981 70%, transparent 70%); }
+.delta-good::before { background: linear-gradient(to right, #f59e0b 50%, transparent 50%); }
+.delta-average::before { background: linear-gradient(to right, #f97316 30%, transparent 30%); }
+.delta-poor::before { background: linear-gradient(to right, #ef4444 20%, transparent 20%); }
 
-.delta-average {
-  color: #f97316 !important;
-}
-
-.delta-poor {
-  color: #ef4444 !important;
-}
+/* Couleurs pour les deltas */
+.delta-excellent { color: #10b981 !important; }
+.delta-good { color: #f59e0b !important; }
+.delta-average { color: #f97316 !important; }
+.delta-poor { color: #ef4444 !important; }
 
 /* Style pour les en-têtes de jours */
 .day-header {
-  font-size: 1.15rem !important;
-  font-weight: 600 !important;
-  padding: 22px 14px !important;
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  padding: 28px 18px !important;
   color: #06b6d4 !important;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .day-header .nb-operateurs {
+  font-size: 1.2rem;
+  margin-top: 8px;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: block;
+}
+
+.day-header .date-display {
   font-size: 1rem;
-  margin-top: 10px;
+  margin-top: 6px;
   font-weight: 500;
   color: #94a3b8;
+  display: block;
 }
 
 /* Style pour les références */
 .reference-cell {
-  font-size: 1.2rem !important;
-  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
   color: #06b6d4 !important;
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* Bordures sombres */
+.reference-cell:hover {
+  background: rgba(6, 182, 212, 0.4) !important;
+  transform: scale(1.02);
+}
+
+/* Bordures améliorées */
 .week-planning-table th,
 .week-planning-table td {
-  border-width: 1px;
+  border-width: 3px;
   border-style: solid;
-  border-color: rgba(71, 85, 105, 0.5);
+  border-color: rgba(71, 85, 105, 0.6);
+}
+
+/* Ligne de séparation NB OP */
+.nb-op-row {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+
+/* Ajustement pour les cellules avec rowspan */
+.week-planning-table th[rowspan="2"] {
+  vertical-align: middle;
+}
+
+/* Style pour maintenir l'alignement */
+.week-planning-table thead tr:first-child th {
+  border-bottom: none;
+}
+
+.week-planning-table thead tr:last-child th {
+  border-top: 3px solid rgba(71, 85, 105, 0.6);
+}
+
+/* ==================== STYLES POUR LE BOUTON PERSONNE ==================== */
+.day-header .person-icon-btn {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(6, 182, 212, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.day-header .person-icon-btn:hover {
+  background: rgba(6, 182, 212, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5);
+}
+
+.day-header .person-icon-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* ==================== SCROLLBAR ==================== */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 5px;
+  background: #1e293b;
+  border-radius: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 5px;
+  background: #475569;
+  border-radius: 6px;
+  border: 2px solid #1e293b;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }
 
 /* ==================== ANIMATIONS ==================== */
@@ -355,12 +456,14 @@
 .success-content {
   background: rgba(16, 185, 129, 0.95);
   color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
+  padding: 16px 24px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 /* ==================== LOADER ==================== */
@@ -370,7 +473,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -382,59 +485,187 @@
 }
 
 .industrial-loader {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(6, 182, 212, 0.3);
-  border-top: 3px solid #06b6d4;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(6, 182, 212, 0.3);
+  border-top: 4px solid #06b6d4;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;
 }
 
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 1536px) {
-  .line-card-large { height: 420px; }
-  .week-planning-table td { min-width: 180px; }
+/* ==================== TABLEAU DES DÉTAILS DE RÉFÉRENCE ==================== */
+.reference-details-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
+.reference-details-table th {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  padding: 20px 16px;
+  font-weight: 700;
+  color: #e2e8f0;
+  border: 2px solid rgba(71, 85, 105, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+}
+
+.reference-details-table td {
+  padding: 18px 14px;
+  border: 2px solid rgba(71, 85, 105, 0.5);
+  vertical-align: middle;
+  font-size: 1.2rem;
+  background: rgba(15, 23, 42, 0.7);
+  color: #e2e8f0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.reference-details-table tr:last-child {
+  border-top: 3px solid #06b6d4;
+  font-weight: 800;
+}
+
+.reference-details-table tr:last-child td {
+  background: rgba(6, 182, 212, 0.15);
+  font-size: 1.3rem;
+}
+
+/* ==================== STYLES POUR LE FORMULAIRE DE SAISIE ==================== */
+.production-form-overlay {
+  backdrop-filter: blur(8px);
+}
+
+.production-form-container {
+  background: rgba(15, 23, 42, 0.97);
+  border: 3px solid rgba(6, 182, 212, 0.6);
+  border-radius: 16px;
+}
+
+/* Scrollbar personnalisée pour le formulaire */
+.production-form-container ::-webkit-scrollbar {
+  width: 10px;
+}
+
+.production-form-container ::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 5px;
+}
+
+.production-form-container ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 5px;
+  border: 2px solid #1e293b;
+}
+
+.production-form-container ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Styles pour les inputs et selects */
+.production-form-container input,
+.production-form-container select {
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  padding: 12px 16px;
+}
+
+.production-form-container input:focus,
+.production-form-container select:focus {
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+  transform: scale(1.02);
+}
+
+/* Animation d'entrée */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.production-form-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* ==================== STYLES POUR LES CHAMPS C EN VERT ==================== */
+.week-planning-table tr:nth-child(5n+1) input {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border-color: rgba(34, 197, 94, 0.6) !important;
+}
+
+.week-planning-table tr:nth-child(5n+1) input:focus {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: rgba(34, 197, 94, 0.9) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+}
+
+.week-planning-table tr:nth-child(5n+1) .value-display {
+  color: #22c55e !important;
+  font-weight: 800;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Grands écrans (1536px et plus) - Défaut */
+
+/* Écrans larges (1536px) */
+@media (max-width: 1536px) {
+  .line-card-large { height: 420px; }
+  .week-planning-table td { min-width: 200px; }
+  .week-planning-table th,
+  .week-planning-table td {
+    padding: 20px 16px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Écrans desktop (1280px) */
 @media (max-width: 1280px) {
   .line-card-large { height: 380px; }
-  .week-planning-table td { min-width: 160px; }
+  .week-planning-table td { min-width: 180px; }
+  .week-planning-table th,
+  .week-planning-table td {
+    font-size: 1.1rem;
+    padding: 18px 14px;
+  }
+  .value-display { font-size: 1.3rem; }
+  .delta-value { font-size: 1.4rem !important; }
+}
+
+/* Tablettes paysage (1024px) */
+@media (max-width: 1024px) {
+  .line-card-large { height: 350px; }
+  .weeks-sidebar { width: 240px; }
   .week-planning-table th,
   .week-planning-table td {
     font-size: 1rem;
     padding: 16px 12px;
   }
-}
-
-@media (max-width: 1024px) {
-  .line-card-large { height: 350px; }
-  .weeks-sidebar { width: 220px; }
-  .week-planning-table th,
-  .week-planning-table td {
-    font-size: 0.95rem;
-    padding: 14px 10px;
-  }
   .line-name-large {
     font-size: 1.7rem;
   }
-}
-
-@media (max-width: 768px) {
-  .weeks-sidebar { width: 200px; }
-  .line-card-large { height: 320px; }
-  .week-planning-table { font-size: 0.9rem; }
-  .week-planning-table th,
-  .week-planning-table td {
-    font-size: 0.9rem;
-    padding: 12px 8px;
+  .production-form-container {
+    max-width: 95vw;
   }
-  .line-name-large {
-    font-size: 1.4rem;
+  
+  .production-form-container .flex {
+    flex-direction: column;
   }
-  .status-badge {
-    font-size: 0.8rem;
-    padding: 8px 16px;
+  
+  .production-form-container .w-1\/2 {
+    width: 100%;
+    border-left: none;
+    border-top: 2px solid #475569;
   }
 }
 
@@ -445,84 +676,192 @@
   }
 }
 
+/* Tablettes portrait (768px) */
 @media (max-width: 768px) {
+  .weeks-sidebar { width: 220px; }
+  .line-card-large { height: 320px; }
+  .week-planning-table { font-size: 0.9rem; }
+  .week-planning-table th,
+  .week-planning-table td {
+    font-size: 0.9rem;
+    padding: 14px 10px;
+  }
+  .line-name-large {
+    font-size: 1.4rem;
+  }
+  .status-badge {
+    font-size: 0.8rem;
+    padding: 8px 16px;
+  }
+  .value-display { font-size: 1.1rem; }
+  .delta-value { font-size: 1.2rem !important; }
+  
   .grid-cols-3 {
     grid-template-columns: 1fr;
   }
 }
-/* ==================== TABLEAU DES DÉTAILS DE RÉFÉRENCE ==================== */
-.reference-details-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: 100%;
-  background: rgba(15, 23, 42, 0.8);
+
+/* Mobiles (640px) */
+@media (max-width: 640px) {
+  .week-planning-table {
+    font-size: 0.8rem;
+  }
+  
+  .week-planning-table th,
+  .week-planning-table td {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .value-display {
+    font-size: 1rem;
+  }
+  
+  .delta-value {
+    font-size: 1.1rem !important;
+  }
+  
+  .week-planning-table input {
+    font-size: 1rem !important;
+    padding: 8px !important;
+    min-height: 40px;
+  }
+  
+  .weeks-sidebar {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    z-index: 50;
+    border-right: none;
+    border-top: 1px solid rgba(71, 85, 105, 0.3);
+  }
 }
 
-.reference-details-table th {
-  background: rgba(30, 41, 59, 0.95);
-  padding: 18px 14px;
-  font-weight: 600;
-  color: #e2e8f0;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 1rem;
+/* Petits mobiles (480px) */
+@media (max-width: 480px) {
+  .line-card-large { height: 280px; }
+  .line-name-large { font-size: 1.2rem; }
+  .line-overlay-large { padding: 2rem 1rem 1rem 1rem; }
+  
+  .week-planning-table th,
+  .week-planning-table td {
+    padding: 10px 6px;
+    font-size: 0.8rem;
+  }
+  
+  .week-planning-table input {
+    font-size: 0.9rem !important;
+    padding: 6px !important;
+    min-height: 35px;
+  }
+  
+  .success-content {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
 }
 
-.reference-details-table td {
-  padding: 16px 12px;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  vertical-align: middle;
-  font-size: 1.1rem;
-  background: rgba(15, 23, 42, 0.6);
-  color: #e2e8f0;
-  text-align: center;
+/* ==================== AMÉLIORATION DE L'ACCESSIBILITÉ ==================== */
+
+/* Réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+  .line-card-large,
+  .week-planning-table tbody tr:hover td,
+  .week-planning-table input,
+  .production-form-container input,
+  .production-form-container select,
+  .day-header .person-icon-btn {
+    transition: none;
+    transform: none;
+  }
+  
+  .particle {
+    animation: none;
+  }
+  
+  .industrial-loader {
+    animation-duration: 2s;
+  }
 }
 
-.reference-details-table tr:last-child {
-  border-top: 3px solid #06b6d4;
-  font-weight: 700;
+/* Mode haute contraste */
+@media (prefers-contrast: high) {
+  .week-planning-table th,
+  .week-planning-table td {
+    border-color: #ffffff;
+    background: #000000;
+    color: #ffffff;
+  }
+  
+  .week-planning-table .sticky-cell {
+    background: #000000;
+    border-right-color: #06b6d4;
+  }
+  
+  .value-display {
+    color: #ffffff;
+    font-weight: 800;
+  }
+  
+  .line-card-large {
+    border-color: #ffffff;
+  }
+  
+  .search-container {
+    border-color: #ffffff;
+  }
 }
 
-.reference-details-table tr:last-child td {
-  background: rgba(6, 182, 212, 0.1);
-  font-size: 1.2rem;
+/* Mode sombre par défaut - déjà implémenté */
+
+/* Orientation paysage sur mobiles */
+@media (max-height: 500px) and (orientation: landscape) {
+  .line-card-large { height: 250px; }
+  .loader-overlay {
+    padding: 20px;
+  }
 }
 
-/* Style pour les cellules cliquables */
-.reference-cell {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+/* Support tactile amélioré */
+@media (pointer: coarse) {
+  .week-planning-table input {
+    min-height: 44px; /* Taille minimale pour les doigts */
+  }
+  
+  .day-header .person-icon-btn {
+    min-width: 44px;
+    height: 44px;
+  }
+  
+  .status-badge {
+    padding: 12px 20px;
+  }
 }
 
-.reference-cell:hover {
-  background: rgba(6, 182, 212, 0.3) !important;
-}
-/* ==================== STYLES POUR LE TABLEAU MODIFIÉ ==================== */
-
-/* Style pour les dates dans les en-têtes */
-.day-header .date-display {
-  font-size: 0.85rem;
-  margin-top: 5px;
-  font-weight: 500;
-  color: #cbd5e1;
-}
-
-/* Style pour la ligne de séparation NB OP */
-.nb-op-row {
-  background: rgba(30, 41, 59, 0.95) !important;
-}
-
-/* Ajustement pour les cellules avec rowspan */
-.week-planning-table th[rowspan="2"] {
-  vertical-align: middle;
-}
-
-/* Style pour maintenir l'alignement */
-.week-planning-table thead tr:first-child th {
-  border-bottom: none;
-}
-
-.week-planning-table thead tr:last-child th {
-  border-top: 1px solid rgba(71, 85, 105, 0.5);
+/* Impression */
+@media print {
+  .header-industrial,
+  .weeks-sidebar,
+  .search-container,
+  .success-notification {
+    display: none;
+  }
+  
+  .full-screen-layout {
+    background: white;
+  }
+  
+  .week-planning-table {
+    box-shadow: none;
+    background: white;
+  }
+  
+  .week-planning-table th,
+  .week-planning-table td {
+    background: white;
+    color: black;
+    border-color: black;
+  }
 }

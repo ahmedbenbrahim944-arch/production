@@ -2,11 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Container et flip */
+/* Container et flip - DIMENSIONS OPTIMISÉES */
 .card-container { 
-  width: 2200px; 
-  height: 950px; 
-  perspective: 1500px; 
+  width: 100%;
+  max-width: 1600px;
+  height: auto;
+  min-height: 700px;
+  perspective: 1500px;
+  padding: 1rem;
 }
 
 .flip { 
@@ -15,6 +18,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 700px;
 }
 
 .flipped { 
@@ -29,32 +33,35 @@
   backface-visibility: hidden; 
   overflow: hidden; 
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: row;
 }
 
 .back { 
   transform: rotateY(180deg); 
 }
 
-/* Input styles améliorés et agrandis */
+/* Input styles - TAILLES OPTIMISÉES */
 .input-industrial { 
   background: rgba(255, 255, 255, 0.08); 
   border: 2px solid rgba(255, 255, 255, 0.25); 
   color: white; 
   transition: all 0.3s ease;
-  font-size: 22px;
+  font-size: 1.25rem;
   cursor: pointer;
-  min-height: 70px;
+  min-height: 65px;
+  padding: 1rem 1.5rem;
 }
 
 .input-industrial::placeholder {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .input-industrial:focus { 
   border-color: #00e6ff; 
   box-shadow: 0 0 25px #00e6ff80, inset 0 0 15px rgba(0, 230, 255, 0.15); 
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.12);
 }
 
@@ -73,18 +80,18 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Boutons améliorés et agrandis */
+/* Boutons - TAILLES OPTIMISÉES */
 .btn-industrial {
   background: linear-gradient(135deg, #00bcd4, #0097a7);
-  padding: 1rem 2.5rem;
+  padding: 1.125rem 2.5rem;
   border-radius: 15px;
   color: white;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.375rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  min-height: 65px;
+  min-height: 70px;
 }
 
 .btn-industrial::before {
@@ -103,21 +110,21 @@
 }
 
 .btn-industrial:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 20px 40px rgba(0, 188, 212, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 188, 212, 0.5);
 }
 
 .btn-industrial-register {
   background: linear-gradient(135deg, #667eea, #764ba2);
-  padding: 1rem 2.5rem;
+  padding: 1.125rem 2.5rem;
   border-radius: 15px;
   color: white;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.375rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  min-height: 65px;
+  min-height: 70px;
 }
 
 .btn-industrial-register::before {
@@ -136,11 +143,11 @@
 }
 
 .btn-industrial-register:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
 }
 
-/* Neon title amélioré et agrandi */
+/* Neon title - TAILLE OPTIMISÉE */
 .neon { 
   color: #00ffff; 
   text-shadow: 
@@ -149,7 +156,8 @@
     0 0 60px #00ffff,
     0 0 100px #00ffff;
   animation: neon-pulse 2s ease-in-out infinite alternate;
-  font-size: 4.5rem;
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  line-height: 1.2;
 }
 
 @keyframes neon-pulse {
@@ -169,7 +177,7 @@
   }
 }
 
-/* Système de particules amélioré */
+/* Système de particules */
 .particle {
   position: absolute;
   border-radius: 50%;
@@ -201,7 +209,7 @@
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-15px) rotate(5deg);
+    transform: translateY(-10px) rotate(3deg);
   }
 }
 
@@ -209,7 +217,7 @@
   animation: float-icon 3s ease-in-out infinite;
 }
 
-/* Loader amélioré */
+/* Loader */
 .loader-container {
   display: flex;
   flex-direction: column;
@@ -218,15 +226,14 @@
 }
 
 .loader {
-  width: 110px;
-  height: 110px;
-  border: 6px solid transparent;
-  border-top: 6px solid #00ffff;
-  border-right: 6px solid #00ffff;
-  border-bottom: 5px solid transparent;
+  width: 80px;
+  height: 80px;
+  border: 5px solid transparent;
+  border-top: 5px solid #00ffff;
+  border-right: 5px solid #00ffff;
   border-radius: 50%;
   animation: spin 1.2s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
 }
 
 @keyframes spin {
@@ -246,7 +253,6 @@
   }
 }
 
-/* Loader Overlay */
 .loader-bg { 
   position: fixed; 
   inset: 0; 
@@ -258,41 +264,41 @@
   backdrop-filter: blur(15px);
 }
 
-/* Styles pour le clavier numérique AGRANDI */
+/* Clavier numérique - DESIGN LATÉRAL OPTIMISÉ */
 .numpad-large {
   animation: fadeIn 0.3s ease-out;
-  min-width: 400px;
+  width: 100%;
+  max-width: 420px;
+  min-width: 360px;
 }
 
-/* Boutons du clavier AGRANDIS */
 .numpad-btn-large {
-  min-height: 5rem !important;
+  min-height: 4.5rem;
   aspect-ratio: 1;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem !important;
+  font-size: 1.75rem;
   font-weight: bold;
-  border-radius: 15px !important;
+  border-radius: 15px;
 }
 
 .numpad-btn-large:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .numpad-btn-large:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Animations pour le clavier numérique */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -300,12 +306,12 @@
   }
 }
 
-/* Indicateur de champ actif */
+/* Indicateur de champ actif - TAILLE OPTIMISÉE */
 .current-field-indicator {
   background: rgba(0, 230, 255, 0.2);
   border: 2px solid #00e6ff;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
   margin-bottom: 1rem;
   text-align: center;
   box-shadow: 0 0 20px rgba(0, 230, 255, 0.3);
@@ -314,87 +320,239 @@
 .current-field-text {
   color: #00e6ff;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   text-shadow: 0 0 10px rgba(0, 230, 255, 0.5);
 }
 
-/* Afficheur de valeur */
+/* Afficheur de valeur - TAILLE OPTIMISÉE */
 .value-display {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 1.125rem;
   margin-bottom: 1.5rem;
   text-align: center;
   min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   color: #00ffff;
   box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
 }
 
-/* Responsive pour très grands écrans */
-@media (min-width: 1920px) {
+/* RESPONSIVE - TABLETTES (≤1024px) */
+@media (max-width: 1024px) {
   .card-container {
-    width: 1600px;
-    height: 850px;
+    max-width: 95%;
+    min-height: 650px;
+    padding: 1rem;
+  }
+
+  .flip {
+    min-height: 650px;
   }
   
+  .face {
+    flex-direction: row;
+    overflow-y: auto;
+  }
+  
+  /* Section gauche réduite */
+  .face > div:first-child {
+    width: 35% !important;
+    padding: 2rem 1.5rem !important;
+  }
+
+  /* Section droite plus large */
+  .face > div:last-child {
+    width: 65% !important;
+    padding: 2rem 1.5rem !important;
+    gap: 1.5rem !important;
+    display: flex;
+    flex-direction: row;
+  }
+
   .neon {
-    font-size: 5rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 1.5rem !important;
+  }
+
+  .face img {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  /* Formulaire prend plus de place */
+  .face > div:last-child > div:first-child {
+    flex: 1;
+    min-width: 320px;
+  }
+
+  /* Clavier à côté */
+  .face > div:last-child > div:last-child {
+    width: auto !important;
+    flex-shrink: 0;
+  }
+
+  .numpad-large {
+    max-width: 340px;
+    min-width: 300px;
+    padding: 1.5rem;
   }
   
   .numpad-btn-large {
-    min-height: 7rem !important;
-    font-size: 2.2rem !important;
+    min-height: 3.75rem;
+    font-size: 1.5rem;
   }
-  
+
   .input-industrial {
-    font-size: 24px;
-    min-height: 80px;
+    font-size: 1.125rem;
+    min-height: 60px;
+  }
+
+  .value-display {
+    min-height: 60px;
+    font-size: 1.35rem;
+  }
+
+  h2 {
+    font-size: 2.25rem !important;
+  }
+
+  .btn-industrial,
+  .btn-industrial-register {
+    font-size: 1.25rem;
+    min-height: 65px;
   }
 }
 
-/* Responsive pour tablettes */
-@media (max-width: 1024px) {
+/* RESPONSIVE - MOBILES (≤768px) - Layout vertical */
+@media (max-width: 768px) {
   .card-container {
-    width: 98%;
-    height: auto;
-    min-height: 700px;
+    padding: 0.5rem;
+    min-height: 550px;
+  }
+
+  .flip {
+    min-height: 550px;
   }
   
   .face {
     flex-direction: column;
   }
   
-  .face > div {
+  .face > div:first-child {
+    width: 100% !important;
+    min-height: 220px;
+    padding: 1.5rem 1rem !important;
+  }
+
+  .face > div:last-child {
+    width: 100% !important;
+    flex-direction: column !important;
+    padding: 1.5rem 1rem !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Formulaire en haut */
+  .face > div:last-child > div:first-child {
+    width: 100% !important;
+    min-width: auto;
+  }
+
+  /* Clavier en bas */
+  .face > div:last-child > div:last-child {
     width: 100% !important;
   }
 
+  .neon {
+    font-size: clamp(1.875rem, 6vw, 2.5rem);
+    margin-bottom: 1rem !important;
+  }
+
+  .face img {
+    width: 110px !important;
+    height: 110px !important;
+  }
+  
   .numpad-large {
-    min-width: 100%;
-    margin-top: 2rem;
+    max-width: 100%;
+    min-width: auto;
+    padding: 1.25rem;
   }
   
   .numpad-btn-large {
-    min-height: 4rem !important;
-    font-size: 1.5rem !important;
+    min-height: 3.5rem;
+    font-size: 1.4rem;
+  }
+  
+  .input-industrial {
+    font-size: 1.125rem;
+    min-height: 58px;
+  }
+  
+  .value-display {
+    min-height: 58px;
+    font-size: 1.3rem;
+  }
+
+  h2 {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  p {
+    font-size: 1.125rem !important;
+  }
+
+  .btn-industrial,
+  .btn-industrial-register {
+    font-size: 1.125rem;
+    padding: 1rem 2rem;
+    min-height: 60px;
+  }
+
+  /* Grid 2 colonnes pour prénom/nom */
+  .grid-cols-2 {
+    gap: 1rem !important;
   }
 }
 
-/* Responsive pour mobiles */
-@media (max-width: 768px) {
+/* RESPONSIVE - PETITS MOBILES (≤480px) */
+@media (max-width: 480px) {
   .card-container {
-    width: 98%;
-    min-height: 550px;
+    padding: 0.25rem;
+    min-height: 400px;
   }
-  
+
+  .flip {
+    min-height: 400px;
+  }
+
+  .face {
+    border-radius: 15px;
+  }
+
+  .face > div:first-child {
+    min-height: 180px;
+    padding: 1rem 0.75rem !important;
+  }
+
+  .face > div:last-child {
+    padding: 1rem 0.75rem !important;
+    gap: 1.5rem !important;
+  }
+
   .neon {
-    font-size: 3.5rem;
+    font-size: clamp(1.5rem, 8vw, 2rem);
+  }
+
+  .face img {
+    width: 80px !important;
+    height: 80px !important;
   }
   
   .numpad-large {
@@ -402,43 +560,36 @@
   }
   
   .numpad-btn-large {
-    min-height: 5rem !important;
-    font-size: 1.8rem !important;
-  }
-  
-  .input-industrial {
-    font-size: 20px;
-    min-height: 65px;
-  }
-  
-  .value-display {
-    min-height: 60px;
-    font-size: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .numpad-large {
-    padding: 0.75rem;
-  }
-  
-  .numpad-btn-large {
-    min-height: 3rem !important;
-    font-size: 1.1rem !important;
+    min-height: 3rem;
+    font-size: 1.15rem;
+    border-radius: 10px;
   }
   
   .btn-industrial,
   .btn-industrial-register {
-     padding: 1.2rem 3rem;
-  border-radius: 18px;
-  font-size: 22px;
-  min-height: 75px;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.95rem;
+    min-height: 48px;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .input-industrial {
+    font-size: 0.9rem;
+    min-height: 46px;
+  }
+
+  /* Passer en 1 colonne pour prénom/nom */
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
   }
 }
 
 /* Scrollbar personnalisée */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -447,13 +598,13 @@
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #00bcd4, #0097a7);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 /* Amélioration de l'accessibilité */
 .numpad-btn-large:focus {
-  outline: 3px solid #00e6ff;
-  outline-offset: 3px;
+  outline: 2px solid #00e6ff;
+  outline-offset: 2px;
 }
 
 .input-industrial:focus {
