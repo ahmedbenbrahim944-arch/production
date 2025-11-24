@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -14,11 +14,11 @@ interface ProductionLine {
 interface DayEntry {
   of: string;
   nbOperateurs: number;
-  c: number;       // Quantité planifiée
-  m: number;       // Modification
-  dp: number;      // Déclaration production
-  dm: number;      // Déclaration magasin
-  delta: number;   // Delta en %
+  c: number;
+  m: number;
+  dp: number;
+  dm: number;
+  delta: number;
 }
 
 interface ReferenceProduction {
@@ -52,11 +52,11 @@ interface ReferenceDetail {
 }
 
 interface DayDetail {
-  qPro: number;        // Quantité total planifiée
-  nbBac: number;       // Nombre de bac
-  tPiece: number;      // Temps de pièce (secondes)
-  tProdH: number;      // Temps de production (heures)
-  tProdMin: number;    // Temps de production (minutes)
+  qPro: number;
+  nbBac: number;
+  tPiece: number;
+  tProdH: number;
+  tProdMin: number;
 }
 
 @Component({
@@ -66,8 +66,12 @@ interface DayDetail {
   templateUrl: './planification.component.html',
   styleUrls: ['./planification.component.css']
 })
-export class PlanificationComponent {
+export class PlanificationComponent implements AfterViewInit {
+  @ViewChild('scrollWrapper') scrollWrapper!: ElementRef;
+  @ViewChild('tableContainer') tableContainer!: ElementRef;
+
   // Signals
+  sidebarVisible = signal(true);
   loading = signal(false);
   selectedLigne = signal<ProductionLine | null>(null);
   selectedWeek = signal<number | null>(null);
@@ -81,12 +85,26 @@ export class PlanificationComponent {
   searchReferenceQuery = signal('');
   selectedReferenceDetails = signal<ReferenceDetail | null>(null);
 
+  // Gestion du scroll
+  isScrollable = signal(false);
+  isScrolled = signal(false);
+  isScrolledEnd = signal(false);
+  showScrollIndicator = signal(true);
+
+  private isTouchScrolling = false;
+  private touchStartX = 0;
+  private scrollLeftStart = 0;
+
   // Données
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
   constructor(private router: Router) {
     this.generateParticles();
     this.loadProductionLines();
+  }
+
+  toggleSidebar(): void {
+    this.sidebarVisible.set(!this.sidebarVisible());
   }
 
   private generateParticles() {
@@ -457,5 +475,70 @@ export class PlanificationComponent {
     });
     
     return total.toString();
+  }
+
+  // Gestion du scroll
+  onTableScroll(event: Event): void {
+    const wrapper = event.target as HTMLElement;
+    this.updateScrollState(wrapper);
+    this.onFirstScroll();
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    const wrapper = this.scrollWrapper.nativeElement;
+    this.isTouchScrolling = true;
+    this.touchStartX = event.touches[0].pageX;
+    this.scrollLeftStart = wrapper.scrollLeft;
+    wrapper.style.cursor = 'grabbing';
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isTouchScrolling) return;
+    
+    event.preventDefault();
+    const wrapper = this.scrollWrapper.nativeElement;
+    const x = event.touches[0].pageX;
+    const walk = (x - this.touchStartX) * 2;
+    wrapper.scrollLeft = this.scrollLeftStart - walk;
+    
+    this.updateScrollState(wrapper);
+  }
+
+  onTouchEnd(): void {
+    this.isTouchScrolling = false;
+    const wrapper = this.scrollWrapper.nativeElement;
+    wrapper.style.cursor = 'grab';
+  }
+
+  private updateScrollState(wrapper: HTMLElement): void {
+    const scrollLeft = wrapper.scrollLeft;
+    const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+    
+    this.isScrolled.set(scrollLeft > 10);
+    this.isScrolledEnd.set(scrollLeft >= maxScroll - 10);
+    this.isScrollable.set(wrapper.scrollWidth > wrapper.clientWidth);
+  }
+
+  scrollToStart(): void {
+    if (this.scrollWrapper?.nativeElement) {
+      this.scrollWrapper.nativeElement.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+  }
+
+  hideScrollIndicator(): void {
+    this.showScrollIndicator.set(false);
+  }
+
+  onFirstScroll(): void {
+    this.hideScrollIndicator();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      if (this.scrollWrapper?.nativeElement) {
+        const wrapper = this.scrollWrapper.nativeElement;
+        this.updateScrollState(wrapper);
+      }
+    }, 100);
   }
 }

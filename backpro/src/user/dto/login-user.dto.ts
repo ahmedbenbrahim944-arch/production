@@ -1,13 +1,16 @@
 // src/user/dto/login-user.dto.ts
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength, IsNumberString } from 'class-validator';
 
 export class LoginUserDto {
-  @IsString()
+  @IsNumberString({}, { message: 'Le nom doit être un nombre' })
   @IsNotEmpty({ message: 'Le nom est obligatoire' })
+  @MinLength(4, { message: 'Le nom doit contenir au moins 4 chiffres' })
+  @MaxLength(10, { message: 'Le nom ne doit pas dépasser 10 chiffres' })
   nom: string;
 
-  @IsString()
+  @IsNumberString({}, { message: 'Le mot de passe doit être un nombre' })
   @IsNotEmpty({ message: 'Le mot de passe est obligatoire' })
-  @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
+  @MinLength(4, { message: 'Le mot de passe doit contenir au moins 4 chiffres' })
+  @MaxLength(10, { message: 'Le mot de passe ne doit pas dépasser 10 chiffres' })
   password: string;
 }

@@ -16,20 +16,19 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50, unique: true })
+  @Column({ length: 10, unique: false }) // Temporairement sans unicité
   nom: string;
 
   @Column({ length: 50 })
   prenom: string;
 
   @Column()
-  @Exclude() // Exclure le password des réponses
+  @Exclude()
   password: string;
 
   @Column({ default: true })
   isActive: boolean;
 
-  // Relation: L'utilisateur (chef secteur) a été créé par un admin
   @ManyToOne(() => Admin, (admin) => admin.usersCreated, { nullable: true })
   @JoinColumn({ name: 'createdById' })
   createdBy: Admin;

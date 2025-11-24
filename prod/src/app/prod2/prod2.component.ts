@@ -88,11 +88,8 @@ interface OperatorFormData {
   matricule: string;
   nomPrenom: string;
   ligne1: string;
-  phasesLigne1: WorkPhase[];
-  ligne2: string;
-  phasesLigne2: WorkPhase[];
-  newPhaseLigne1: { phase: string; heures: number };
-  newPhaseLigne2: { phase: string; heures: number };
+  phases: string[]; // Tableau de 3 phases max
+   heuresPhases: number[]; // ← NOUVEAU: Tableau des heures par phase
   totalHeures: number;
 }
 
@@ -126,7 +123,6 @@ export class Prod2Component implements AfterViewInit {
   selectedDayForProduction = signal<string>('');
   productionRecords = signal<ProductionRecord[]>([]);
   currentDate = signal<string>('');
-  activeTab = signal<'ligne1' | 'ligne2'>('ligne1');
   searchRecordQuery = signal('');
   
   operators = signal<Operator[]>([
@@ -141,9 +137,12 @@ export class Prod2Component implements AfterViewInit {
   ]);
 
   operatorsFormData = signal<Map<string, OperatorFormData>>(new Map());
-
   availablePhases = signal<string[]>([]);
-  availablePhasesLigne2 = signal<string[]>([]);
+  selectedMatricules = signal<string[]>([]);
+  showRecordsPanel = signal<boolean>(false);
+  showRecordsDetails = signal<boolean>(false);
+  selectedRecordForDetails = signal<ProductionRecord | null>(null);
+  filteredOperatorsForSelection = signal<Operator[]>([]);
 
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
@@ -151,7 +150,7 @@ export class Prod2Component implements AfterViewInit {
     this.generateParticles();
     this.loadProductionLines();
     this.loadSampleProductionRecords();
-     this.updateFilteredOperators();
+    this.updateFilteredOperators();
   }
 
   toggleSidebar(): void {
@@ -169,7 +168,6 @@ export class Prod2Component implements AfterViewInit {
   }
 
   private loadProductionLines() {
-    console.log('Loading production lines...');
     const lines: ProductionLine[] = [
       {
         ligne: 'L04:RXT1',
@@ -215,7 +213,6 @@ export class Prod2Component implements AfterViewInit {
       }
     ];
     this.availableLines.set(lines);
-    console.log('Production lines loaded:', lines.length);
   }
 
   filteredLines = computed(() => {
@@ -256,17 +253,8 @@ export class Prod2Component implements AfterViewInit {
       record.date === currentDate && 
       (record.matricule.toLowerCase().includes(query) ||
        record.nomPrenom.toLowerCase().includes(query) ||
-       record.ligne1.toLowerCase().includes(query) ||
-       (record.ligne2 && record.ligne2.toLowerCase().includes(query)))
+       record.ligne1.toLowerCase().includes(query))
     );
-  });
-
-  selectedOperators = computed(() => {
-    return this.operators().filter(op => op.selected);
-  });
-
-  hasSelectedOperators = computed(() => {
-    return this.selectedOperators().length > 0;
   });
 
   getAvailableWeeks() {
@@ -303,7 +291,6 @@ export class Prod2Component implements AfterViewInit {
   }
 
   onLigneSelected(line: ProductionLine) {
-    console.log('Line selected:', line.ligne);
     this.selectedLigne.set(line);
     this.selectedWeek.set(null);
     this.weekPlanification.set(null);
@@ -312,7 +299,6 @@ export class Prod2Component implements AfterViewInit {
   }
 
   onWeekSelected(weekNumber: number) {
-    console.log('Week selected:', weekNumber);
     const line = this.selectedLigne();
     
     if (line && weekNumber) {
@@ -324,7 +310,6 @@ export class Prod2Component implements AfterViewInit {
   }
 
   private loadWeekPlanification(week: number, line: ProductionLine) {
-    console.log('Loading week planification...');
     this.loading.set(true);
 
     setTimeout(() => {
@@ -362,7 +347,6 @@ export class Prod2Component implements AfterViewInit {
         references
       });
       this.loading.set(false);
-      console.log('Week planification loaded');
     }, 600);
   }
 
@@ -435,8 +419,6 @@ export class Prod2Component implements AfterViewInit {
     this.searchReferenceQuery.set(target.value);
   }
 
- 
-
   clearLineSearch(): void {
     this.searchLineQuery.set('');
   }
@@ -487,13 +469,6 @@ export class Prod2Component implements AfterViewInit {
     return ref[day] as DayEntry | undefined;
   }
 
-  // NOUVELLE MÉTHODE : Gestion des onglets
-  setActiveTab(tab: 'ligne1' | 'ligne2'): void {
-    this.activeTab.set(tab);
-  }
-
-  
-
   private setDefaultDate(day: string): void {
     const planif = this.weekPlanification();
     if (!planif) return;
@@ -513,36 +488,6 @@ export class Prod2Component implements AfterViewInit {
     return `${day}/${month}/${year}`;
   }
 
-  resetOperatorSelections(): void {
-    this.operators.update(ops => 
-      ops.map(op => ({ ...op, selected: false }))
-    );
-  }
-
-  initializeOperatorsFormData(): void {
-    const currentLine = this.selectedLigne();
-    if (!currentLine) return;
-
-    const formDataMap = new Map<string, OperatorFormData>();
-    
-    this.operators().forEach(operator => {
-      formDataMap.set(operator.matricule, {
-        matricule: operator.matricule,
-        nomPrenom: `${operator.nom} ${operator.prenom}`,
-        ligne1: currentLine.ligne,
-        phasesLigne1: [],
-        ligne2: '',
-        phasesLigne2: [],
-        newPhaseLigne1: { phase: '', heures: 0 },
-        newPhaseLigne2: { phase: '', heures: 0 },
-        totalHeures: 0
-      });
-    });
-
-    this.operatorsFormData.set(formDataMap);
-    this.loadAvailablePhases(currentLine.ligne);
-  }
-
   private loadAvailablePhases(ligne: string): void {
     const phasesMap: { [key: string]: string[] } = {
       'L04:RXT1': ['4101', '4102', '4103', '4104', '4201', '4202'],
@@ -554,7 +499,6 @@ export class Prod2Component implements AfterViewInit {
     };
 
     this.availablePhases.set(phasesMap[ligne] || []);
-    this.availablePhasesLigne2.set(['PHASE1', 'PHASE2', 'PHASE3', 'PHASE4']);
   }
 
   private loadSampleProductionRecords(): void {
@@ -577,160 +521,26 @@ export class Prod2Component implements AfterViewInit {
         date: '06/01/2025',
         ligne1: 'L04:RXT1',
         phasesLigne1: [{ phase: '4102', heures: 6, ligne: 'L04:RXT1' }],
-        ligne2: 'L07:COM A1',
-        phasesLigne2: [{ phase: 'PHASE1', heures: 2, ligne: 'L07:COM A1' }],
-        totalHeures: 8
+        ligne2: '',
+        phasesLigne2: [],
+        totalHeures: 6
       }
     ];
 
     this.productionRecords.set(sampleRecords);
   }
 
-  toggleOperatorSelection(matricule: string): void {
-    this.operators.update(ops => 
-      ops.map(op => 
-        op.matricule === matricule ? { ...op, selected: !op.selected } : op
-      )
-    );
-  }
-
-  
-
- 
-
-  getOperatorFormData(matricule: string): OperatorFormData | undefined {
-    return this.operatorsFormData().get(matricule);
-  }
-
-  updateOperatorFormData(matricule: string, updates: Partial<OperatorFormData>): void {
-    const currentData = this.operatorsFormData().get(matricule);
-    if (currentData) {
-      const updatedData = { ...currentData, ...updates };
-      updatedData.totalHeures = this.calculateTotalHeuresForOperator(updatedData);
-      
-      this.operatorsFormData.update(map => {
-        map.set(matricule, updatedData);
-        return new Map(map);
-      });
-    }
-  }
-
-  calculateTotalHeuresForOperator(formData: OperatorFormData): number {
-    const totalLigne1 = formData.phasesLigne1.reduce((sum, phase) => sum + phase.heures, 0);
-    const totalLigne2 = formData.phasesLigne2.reduce((sum, phase) => sum + phase.heures, 0);
-    return totalLigne1 + totalLigne2;
-  }
-
-  addPhaseToLigne1(matricule: string): void {
-    const formData = this.getOperatorFormData(matricule);
-    if (!formData) return;
-
-    const newPhase = { ...formData.newPhaseLigne1 };
-    
-    if (newPhase.phase && newPhase.heures > 0) {
-      const workPhase: WorkPhase = {
-        phase: newPhase.phase,
-        heures: newPhase.heures,
-        ligne: formData.ligne1
-      };
-      
-      this.updateOperatorFormData(matricule, {
-        phasesLigne1: [...formData.phasesLigne1, workPhase],
-        newPhaseLigne1: { phase: '', heures: 0 }
-      });
-    }
-  }
-
-  addPhaseToLigne2(matricule: string): void {
-    const formData = this.getOperatorFormData(matricule);
-    if (!formData) return;
-
-    const newPhase = { ...formData.newPhaseLigne2 };
-    
-    if (newPhase.phase && newPhase.heures > 0 && formData.ligne2) {
-      const workPhase: WorkPhase = {
-        phase: newPhase.phase,
-        heures: newPhase.heures,
-        ligne: formData.ligne2
-      };
-      
-      this.updateOperatorFormData(matricule, {
-        phasesLigne2: [...formData.phasesLigne2, workPhase],
-        newPhaseLigne2: { phase: '', heures: 0 }
-      });
-    }
-  }
-
-  removePhase(matricule: string, ligne: 'ligne1' | 'ligne2', index: number): void {
-    const formData = this.getOperatorFormData(matricule);
-    if (!formData) return;
-
-    if (ligne === 'ligne1') {
-      this.updateOperatorFormData(matricule, {
-        phasesLigne1: formData.phasesLigne1.filter((_, i) => i !== index)
-      });
-    } else {
-      this.updateOperatorFormData(matricule, {
-        phasesLigne2: formData.phasesLigne2.filter((_, i) => i !== index)
-      });
-    }
-  }
-
-  updateNewPhase(matricule: string, ligne: 'ligne1' | 'ligne2', field: 'phase' | 'heures', value: string | number): void {
-    const formData = this.getOperatorFormData(matricule);
-    if (!formData) return;
-
-    if (ligne === 'ligne1') {
-      this.updateOperatorFormData(matricule, {
-        newPhaseLigne1: { 
-          ...formData.newPhaseLigne1, 
-          [field]: field === 'heures' ? +value : value 
-        }
-      });
-    } else {
-      this.updateOperatorFormData(matricule, {
-        newPhaseLigne2: { 
-          ...formData.newPhaseLigne2, 
-          [field]: field === 'heures' ? +value : value 
-        }
-      });
-    }
-  }
-
-  updateLigne2(matricule: string, value: string): void {
-    this.updateOperatorFormData(matricule, { ligne2: value });
-  }
-
   formatPhases(phases: WorkPhase[]): string {
     return phases.map(p => `${p.phase}(${p.heures}h)`).join(', ');
   }
 
-  
-
-  resetOperatorForms(): void {
-    const selectedOps = this.selectedOperators();
-    const currentLine = this.selectedLigne();
-    
-    selectedOps.forEach(operator => {
-      this.updateOperatorFormData(operator.matricule, {
-        phasesLigne1: [],
-        phasesLigne2: [],
-        newPhaseLigne1: { phase: '', heures: 0 },
-        newPhaseLigne2: { phase: '', heures: 0 },
-        ligne2: '',
-        totalHeures: 0
-      });
-    });
-  }
-
   closeProductionForm(): void {
     this.showProductionForm.set(false);
-    this.resetOperatorSelections();
+    this.selectedMatricules.set([]);
+    this.operatorsFormData.set(new Map());
   }
 
   showReferenceDetails(ref: ReferenceProduction): void {
-    console.log('Showing details for reference:', ref.reference);
-    
     const referenceDetail: ReferenceDetail = {
       reference: ref.reference
     };
@@ -862,61 +672,52 @@ export class Prod2Component implements AfterViewInit {
       }
     }, 100);
   }
-  // Ajoutez ces signaux après les autres signaux existants
-selectedMatricules = signal<string[]>([]);
-showRecordsPanel = signal<boolean>(false);
-showRecordsDetails = signal<boolean>(false);
-selectedRecordForDetails = signal<ProductionRecord | null>(null);
-filteredOperatorsForSelection = signal<Operator[]>([]);
 
-// Ajoutez ces méthodes dans la classe
+  // NOUVELLES MÉTHODES POUR LE FORMULAIRE SIMPLIFIÉ
 
-// Méthode pour filtrer les opérateurs
-updateFilteredOperators(): void {
-  const query = this.searchRecordQuery().toLowerCase();
-  const allOperators = this.operators();
-  
-  if (!query) {
-    this.filteredOperatorsForSelection.set(allOperators);
-    return;
+  updateFilteredOperators(): void {
+    const query = this.searchRecordQuery().toLowerCase();
+    const allOperators = this.operators();
+    
+    if (!query) {
+      this.filteredOperatorsForSelection.set(allOperators);
+      return;
+    }
+    
+    const filtered = allOperators.filter(op => 
+      op.matricule.toLowerCase().includes(query) ||
+      op.nom.toLowerCase().includes(query) ||
+      op.prenom.toLowerCase().includes(query)
+    );
+    this.filteredOperatorsForSelection.set(filtered);
   }
-  
-  const filtered = allOperators.filter(op => 
-    op.matricule.toLowerCase().includes(query) ||
-    op.nom.toLowerCase().includes(query) ||
-    op.prenom.toLowerCase().includes(query)
-  );
-  this.filteredOperatorsForSelection.set(filtered);
-}
 
-// Méthode pour basculer la sélection d'un matricule
-toggleMatriculeSelection(matricule: string): void {
-  const currentSelection = this.selectedMatricules();
-  if (currentSelection.includes(matricule)) {
-    this.selectedMatricules.set(currentSelection.filter(m => m !== matricule));
-  } else {
-    this.selectedMatricules.set([...currentSelection, matricule]);
-    // Initialiser les données pour ce nouvel opérateur
-    this.initializeOperatorFormData(matricule);
+  toggleMatriculeSelection(matricule: string): void {
+    const currentSelection = this.selectedMatricules();
+    if (currentSelection.includes(matricule)) {
+      this.selectedMatricules.set(currentSelection.filter(m => m !== matricule));
+      // Supprimer les données de l'opérateur
+      const formData = this.operatorsFormData();
+      formData.delete(matricule);
+      this.operatorsFormData.set(new Map(formData));
+    } else {
+      this.selectedMatricules.set([...currentSelection, matricule]);
+      this.initializeOperatorFormData(matricule);
+    }
   }
-}
 
-// Sélectionner tous les opérateurs
-selectAllOperators(): void {
-  const allMatricules = this.operators().map(op => op.matricule);
-  this.selectedMatricules.set(allMatricules);
-  // Initialiser les données pour tous les opérateurs
-  allMatricules.forEach(matricule => this.initializeOperatorFormData(matricule));
-}
+  selectAllOperators(): void {
+    const allMatricules = this.filteredOperatorsForSelection().map(op => op.matricule);
+    this.selectedMatricules.set(allMatricules);
+    allMatricules.forEach(matricule => this.initializeOperatorFormData(matricule));
+  }
 
-// Désélectionner tous les opérateurs
-deselectAllOperators(): void {
-  this.selectedMatricules.set([]);
-  this.operatorsFormData.set(new Map());
-}
+  deselectAllOperators(): void {
+    this.selectedMatricules.set([]);
+    this.operatorsFormData.set(new Map());
+  }
 
-// Initialiser les données pour un opérateur spécifique
-initializeOperatorFormData(matricule: string): void {
+  initializeOperatorFormData(matricule: string): void {
   const currentLine = this.selectedLigne();
   if (!currentLine) return;
 
@@ -925,18 +726,14 @@ initializeOperatorFormData(matricule: string): void {
 
   const currentFormData = this.operatorsFormData();
   
-  // Ne réinitialiser que si l'opérateur n'a pas déjà des données
   if (!currentFormData.has(matricule)) {
     const newFormData = new Map(currentFormData);
     newFormData.set(matricule, {
       matricule: operator.matricule,
       nomPrenom: `${operator.nom} ${operator.prenom}`,
       ligne1: currentLine.ligne,
-      phasesLigne1: [],
-      phasesLigne2: [],
-      ligne2: '',
-      newPhaseLigne1: { phase: '', heures: 0 },
-      newPhaseLigne2: { phase: '', heures: 0 },
+      phases: ['', '', ''], // 3 phases vides
+      heuresPhases: [0, 0, 0], // ← NOUVEAU: Heures par phase initialisées à 0
       totalHeures: 0
     });
     this.operatorsFormData.set(newFormData);
@@ -945,122 +742,188 @@ initializeOperatorFormData(matricule: string): void {
   this.loadAvailablePhases(currentLine.ligne);
 }
 
-// Sauvegarder tous les opérateurs sélectionnés
-saveAllProductionRecords(): void {
-  const selectedMatricules = this.selectedMatricules();
-  if (selectedMatricules.length === 0) {
-    alert('Veuillez sélectionner au moins un opérateur');
+updateOperatorPhaseHeures(matricule: string, phaseIndex: number, value: string): void {
+  const formData = this.getOperatorFormData(matricule);
+  if (!formData) return;
+
+  const heures = parseFloat(value) || 0;
+  
+  // Vérifier que la valeur ne dépasse pas 8h
+  if (heures > 8) {
+    alert('Les heures par phase ne peuvent pas dépasser 8h');
     return;
   }
 
-  let savedCount = 0;
-  let hasErrors = false;
+  const updatedHeuresPhases = [...formData.heuresPhases];
+  updatedHeuresPhases[phaseIndex] = heures;
 
-  selectedMatricules.forEach(matricule => {
+  // Calculer le total automatiquement
+  const totalHeures = updatedHeuresPhases.reduce((sum, heures) => sum + heures, 0);
+
+  // Vérifier que le total ne dépasse pas 8h
+  if (totalHeures > 8) {
+    alert(`Le total des heures (${totalHeures}h) dépasse 8 heures`);
+    return;
+  }
+
+  const updatedFormData: OperatorFormData = {
+    ...formData,
+    heuresPhases: updatedHeuresPhases,
+    totalHeures: totalHeures
+  };
+
+  this.operatorsFormData().set(matricule, updatedFormData);
+  this.operatorsFormData.set(new Map(this.operatorsFormData()));
+}
+
+getSafeOperatorFormData(matricule: string): OperatorFormData {
+  const formData = this.getOperatorFormData(matricule);
+  if (!formData) {
+    // Retourner un objet par défaut si non trouvé
+    return {
+      matricule: matricule,
+      nomPrenom: '',
+      ligne1: this.selectedLigne()?.ligne || '',
+      phases: ['', '', ''],
+      heuresPhases: [0, 0, 0],
+      totalHeures: 0
+    };
+  }
+  return formData;
+}
+
+
+
+getOperatorPhaseHeures(matricule: string, phaseIndex: number): number {
+  const formData = this.getOperatorFormData(matricule);
+  if (!formData || !formData.heuresPhases || phaseIndex >= formData.heuresPhases.length) {
+    return 0;
+  }
+  return formData.heuresPhases[phaseIndex];
+}
+
+  getOperatorFormData(matricule: string): OperatorFormData | undefined {
+    return this.operatorsFormData().get(matricule);
+  }
+
+  getOperatorPhaseValue(matricule: string, phaseIndex: number): string {
     const formData = this.getOperatorFormData(matricule);
-    if (!formData || formData.totalHeures === 0) {
-      console.log(`Aucune donnée pour ${matricule}`);
-      return;
-    }
+    if (!formData || phaseIndex >= formData.phases.length) return '';
+    return formData.phases[phaseIndex];
+  }
 
-    if (formData.totalHeures > 8) {
-      alert(`Le total des heures pour ${formData.nomPrenom} ne peut pas dépasser 8 heures (${formData.totalHeures}h)`);
-      hasErrors = true;
-      return;
-    }
+  updateOperatorPhase(matricule: string, phaseIndex: number, value: string): void {
+    const formData = this.getOperatorFormData(matricule);
+    if (!formData) return;
 
-    const newRecord: ProductionRecord = {
-      id: Date.now().toString() + savedCount,
-      matricule: formData.matricule,
-      nomPrenom: formData.nomPrenom,
-      date: this.currentDate(),
-      ligne1: formData.ligne1,
-      phasesLigne1: [...formData.phasesLigne1],
-      phasesLigne2: [...formData.phasesLigne2],
-      ligne2: formData.ligne2,
-      totalHeures: formData.totalHeures
+    const updatedPhases = [...formData.phases];
+    updatedPhases[phaseIndex] = value;
+
+    const updatedFormData: OperatorFormData = {
+      ...formData,
+      phases: updatedPhases
     };
 
-    this.productionRecords.update(records => [newRecord, ...records]);
-    savedCount++;
-  });
-
-  if (hasErrors) return;
-
-  if (savedCount > 0) {
-    this.showSuccessMessage(`${savedCount} enregistrement(s) sauvegardé(s) avec succès`);
-    this.resetOperatorForms();
-  } else {
-    alert('Aucun enregistrement à sauvegarder');
-  }
-}
-
-// Réinitialiser les formulaires
-
-
-// Basculer l'affichage du panneau des enregistrements
-toggleRecordsPanel(): void {
-  this.showRecordsPanel.set(!this.showRecordsPanel());
-}
-
-// Afficher les détails d'un enregistrement
-showRecordDetails(record: ProductionRecord): void {
-  this.selectedRecordForDetails.set(record);
-  this.showRecordsDetails.set(true);
-}
-
-// Fermer les détails
-closeRecordDetails(): void {
-  this.showRecordsDetails.set(false);
-  this.selectedRecordForDetails.set(null);
-}
-
-// Appliquer les mêmes phases à tous les opérateurs sélectionnés
-applyToAllOperators(): void {
-  const selectedMatricules = this.selectedMatricules();
-  if (selectedMatricules.length === 0) {
-    alert('Veuillez sélectionner au moins un opérateur');
-    return;
+    this.operatorsFormData().set(matricule, updatedFormData);
+    this.operatorsFormData.set(new Map(this.operatorsFormData()));
   }
 
-  // Prendre le premier opérateur comme modèle
-  const firstMatricule = selectedMatricules[0];
-  const templateData = this.getOperatorFormData(firstMatricule);
-  
-  if (!templateData) return;
+  updateOperatorHeures(matricule: string, value: string): void {
+    const formData = this.getOperatorFormData(matricule);
+    if (!formData) return;
 
-  selectedMatricules.forEach(matricule => {
-    if (matricule !== firstMatricule) {
-      this.updateOperatorFormData(matricule, {
-        phasesLigne1: [...templateData.phasesLigne1],
-        phasesLigne2: [...templateData.phasesLigne2],
-        ligne2: templateData.ligne2,
-        totalHeures: templateData.totalHeures
-      });
+    const heures = parseFloat(value) || 0;
+
+    const updatedFormData: OperatorFormData = {
+      ...formData,
+      totalHeures: heures
+    };
+
+    this.operatorsFormData().set(matricule, updatedFormData);
+    this.operatorsFormData.set(new Map(this.operatorsFormData()));
+  }
+
+  saveAllProductionRecords(): void {
+    const selectedMatricules = this.selectedMatricules();
+    if (selectedMatricules.length === 0) {
+      alert('Veuillez sélectionner au moins un opérateur');
+      return;
     }
-  });
 
-  this.showSuccessMessage(`Configuration appliquée à ${selectedMatricules.length} opérateurs`);
+    let savedCount = 0;
+    let hasErrors = false;
+
+    selectedMatricules.forEach(matricule => {
+      const formData = this.getOperatorFormData(matricule);
+      if (!formData || formData.totalHeures === 0) {
+        console.log(`Aucune donnée pour ${matricule}`);
+        return;
+      }
+
+      if (formData.totalHeures > 8) {
+        alert(`Le total des heures pour ${formData.nomPrenom} ne peut pas dépasser 8 heures (${formData.totalHeures}h)`);
+        hasErrors = true;
+        return;
+      }
+
+      // Créer les phases avec les heures
+      const phasesLigne1: WorkPhase[] = formData.phases
+        .filter(phase => phase !== '')
+        .map(phase => ({
+          phase: phase,
+          heures: formData.totalHeures / formData.phases.filter(p => p !== '').length, // Répartir équitablement
+          ligne: formData.ligne1
+        }));
+
+      const newRecord: ProductionRecord = {
+        id: Date.now().toString() + savedCount,
+        matricule: formData.matricule,
+        nomPrenom: formData.nomPrenom,
+        date: this.currentDate(),
+        ligne1: formData.ligne1,
+        phasesLigne1: phasesLigne1,
+        phasesLigne2: [],
+        ligne2: '',
+        totalHeures: formData.totalHeures
+      };
+       this.productionRecords.update(records => [newRecord, ...records]);
+  savedCount++;
+});
+
+if (hasErrors) return;
+
+if (savedCount > 0) {
+  this.showSuccessMessage(`${savedCount} enregistrement(s) sauvegardé(s) avec succès`);
+  this.closeProductionForm();
+} else {
+  alert('Aucun enregistrement à sauvegarder');
 }
-
-// Mettre à jour la méthode onPersonIconClick
+}
+toggleRecordsPanel(): void {
+this.showRecordsPanel.set(!this.showRecordsPanel());
+}
+showRecordDetails(record: ProductionRecord): void {
+this.selectedRecordForDetails.set(record);
+this.showRecordsDetails.set(true);
+}
+closeRecordDetails(): void {
+this.showRecordsDetails.set(false);
+this.selectedRecordForDetails.set(null);
+}
 onPersonIconClick(day: string): void {
-  console.log('Opening production form for day:', day);
-  
-  this.selectedDayForProduction.set(day);
-  this.showProductionForm.set(true);
-  this.showRecordsPanel.set(false);
-  
-  this.setDefaultDate(day);
-  this.selectedMatricules.set([]);
-  this.searchRecordQuery.set('');
-  this.updateFilteredOperators(); // Initialiser la liste filtrée
-}
+console.log('Opening production form for day:', day);
+this.selectedDayForProduction.set(day);
+this.showProductionForm.set(true);
+this.showRecordsPanel.set(false);
 
-// Mettre à jour la méthode onSearchRecordChange
+this.setDefaultDate(day);
+this.selectedMatricules.set([]);
+this.searchRecordQuery.set('');
+this.updateFilteredOperators();
+}
 onSearchRecordChange(event: Event): void {
-  const target = event.target as HTMLInputElement;
-  this.searchRecordQuery.set(target.value);
-  this.updateFilteredOperators();
+const target = event.target as HTMLInputElement;
+this.searchRecordQuery.set(target.value);
+this.updateFilteredOperators();
 }
 }

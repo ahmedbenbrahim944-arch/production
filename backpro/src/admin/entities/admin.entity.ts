@@ -10,14 +10,14 @@ import {
 import { Exclude } from 'class-transformer';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
-import { Semaine } from '../../semaine/entities/semaine.entity'; // Ajouter cette importation
+import { Semaine } from '../../semaine/entities/semaine.entity';
 
 @Entity('admins')
 export class Admin {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50, unique: true })
+  @Column({ length: 10, unique: true }) // Réduit à 10 caractères max
   nom: string;
 
   @Column({ length: 50 })
@@ -39,7 +39,7 @@ export class Admin {
 
   // Relation: Un admin peut créer plusieurs semaines
   @OneToMany(() => Semaine, (semaine) => semaine.creePar)
-  semainesCrees: Semaine[]; // Ajouter cette ligne
+  semainesCrees: Semaine[];
 
   @CreateDateColumn()
   createdAt: Date;

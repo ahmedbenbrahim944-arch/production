@@ -1,10 +1,11 @@
 // src/user/dto/update-user.dto.ts
-import { IsString, MinLength, MaxLength, IsOptional, IsBoolean, Matches } from 'class-validator';
+import { IsString, MinLength, MaxLength, IsOptional, IsBoolean, Matches, IsNumberString } from 'class-validator';
 
 export class UpdateUserDto {
-  @IsString()
+  @IsNumberString({}, { message: 'Le nom doit être un nombre' })
   @IsOptional()
-  @MaxLength(50, { message: 'Le nom ne doit pas dépasser 50 caractères' })
+  @MinLength(4, { message: 'Le nom doit contenir au moins 4 chiffres' })
+  @MaxLength(10, { message: 'Le nom ne doit pas dépasser 10 chiffres' })
   nom?: string;
 
   @IsString()
@@ -12,12 +13,10 @@ export class UpdateUserDto {
   @MaxLength(50, { message: 'Le prénom ne doit pas dépasser 50 caractères' })
   prenom?: string;
 
-  @IsString()
+  @IsNumberString({}, { message: 'Le mot de passe doit être un nombre' })
   @IsOptional()
-  @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
-  })
+  @MinLength(4, { message: 'Le mot de passe doit contenir au moins 4 chiffres' })
+  @MaxLength(10, { message: 'Le mot de passe ne doit pas dépasser 10 chiffres' })
   password?: string;
 
   @IsBoolean()

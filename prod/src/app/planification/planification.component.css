@@ -865,3 +865,226 @@
     border-color: black;
   }
 }
+/* ==================== COLONNE OF VERTICALE ==================== */
+.vertical-text-cell {
+  min-width: 50px !important;
+  max-width: 50px !important;
+  padding: 10px 5px !important;
+  position: relative;
+}
+
+.vertical-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+}
+
+.vertical-text-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: #06b6d4;
+  letter-spacing: 1px;
+  text-orientation: mixed;
+}
+
+.vertical-text-input {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #000000 !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid #06b6d4 !important;
+  border-radius: 4px;
+  padding: 8px 4px !important;
+  text-align: center;
+  width: 100%;
+  min-width: 40px;
+  height: auto;
+}
+
+.vertical-text-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1) !important;
+  border-color: #06b6d4 !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+}
+
+.vertical-text-value {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-orientation: mixed;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vertical-text-cell {
+    min-width: 45px !important;
+    max-width: 45px !important;
+    padding: 8px 4px !important;
+  }
+  
+  .vertical-text-value {
+    font-size: 1.2rem;
+  }
+  
+  .vertical-text-input {
+    font-size: 1rem !important;
+  }
+}
+
+/* ==================== SCROLL HORIZONTAL AMÉLIORÉ ==================== */
+.table-responsive-container {
+  border-radius: 12px;
+  position: relative;
+  background: rgba(15, 23, 42, 0.95);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(6, 182, 212, 0.6) rgba(30, 41, 59, 0.3);
+  position: relative;
+  cursor: grab;
+}
+
+.table-scroll-wrapper:active {
+  cursor: grabbing;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 14px;
+  background: rgba(30, 41, 59, 0.3);
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 8px;
+  margin: 0 20px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.7);
+  border-radius: 8px;
+  border: 3px solid rgba(30, 41, 59, 0.3);
+  background-clip: padding-box;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.9);
+}
+
+.planning-table-min-width {
+  min-width: 1200px;
+}
+
+.scroll-indicator {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(6, 182, 212, 0.95);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+  animation: pulse-indicator 2s infinite;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.scroll-indicator:hover {
+  background: rgba(6, 182, 212, 1);
+}
+
+@keyframes pulse-indicator {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.05);
+  }
+}
+
+/* Gradients de défilement */
+.table-responsive-container::before,
+.table-responsive-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.table-responsive-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.9), transparent);
+}
+
+.table-responsive-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(15, 23, 42, 0.9), transparent);
+}
+
+/* États de scroll */
+.scrollable::after {
+  opacity: 1;
+}
+
+.scrolled::before {
+  opacity: 1;
+}
+
+.scrolled-end::after {
+  opacity: 0;
+}
+
+.scrolled-start::before {
+  opacity: 0;
+}
+
+/* Support tactile amélioré */
+@media (pointer: coarse) {
+  .table-scroll-wrapper::-webkit-scrollbar {
+    height: 16px;
+  }
+  
+  .table-scroll-wrapper {
+    padding-bottom: 8px;
+  }
+}
+
+/* Afficher l'indicateur sur tablette/mobile */
+@media (max-width: 1024px) {
+  .scroll-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
