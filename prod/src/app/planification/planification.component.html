@@ -332,22 +332,32 @@
                       </tr>
                       
                       <!-- Ligne Delta -->
-                      <tr class="border-b-2 border-gray-700">
-                        <td class="text-center font-bold text-cyan-400 border-2 border-gray-700 py-3 sm:py-4 text-sm sm:text-base">Δ</td>
-                        <ng-container *ngFor="let day of weekDays">
-                          <td class="text-center border-2 border-gray-700 py-3 sm:py-4">
-                            <span *ngIf="getDayEntry(ref, day)"
-                                  [class.delta-excellent]="getDayEntry(ref, day)!.delta >= 70"
-                                  [class.delta-good]="getDayEntry(ref, day)!.delta >= 50 && getDayEntry(ref, day)!.delta < 70"
-                                  [class.delta-average]="getDayEntry(ref, day)!.delta >= 20 && getDayEntry(ref, day)!.delta < 50"
-                                  [class.delta-poor]="getDayEntry(ref, day)!.delta < 20"
-                                  class="font-bold delta-value text-base sm:text-lg">
-                              {{ getDayEntry(ref, day)!.delta }}%
-                            </span>
-                            <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-sm sm:text-base">-</span>
-                          </td>
-                        </ng-container>
-                      </tr>
+                      <!-- Ligne Delta - VERSION CLIQUABLE -->
+<tr class="border-b-2 border-gray-700">
+  <td class="text-center font-bold text-cyan-400 border-2 border-gray-700 py-3 sm:py-4 text-sm sm:text-base">Δ</td>
+  <ng-container *ngFor="let day of weekDays">
+    <td class="text-center border-2 border-gray-700 py-3 sm:py-4">
+      <button *ngIf="getDayEntry(ref, day)"
+              (click)="openCausesModal(ref, day)"
+              type="button"
+              [ngClass]="{
+                'delta-excellent': getDayEntry(ref, day)!.delta >= 70,
+                'delta-good': getDayEntry(ref, day)!.delta >= 50 && getDayEntry(ref, day)!.delta < 70,
+                'delta-average': getDayEntry(ref, day)!.delta >= 20 && getDayEntry(ref, day)!.delta < 50,
+                'delta-poor': getDayEntry(ref, day)!.delta < 20
+              }"
+              class="font-bold delta-value text-base sm:text-lg w-full px-2 py-2 rounded-lg hover:scale-105 transition-transform cursor-pointer hover:shadow-lg relative group">
+        {{ getDayEntry(ref, day)!.delta }}%
+        
+        <!-- Indicateur de causes enregistrées -->
+        <span *ngIf="getDayEntry(ref, day)!.causes" 
+              class="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full"
+              title="Causes enregistrées"></span>
+      </button>
+      <span *ngIf="!getDayEntry(ref, day)" class="text-gray-500 text-sm sm:text-base">-</span>
+    </td>
+  </ng-container>
+</tr>
                     </ng-container>
                   </tbody>
                 </table>
@@ -482,6 +492,172 @@
         </div>
       </div>
     </div>
+    <!-- Modal des 5M Causes -->
+<!-- Modal des 5M Causes - VERSION LECTURE SEULE -->
+<div *ngIf="showCausesModal()" 
+     class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+  <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-2xl w-full max-w-3xl border-2 border-cyan-600 causes-modal-content causes-modal-wrapper">
+    
+    <!-- Header -->
+    <div class="bg-cyan-600 p-6 flex justify-between items-center rounded-t-xl">
+      <div>
+        <h2 class="text-2xl font-bold text-white">ANALYSE DES CAUSES - 5M (CONSULTATION)</h2>
+        <p class="text-cyan-100 text-sm mt-1" *ngIf="selectedEntryForCauses()">
+          {{ selectedEntryForCauses()!.reference.reference }} - 
+          {{ selectedEntryForCauses()!.day | titlecase }}
+        </p>
+      </div>
+      <button (click)="closeCausesModal()" 
+              type="button"
+              class="text-white hover:text-cyan-200 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Résumé de l'écart -->
+    <div class="p-6 bg-slate-800/50 border-b border-slate-700">
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-cyan-500/30">
+          <div class="text-cyan-400 text-sm font-semibold mb-1">Quantité Planifiée (C)</div>
+          <div class="text-white text-2xl font-bold">
+            {{ getSelectedC() }}
+          </div>
+        </div>
+        
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-orange-500/30">
+          <div class="text-orange-400 text-sm font-semibold mb-1">Produit Fini (DP)</div>
+          <div class="text-white text-2xl font-bold">
+            {{ getSelectedDP() }}
+          </div>
+        </div>
+        
+        <div class="bg-slate-900/80 p-4 rounded-lg border border-red-500/30">
+          <div class="text-red-400 text-sm font-semibold mb-1">Écart à Justifier</div>
+          <div class="text-red-400 text-2xl font-bold">
+            {{ getEcartCDP() }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire des 5M - LECTURE SEULE -->
+    <div class="p-6 space-y-4 max-h-[400px] overflow-y-auto causes-modal-form-section">      
+      <!-- M1: Matière première -->
+      <div class="bg-slate-800/80 p-4 rounded-lg border border-cyan-500/40">
+        <label class="block text-cyan-400 font-bold text-sm mb-3">M1: Matière première</label>
+        <div class="flex items-center justify-center">
+          <div class="bg-slate-700 border-2 border-cyan-500/40 rounded-lg px-4 py-3 text-white text-xl text-center font-bold w-32">
+            {{ currentCauses().m1MatierePremiere }}
+          </div>
+        </div>
+      </div>
+
+      <!-- M2: Absence -->
+      <div class="bg-slate-800/80 p-4 rounded-lg border border-red-500/40">
+        <label class="block text-red-400 font-bold text-sm mb-3">M2: absence</label>
+        <div class="flex items-center justify-center">
+          <div class="bg-slate-700 border-2 border-red-500/40 rounded-lg px-4 py-3 text-white text-xl text-center font-bold w-32">
+            {{ currentCauses().m2Absence }}
+          </div>
+        </div>
+      </div>
+
+      <!-- M2: Rendement -->
+      <div class="bg-slate-800/80 p-4 rounded-lg border border-orange-500/40">
+        <label class="block text-orange-400 font-bold text-sm mb-3">M2: Rendement</label>
+        <div class="flex items-center justify-center">
+          <div class="bg-slate-700 border-2 border-orange-500/40 rounded-lg px-4 py-3 text-white text-xl text-center font-bold w-32">
+            {{ currentCauses().m2Rendement }}
+          </div>
+        </div>
+      </div>
+
+      <!-- M4: Maintenance -->
+      <div class="bg-slate-800/80 p-4 rounded-lg border border-yellow-500/40">
+        <label class="block text-yellow-400 font-bold text-sm mb-3">M4: maintenance</label>
+        <div class="flex items-center justify-center">
+          <div class="bg-slate-700 border-2 border-yellow-500/40 rounded-lg px-4 py-3 text-white text-xl text-center font-bold w-32">
+            {{ currentCauses().m4Maintenance }}
+          </div>
+        </div>
+      </div>
+
+      <!-- M5: Qualité -->
+      <div class="bg-slate-800/80 p-4 rounded-lg border border-purple-500/40">
+        <label class="block text-purple-400 font-bold text-sm mb-3">M5: Qualité</label>
+        <div class="flex items-center justify-center">
+          <div class="bg-slate-700 border-2 border-purple-500/40 rounded-lg px-4 py-3 text-white text-xl text-center font-bold w-32">
+            {{ currentCauses().m5Qualite }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer avec totaux -->
+    <div class="p-6 bg-slate-800/50 border-t border-slate-700 rounded-b-xl">
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-slate-900/80 p-3 rounded-lg text-center border border-cyan-500/30">
+          <div class="text-cyan-400 text-xs font-semibold mb-1">Total Causes</div>
+          <div class="text-white text-xl font-bold">{{ getTotalCauses() }}</div>
+        </div>
+        
+        <div class="bg-slate-900/80 p-3 rounded-lg text-center border border-red-500/30">
+          <div class="text-red-400 text-xs font-semibold mb-1">Écart à Justifier</div>
+          <div class="text-white text-xl font-bold">{{ getEcartCDP() }}</div>
+        </div>
+        
+        <div class="bg-slate-900/80 p-3 rounded-lg text-center border"
+             [ngClass]="{
+               'border-green-500/30': getDifferenceRestante() === 0,
+               'border-yellow-500/30': getDifferenceRestante() !== 0
+             }">
+          <div class="text-xs font-semibold mb-1"
+               [ngClass]="{
+                 'text-green-400': getDifferenceRestante() === 0,
+                 'text-yellow-400': getDifferenceRestante() !== 0
+               }">
+            Différence
+          </div>
+          <div class="text-xl font-bold"
+               [ngClass]="{
+                 'text-green-400': getDifferenceRestante() === 0,
+                 'text-yellow-400': getDifferenceRestante() !== 0
+               }">
+            {{ getDifferenceRestante() }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerte si différence non nulle -->
+      <div *ngIf="getDifferenceRestante() !== 0" 
+           class="mb-4 p-3 bg-yellow-900/30 border border-yellow-600/50 rounded-lg flex items-start">
+        <svg class="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+          <div class="text-yellow-400 font-semibold text-sm">Attention</div>
+          <div class="text-yellow-200 text-xs mt-1">
+            La somme des causes ({{ getTotalCauses() }}) ne correspond pas à l'écart total ({{ getEcartCDP() }})
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton Fermer uniquement -->
+      <div class="flex justify-end">
+        <button (click)="closeCausesModal()"
+                type="button"
+                class="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-semibold transition-colors flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- Message de succès -->

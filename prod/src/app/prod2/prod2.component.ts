@@ -10,6 +10,19 @@ interface ProductionLine {
   references: string[];
   isActive: boolean;
 }
+interface MatierePremiere {
+  reference: string;
+  quantite: number;
+}
+
+interface Causes5M {
+  m1MatierePremiere: number;
+   m1References: MatierePremiere[];
+  m2Absence: number;
+  m2Rendement: number;
+  m4Maintenance: number;
+  m5Qualite: number;
+}
 
 interface DayEntry {
   of: string;
@@ -19,6 +32,7 @@ interface DayEntry {
   dp: number;
   dm: number;
   delta: number;
+  causes?: Causes5M;
 }
 
 interface ReferenceProduction {
@@ -118,6 +132,58 @@ export class Prod2Component implements AfterViewInit {
   searchLineQuery = signal('');
   searchReferenceQuery = signal('');
   selectedReferenceDetails = signal<ReferenceDetail | null>(null);
+  currentMPReference = signal<string>('');
+  currentMPQuantite = signal<number>(0);
+
+  showCausesModal = signal(false);
+  selectedEntryForCauses = signal<{
+  reference: ReferenceProduction;
+  day: string;
+  entry: DayEntry;
+} | null>(null);
+currentCauses = signal<Causes5M>({
+  m1MatierePremiere: 0,
+  m1References: [],
+  m2Absence: 0,
+  m2Rendement: 0,
+  m4Maintenance: 0,
+  m5Qualite: 0
+});
+
+addMatierePremiereReference(): void {
+    const reference = this.currentMPReference().trim();
+    const quantite = this.currentMPQuantite();
+    
+    if (!reference || quantite <= 0) {
+      alert('Veuillez saisir une référence valide et une quantité supérieure à 0');
+      return;
+    }
+
+    this.currentCauses.update(causes => ({
+      ...causes,
+      m1References: [...causes.m1References, { reference, quantite }]
+    }));
+
+    // Réinitialiser les champs
+    this.currentMPReference.set('');
+    this.currentMPQuantite.set(0);
+  }
+
+  removeMatierePremiereReference(index: number): void {
+    this.currentCauses.update(causes => ({
+      ...causes,
+      m1References: causes.m1References.filter((_, i) => i !== index)
+    }));
+  }
+
+  updateMPReference(value: string): void {
+    this.currentMPReference.set(value);
+  }
+
+  updateMPQuantite(value: string): void {
+    const numValue = Math.max(0, parseInt(value) || 0);
+    this.currentMPQuantite.set(numValue);
+  }
 
   showProductionForm = signal(false);
   selectedDayForProduction = signal<string>('');
@@ -925,5 +991,227 @@ onSearchRecordChange(event: Event): void {
 const target = event.target as HTMLInputElement;
 this.searchRecordQuery.set(target.value);
 this.updateFilteredOperators();
+}
+
+openCausesModal(ref: ReferenceProduction, day: string): void {
+  const entry = this.getDayEntry(ref, day);
+  if (!entry) return;
+
+  this.selectedEntryForCauses.set({ reference: ref, day, entry });
+  
+  // Charger les causes existantes ou initialiser à zéro
+  if (entry.causes) {
+    this.currentCauses.set({ ...entry.causes,
+       m1References: entry.causes.m1References || [] 
+     });
+  } else {
+    this.currentCauses.set({
+      m1MatierePremiere: 0,
+       m1References: [],
+      m2Absence: 0,
+      m2Rendement: 0,
+      m4Maintenance: 0,
+      m5Qualite: 0
+    });
+  }
+  this.currentMPReference.set('');
+    this.currentMPQuantite.set(0);
+  this.showCausesModal.set(true);
+}
+
+closeCausesModal(): void {
+  this.showCausesModal.set(false);
+  this.selectedEntryForCauses.set(null);
+}
+
+updateCause(causeKey: keyof Causes5M, value: string): void {
+  if (causeKey === 'm1References') {
+    // Ne rien faire pour m1References car c'est un tableau
+    return;
+  }
+  
+  const numValue = Math.max(0, parseInt(value) || 0);
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: numValue
+  }));
+}
+ showMatierePremiereModal = signal(false);
+  selectedMatierePremiereRefs = signal<string[]>([]);
+  
+  // Liste des références de matière première disponibles
+  availableMatierePremiereRefs = signal<string[]>([
+    '8', '16', '60', '75', '110', '136', '212', '264', '344', '360', '377', '404'
+  ]);
+
+hasMatierePremierReferences(): boolean {
+  return this.currentCauses().m1References.length > 0;
+}
+
+incrementCause(causeKey: keyof Causes5M, amount: number = 100): void {
+  if (causeKey === 'm1References') {
+    // Ne rien faire pour m1References car c'est un tableau
+    return;
+  }
+  
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: (causes[causeKey] as number) + amount
+  }));
+}
+
+decrementCause(causeKey: keyof Causes5M, amount: number = 100): void {
+  if (causeKey === 'm1References') {
+    // Ne rien faire pour m1References car c'est un tableau
+    return;
+  }
+  
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: Math.max(0, (causes[causeKey] as number) - amount)
+  }));
+}
+
+getTotalCauses(): number {
+    const causes = this.currentCauses();
+    const totalReferences = causes.m1References.reduce((sum, ref) => sum + ref.quantite, 0);
+    
+    return totalReferences + 
+           causes.m2Absence + 
+           causes.m2Rendement + 
+           causes.m4Maintenance + 
+           causes.m5Qualite;
+  }
+  getTotalM1References(): number {
+  return this.currentCauses().m1References.reduce((sum, ref) => sum + ref.quantite, 0);
+}
+
+getEcartCDP(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return Math.abs(selected.entry.c - selected.entry.dp);
+}
+
+getDifferenceRestante(): number {
+  return this.getEcartCDP() - this.getTotalCauses();
+}
+
+saveCauses(): void {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return;
+
+  const planif = this.weekPlanification();
+  if (!planif) return;
+
+  const updatedPlanif = { ...planif };
+  const refIndex = updatedPlanif.references.findIndex(
+    r => r.reference === selected.reference.reference
+  );
+
+  if (refIndex !== -1) {
+    const dayEntry = updatedPlanif.references[refIndex][selected.day] as DayEntry;
+    if (dayEntry) {
+      dayEntry.causes = { ...this.currentCauses() };
+    }
+    this.weekPlanification.set(updatedPlanif);
+  }
+
+  this.showSuccessMessage('Causes sauvegardées avec succès');
+  this.closeCausesModal();
+}
+getSelectedC(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return selected.entry.c;
+}
+
+getSelectedDP(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return selected.entry.dp;
+}
+// Ajouter ces méthodes à la fin de la classe
+
+openMatierePremiereModal(): void {
+  this.showMatierePremiereModal.set(true);
+  this.selectedMatierePremiereRefs.set([]);
+}
+
+closeMatierePremiereModal(): void {
+  this.showMatierePremiereModal.set(false);
+  this.selectedMatierePremiereRefs.set([]);
+}
+
+toggleMatierePremiereSelection(ref: string): void {
+  const currentSelection = this.selectedMatierePremiereRefs();
+  if (currentSelection.includes(ref)) {
+    this.selectedMatierePremiereRefs.set(currentSelection.filter(r => r !== ref));
+  } else {
+    this.selectedMatierePremiereRefs.set([...currentSelection, ref]);
+  }
+}
+
+selectAllMatierePremiereRefs(): void {
+  this.selectedMatierePremiereRefs.set([...this.availableMatierePremiereRefs()]);
+}
+
+deselectAllMatierePremiereRefs(): void {
+  this.selectedMatierePremiereRefs.set([]);
+}
+
+onSearchMatierePremiere(query: string): void {
+  // Pour l'instant, on garde toutes les références visibles
+  // Vous pourriez implémenter un filtrage si nécessaire
+  console.log('Recherche:', query);
+}
+
+addMatierePremiereRefsToLine(): void {
+  const selectedRefs = this.selectedMatierePremiereRefs();
+  const currentLine = this.selectedLigne();
+  
+  if (selectedRefs.length === 0 || !currentLine) {
+    return;
+  }
+
+  // Mettre à jour la ligne avec les nouvelles références
+  const updatedLines = this.availableLines().map(line => {
+    if (line.ligne === currentLine.ligne) {
+      // Ajouter les nouvelles références qui n'existent pas déjà
+      const newRefs = selectedRefs.filter(ref => !line.references.includes(ref));
+      const updatedReferences = [...line.references, ...newRefs];
+      
+      return {
+        ...line,
+        references: updatedReferences,
+        referenceCount: updatedReferences.length
+      };
+    }
+    return line;
+  });
+
+  this.availableLines.set(updatedLines);
+
+  // Mettre à jour la ligne sélectionnée
+  const updatedLine = updatedLines.find(line => line.ligne === currentLine.ligne);
+  if (updatedLine) {
+    this.selectedLigne.set(updatedLine);
+  }
+
+  // Si une planification de semaine est chargée, la mettre à jour aussi
+  const currentPlanif = this.weekPlanification();
+  if (currentPlanif) {
+    // Ajouter les nouvelles références à la planification
+    selectedRefs.forEach(ref => {
+      if (!currentPlanif.references.some(r => r.reference === ref)) {
+        const newRef: ReferenceProduction = { reference: ref };
+        currentPlanif.references.push(newRef);
+      }
+    });
+    
+    this.weekPlanification.set({ ...currentPlanif });
+  }
+
+  this.showSuccessMessage(`${selectedRefs.length} référence(s) ajoutée(s) avec succès`);
+  this.closeMatierePremiereModal();
 }
 }

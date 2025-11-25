@@ -1088,3 +1088,187 @@
     gap: 8px;
   }
 }
+
+/* Overlay de la modal */
+.causes-modal-overlay {
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
+  overflow-y: auto !important; /* ← AJOUT pour permettre le scroll */
+  padding: 20px; /* Espacement autour de la modal */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Conteneur principal de la modal avec scroll */
+.causes-modal-content {
+  animation: slideUp 0.3s ease;
+  max-height: 90vh !important; /* ← AJOUT: limite la hauteur à 90% de l'écran */
+  overflow-y: auto !important; /* ← AJOUT: active le scroll vertical */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Section scrollable du formulaire 5M */
+.causes-modal-form-section {
+  max-height: 400px !important; /* ← hauteur max pour la section des 5M */
+  overflow-y: auto !important; /* ← scroll dans la section des formulaires */
+  padding-right: 8px; /* espace pour la scrollbar */
+}
+
+/* Style pour les boutons Delta cliquables */
+.delta-value {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.delta-value:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+}
+
+.delta-value:active {
+  transform: scale(0.95);
+}
+
+/* Animation pour l'indicateur de causes enregistrées */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Styles pour les inputs de causes */
+.causes-modal-content input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.causes-modal-content input[type="number"]::-webkit-inner-spin-button,
+.causes-modal-content input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.causes-modal-content input[type="number"]:focus {
+  transform: scale(1.02);
+}
+
+/* Styles pour les boutons + et - */
+.causes-modal-content button svg {
+  transition: transform 0.2s ease;
+}
+
+.causes-modal-content button:hover svg {
+  transform: scale(1.2);
+}
+
+.causes-modal-content button:active {
+  transform: scale(0.95);
+}
+
+/* Style pour l'alerte de différence */
+.alert-warning {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Scrollbar personnalisée pour la modal */
+.causes-modal-content::-webkit-scrollbar,
+.causes-modal-form-section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.causes-modal-content::-webkit-scrollbar-track,
+.causes-modal-form-section::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 4px;
+}
+
+.causes-modal-content::-webkit-scrollbar-thumb,
+.causes-modal-form-section::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.6);
+  border-radius: 4px;
+}
+
+.causes-modal-content::-webkit-scrollbar-thumb:hover,
+.causes-modal-form-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.8);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+  .causes-modal-content {
+    max-height: 95vh !important; /* Plus de hauteur sur mobile */
+  }
+  
+  .causes-modal-form-section {
+    max-height: 300px !important; /* Section plus petite sur mobile */
+  }
+  
+  .delta-value {
+    font-size: 1rem !important;
+    padding: 6px !important;
+  }
+  
+  .causes-modal-overlay {
+    padding: 10px; /* Moins de padding sur mobile */
+  }
+}
+
+@media (max-width: 640px) {
+  .causes-modal-content input[type="number"] {
+    font-size: 1.2rem !important;
+    padding: 10px !important;
+  }
+  
+  .causes-modal-content button {
+    padding: 8px !important;
+  }
+  
+  .causes-modal-content {
+    max-height: 98vh !important; /* Presque plein écran sur petit mobile */
+  }
+}
+
+/* Correction pour éviter que le contenu sorte de la modal */
+.causes-modal-wrapper {
+  max-width: 48rem; /* max-w-3xl */
+  margin: 0 auto;
+  position: relative;
+}

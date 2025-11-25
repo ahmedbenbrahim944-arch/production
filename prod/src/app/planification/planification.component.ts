@@ -10,6 +10,13 @@ interface ProductionLine {
   references: string[];
   isActive: boolean;
 }
+interface Causes5M {
+  m1MatierePremiere: number;
+  m2Absence: number;
+  m2Rendement: number;
+  m4Maintenance: number;
+  m5Qualite: number;
+}
 
 interface DayEntry {
   of: string;
@@ -19,6 +26,7 @@ interface DayEntry {
   dp: number;
   dm: number;
   delta: number;
+  causes?: Causes5M;
 }
 
 interface ReferenceProduction {
@@ -30,6 +38,10 @@ interface ReferenceProduction {
   jeudi?: DayEntry;
   vendredi?: DayEntry;
   samedi?: DayEntry;
+}
+interface MatierePremiere {
+  reference: string;
+  quantite: number;
 }
 
 interface WeekPlanification {
@@ -84,6 +96,21 @@ export class PlanificationComponent implements AfterViewInit {
   searchLineQuery = signal('');
   searchReferenceQuery = signal('');
   selectedReferenceDetails = signal<ReferenceDetail | null>(null);
+
+  showCausesModal = signal(false);
+  selectedEntryForCauses = signal<{
+    reference: ReferenceProduction;
+    day: string;
+    entry: DayEntry;
+  } | null>(null);
+  
+  currentCauses = signal<Causes5M>({
+    m1MatierePremiere: 0,
+    m2Absence: 0,
+    m2Rendement: 0,
+    m4Maintenance: 0,
+    m5Qualite: 0
+  });
 
   // Gestion du scroll
   isScrollable = signal(false);
@@ -541,4 +568,105 @@ export class PlanificationComponent implements AfterViewInit {
       }
     }, 100);
   }
+  // Ajouter ces méthodes à la fin de la classe PlanificationComponent
+
+openCausesModal(ref: ReferenceProduction, day: string): void {
+  const entry = this.getDayEntry(ref, day);
+  if (!entry) return;
+
+  this.selectedEntryForCauses.set({ reference: ref, day, entry });
+  
+  // Charger les causes existantes ou initialiser à zéro
+  if (entry.causes) {
+    this.currentCauses.set({ ...entry.causes });
+  } else {
+    this.currentCauses.set({
+      m1MatierePremiere: 0,
+      m2Absence: 0,
+      m2Rendement: 0,
+      m4Maintenance: 0,
+      m5Qualite: 0
+    });
+  }
+  
+  this.showCausesModal.set(true);
+}
+
+closeCausesModal(): void {
+  this.showCausesModal.set(false);
+  this.selectedEntryForCauses.set(null);
+}
+
+updateCause(causeKey: keyof Causes5M, value: string): void {
+  const numValue = Math.max(0, parseInt(value) || 0);
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: numValue
+  }));
+}
+
+incrementCause(causeKey: keyof Causes5M, amount: number = 100): void {
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: causes[causeKey] + amount
+  }));
+}
+
+decrementCause(causeKey: keyof Causes5M, amount: number = 100): void {
+  this.currentCauses.update(causes => ({
+    ...causes,
+    [causeKey]: Math.max(0, causes[causeKey] - amount)
+  }));
+}
+
+getTotalCauses(): number {
+  const causes = this.currentCauses();
+  return Object.values(causes).reduce((sum, val) => sum + val, 0);
+}
+
+getEcartCDP(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return Math.abs(selected.entry.c - selected.entry.dp);
+}
+
+getDifferenceRestante(): number {
+  return this.getEcartCDP() - this.getTotalCauses();
+}
+
+saveCauses(): void {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return;
+
+  const planif = this.weekPlanification();
+  if (!planif) return;
+
+  const updatedPlanif = { ...planif };
+  const refIndex = updatedPlanif.references.findIndex(
+    r => r.reference === selected.reference.reference
+  );
+
+  if (refIndex !== -1) {
+    const dayEntry = updatedPlanif.references[refIndex][selected.day] as DayEntry;
+    if (dayEntry) {
+      dayEntry.causes = { ...this.currentCauses() };
+    }
+    this.weekPlanification.set(updatedPlanif);
+  }
+
+  this.showSuccessMessage('Causes sauvegardées avec succès');
+  this.closeCausesModal();
+}
+
+getSelectedC(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return selected.entry.c;
+}
+
+getSelectedDP(): number {
+  const selected = this.selectedEntryForCauses();
+  if (!selected) return 0;
+  return selected.entry.dp;
+}
 }
