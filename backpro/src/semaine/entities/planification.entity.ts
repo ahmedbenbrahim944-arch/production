@@ -8,19 +8,19 @@ export class Planification {
   id: number;
 
   @Column({ type: 'varchar', length: 50 })
-  semaine: string; // "semaine46"
+  semaine: string;
 
   @Column({ type: 'varchar', length: 20 })
-  jour: string; // "lundi", "mardi", etc.
+  jour: string;
 
   @Column({ type: 'varchar', length: 255 })
-  ligne: string; // "L04:RXT1"
+  ligne: string;
 
   @Column({ type: 'varchar', length: 100 })
-  reference: string; // "RA5246801"
+  reference: string;
 
   @Column({ type: 'varchar', length: 100, default: '' })
-  of: string; // "OF-2024-L04-48-LUNDI"
+  of: string;
 
   @Column({ type: 'int', default: 0 })
   qtePlanifiee: number;
@@ -28,8 +28,13 @@ export class Planification {
   @Column({ type: 'varchar', length: 100, default: '200' })
   emballage: string;
 
-  @Column({ type: 'int', default: 0 })
+  // CHANGER EN FLOAT POUR STOCKER LES DÉCIMALES
+  @Column({ type: 'float', default: 0 })
   nbOperateurs: number;
+
+  // CHANGER EN FLOAT POUR STOCKER LES DÉCIMALES
+  @Column({ type: 'float', default: 0 })
+  nbHeuresPlanifiees: number;
 
   @Column({ type: 'int', default: 0 })
   decProduction: number;

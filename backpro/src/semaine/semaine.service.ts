@@ -13,6 +13,7 @@ import { UpdatePlanificationDto } from './dto/update-planification.dto';
 import { Admin } from '../admin/entities/admin.entity';
 import { Product } from '../product/entities/product.entity';
 import { UpdateProductionSimpleDto } from './dto/update-production-simple.dto';
+import { TempsSec } from '../temps-sec/entities/temps-sec.entity';
 
 @Injectable()
 export class SemaineService {
@@ -27,99 +28,186 @@ export class SemaineService {
     private planificationRepository: Repository<Planification>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+     @InjectRepository(TempsSec) // AJOUTER CETTE LIGNE
+  private tempsSecRepository: Repository<TempsSec>, // AJOUTER CETTE LIGNE
   ) {}
 
   // ==================== MÉTHODES PLANIFICATION ====================
 
-  async createPlanification(createPlanificationDto: CreatePlanificationDto) {
-    const { semaine, jour, ligne, reference } = createPlanificationDto;
+  // Dans src/semaine/semaine.service.ts - Méthode createPlanification
+// Dans src/semaine/semaine.service.ts - Méthode createPlanification corrigée
+async createPlanification(createPlanificationDto: CreatePlanificationDto) {
+  const { semaine, jour, ligne, reference, qtePlanifiee = 0 } = createPlanificationDto;
 
-    // Valider le jour
-    const joursValides = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-    if (!joursValides.includes(jour)) {
-      throw new BadRequestException('Jour invalide. Les jours valides sont: lundi, mardi, mercredi, jeudi, vendredi, samedi');
-    }
+  console.log('=== DÉBUT CRÉATION PLANIFICATION ===');
+  console.log('Données reçues:', { semaine, jour, ligne, reference, qtePlanifiee });
 
-    // Vérifier si la planification existe déjà
-    const existingPlanification = await this.planificationRepository.findOne({
-      where: {
-        semaine,
-        jour,
-        ligne,
-        reference
-      }
-    });
-
-    if (existingPlanification) {
-      throw new ConflictException('Une planification existe déjà pour cette combinaison semaine/jour/ligne/référence');
-    }
-
-    // Trouver l'entité semaine
-    const semaineEntity = await this.semaineRepository.findOne({
-      where: { nom: semaine }
-    });
-
-    if (!semaineEntity) {
-      throw new NotFoundException(`Semaine "${semaine}" non trouvée`);
-    }
-
-    try {
-      const planification = new Planification();
-      planification.semaine = semaine;
-      planification.jour = jour;
-      planification.ligne = ligne;
-      planification.reference = reference;
-      planification.of = createPlanificationDto.of || '';
-      planification.qtePlanifiee = createPlanificationDto.qtePlanifiee || 0;
-      planification.emballage = createPlanificationDto.emballage || '200';
-      planification.nbOperateurs = createPlanificationDto.nbOperateurs || 0;
-      planification.decProduction = createPlanificationDto.decProduction || 0;
-      planification.decMagasin = createPlanificationDto.decMagasin || 0;
-      planification.semaineEntity = semaineEntity;
-
-      const savedPlanification = await this.planificationRepository.save(planification);
-
-      return {
-        message: 'Planification créée avec succès',
-        planification: savedPlanification
-      };
-    } catch (error) {
-      console.error('Erreur création planification:', error);
-      throw new InternalServerErrorException('Erreur lors de la création de la planification');
-    }
+  // Valider le jour
+  const joursValides = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  if (!joursValides.includes(jour)) {
+    throw new BadRequestException('Jour invalide. Les jours valides sont: lundi, mardi, mercredi, jeudi, vendredi, samedi');
   }
+
+  // Vérifier si la planification existe déjà
+  const existingPlanification = await this.planificationRepository.findOne({
+    where: {
+      semaine,
+      jour,
+      ligne,
+      reference
+    }
+  });
+
+  if (existingPlanification) {
+    throw new ConflictException('Une planification existe déjà pour cette combinaison semaine/jour/ligne/référence');
+  }
+
+  // CORRECTION: Bien définir la variable semaineEntity
+  const semaineEntity = await this.semaineRepository.findOne({
+    where: { nom: semaine }
+  });
+
+  if (!semaineEntity) {
+    throw new NotFoundException(`Semaine "${semaine}" non trouvée`);
+  }
+
+  // RECHERCHER LE TEMPS PAR SECONDE
+  const tempsSec = await this.tempsSecRepository.findOne({
+    where: { ligne, reference }
+  });
+
+  console.log('Temps sec trouvé:', tempsSec);
+
+  if (!tempsSec) {
+    throw new NotFoundException(`Temps par seconde non trouvé pour la ligne "${ligne}" et référence "${reference}"`);
+  }
+
+  // CALCULER LES CHAMPS AUTOMATIQUES
+  const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
+    qtePlanifiee, 
+    tempsSec.seconde
+  );
+
+  console.log('Calculs automatiques:', { 
+    qtePlanifiee, 
+    tempsSec: tempsSec.seconde,
+    nbHeuresPlanifiees, 
+    nbOperateurs 
+  });
+
+  try {
+    const planification = new Planification();
+    planification.semaine = semaine;
+    planification.jour = jour;
+    planification.ligne = ligne;
+    planification.reference = reference;
+    planification.of = createPlanificationDto.of || '';
+    planification.qtePlanifiee = qtePlanifiee;
+    planification.emballage = createPlanificationDto.emballage || '200';
+    planification.nbOperateurs = nbOperateurs;
+    planification.nbHeuresPlanifiees = nbHeuresPlanifiees;
+    planification.decProduction = 0;
+    planification.decMagasin = 0;
+    planification.semaineEntity = semaineEntity; // MAINTENANT LA VARIABLE EST DÉFINIE
+
+    console.log('Planification avant sauvegarde:', planification);
+
+    const savedPlanification = await this.planificationRepository.save(planification);
+
+    console.log('Planification sauvegardée:', savedPlanification);
+
+    return {
+      message: 'Planification créée avec succès',
+      planification: savedPlanification
+    };
+  } catch (error) {
+    console.error('Erreur détaillée création planification:', error);
+    throw new InternalServerErrorException('Erreur lors de la création de la planification');
+  }
+}
+ private calculateAutoPlanificationFields(qtePlanifiee: number, tempsSec: number) {
+  // Vérifier que les valeurs sont valides
+  if (!qtePlanifiee || qtePlanifiee <= 0 || !tempsSec || tempsSec <= 0) {
+    return {
+      nbHeuresPlanifiees: 0,
+      nbOperateurs: 0
+    };
+  }
+
+  // Calcul du N°H planifié
+  const nbHeuresPlanifieesBrut = (qtePlanifiee * tempsSec) / 3600;
+  
+  // Tronquer à 2 décimales (pas d'arrondi)
+  const nbHeuresPlanifiees = Math.floor(nbHeuresPlanifieesBrut * 100) / 100;
+  
+  // Calcul du N°OP
+  const nbOperateursBrut = nbHeuresPlanifiees / 8;
+  
+  // Tronquer à 2 décimales (pas d'arrondi)
+  const nbOperateurs = Math.floor(nbOperateursBrut * 100) / 100;
+
+  console.log('Résultats calcul (tronqués à 2 décimales):', {
+    nbHeuresPlanifiees,
+    nbOperateurs
+  });
+  
+  return {
+    nbHeuresPlanifiees: nbHeuresPlanifiees,
+    nbOperateurs: nbOperateurs
+  };
+}
 
   async updatePlanification(id: number, updatePlanificationDto: UpdatePlanificationDto) {
-    const planification = await this.planificationRepository.findOne({
-      where: { id }
-    });
+  const planification = await this.planificationRepository.findOne({
+    where: { id }
+  });
 
-    if (!planification) {
-      throw new NotFoundException('Planification non trouvée');
-    }
-
-    try {
-      // Mettre à jour les champs
-      if (updatePlanificationDto.of !== undefined) planification.of = updatePlanificationDto.of;
-      if (updatePlanificationDto.qtePlanifiee !== undefined) planification.qtePlanifiee = updatePlanificationDto.qtePlanifiee;
-      if (updatePlanificationDto.emballage !== undefined) planification.emballage = updatePlanificationDto.emballage;
-      if (updatePlanificationDto.nbOperateurs !== undefined) planification.nbOperateurs = updatePlanificationDto.nbOperateurs;
-      if (updatePlanificationDto.decProduction !== undefined) planification.decProduction = updatePlanificationDto.decProduction;
-      if (updatePlanificationDto.decMagasin !== undefined) planification.decMagasin = updatePlanificationDto.decMagasin;
-
-      planification.updatedAt = new Date();
-
-      const updatedPlanification = await this.planificationRepository.save(planification);
-
-      return {
-        message: 'Planification mise à jour avec succès',
-        planification: updatedPlanification
-      };
-    } catch (error) {
-      console.error('Erreur mise à jour planification:', error);
-      throw new InternalServerErrorException('Erreur lors de la mise à jour de la planification');
-    }
+  if (!planification) {
+    throw new NotFoundException('Planification non trouvée');
   }
+
+  try {
+    // Si la quantité planifiée change, recalculer les champs automatiques
+    if (updatePlanificationDto.qtePlanifiee !== undefined) {
+      // Rechercher le temps par seconde
+      const tempsSec = await this.tempsSecRepository.findOne({
+        where: { 
+          ligne: planification.ligne, 
+          reference: planification.reference 
+        }
+      });
+
+      if (tempsSec) {
+        const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
+          updatePlanificationDto.qtePlanifiee, 
+          tempsSec.seconde
+        );
+        
+        planification.nbOperateurs = nbOperateurs;
+        // Vous pouvez stocker nbHeuresPlanifiees si vous ajoutez ce champ à l'entité
+      }
+    }
+
+    // Mettre à jour les autres champs
+    if (updatePlanificationDto.of !== undefined) planification.of = updatePlanificationDto.of;
+    if (updatePlanificationDto.qtePlanifiee !== undefined) planification.qtePlanifiee = updatePlanificationDto.qtePlanifiee;
+    if (updatePlanificationDto.emballage !== undefined) planification.emballage = updatePlanificationDto.emballage;
+    if (updatePlanificationDto.decProduction !== undefined) planification.decProduction = updatePlanificationDto.decProduction;
+    if (updatePlanificationDto.decMagasin !== undefined) planification.decMagasin = updatePlanificationDto.decMagasin;
+
+    planification.updatedAt = new Date();
+
+    const updatedPlanification = await this.planificationRepository.save(planification);
+
+    return {
+      message: 'Planification mise à jour avec succès',
+      planification: updatedPlanification
+    };
+  } catch (error) {
+    console.error('Erreur mise à jour planification:', error);
+    throw new InternalServerErrorException('Erreur lors de la mise à jour de la planification');
+  }
+}
 
   async getPlanificationsBySemaine(semaineNom: string) {
     const semaine = await this.semaineRepository.findOne({

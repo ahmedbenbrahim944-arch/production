@@ -29,16 +29,4 @@ export class CreatePlanificationDto {
   @IsString()
   @IsOptional()
   emballage?: string;
-
-  @IsNumber()
-  @IsOptional()
-  nbOperateurs?: number;
-
-  @IsNumber()
-  @IsOptional()
-  decProduction?: number;
-
-  @IsNumber()
-  @IsOptional()
-  decMagasin?: number;
 }

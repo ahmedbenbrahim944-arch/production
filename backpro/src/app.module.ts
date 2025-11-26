@@ -8,6 +8,11 @@ import { Admin } from './admin/entities/admin.entity';
 import { User } from './user/entities/user.entity';
 import { ProductModule } from './product/product.module';
 import { SemaineModule } from './semaine/semaine.module';
+import { OuvrierModule } from './ouvrier/ouvrier.module';
+import { TempsSecModule } from './temps-sec/temps-sec.module';
+import { Phase } from './phase/entities/phase.entity';
+import { PhaseModule } from './phase/phase.module';
+import { MatierePremierModule } from './matiere-premier/matiere-premier.module';
 
 @Module({
   imports: [
@@ -28,7 +33,11 @@ import { SemaineModule } from './semaine/semaine.module';
     UserModule,
     AuthModule,
     ProductModule,
-    SemaineModule
+    SemaineModule,
+    OuvrierModule,
+    TempsSecModule,
+    PhaseModule,
+    MatierePremierModule
   ],
   controllers: [],
   providers: [],

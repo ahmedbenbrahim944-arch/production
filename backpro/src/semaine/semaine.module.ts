@@ -8,12 +8,23 @@ import { SemaineLigne } from './entities/semaine-ligne.entity';
 import { LigneReference } from './entities/ligne-reference.entity';
 import { Planification } from './entities/planification.entity';
 import { Product } from '../product/entities/product.entity';
+import { TempsSec } from '../temps-sec/entities/temps-sec.entity'; // AJOUTER
+import { TempsSecModule } from '../temps-sec/temps-sec.module'; // AJOUTER
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Semaine, SemaineLigne, LigneReference, Planification, Product])
+    TypeOrmModule.forFeature([
+      Semaine, 
+      SemaineLigne, 
+      LigneReference, 
+      Planification, 
+      Product,
+      TempsSec // AJOUTER CETTE LIGNE
+    ]),
+    TempsSecModule // AJOUTER CETTE LIGNE POUR IMPORTER LE MODULE
   ],
   controllers: [SemaineController],
-  providers: [SemaineService]
+  providers: [SemaineService],
+  exports: [SemaineService]
 })
 export class SemaineModule {}

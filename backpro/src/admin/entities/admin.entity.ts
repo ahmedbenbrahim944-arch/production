@@ -11,6 +11,8 @@ import { Exclude } from 'class-transformer';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
 import { Semaine } from '../../semaine/entities/semaine.entity';
+import { TempsSec } from '../../temps-sec/entities/temps-sec.entity';
+
 
 @Entity('admins')
 export class Admin {
@@ -46,4 +48,5 @@ export class Admin {
 
   @UpdateDateColumn()
   updatedAt: Date;
+  // Dans src/admin/entities/admin.entity.ts
 }
