@@ -14,6 +14,9 @@ import { Admin } from '../admin/entities/admin.entity';
 import { Product } from '../product/entities/product.entity';
 import { UpdateProductionSimpleDto } from './dto/update-production-simple.dto';
 import { TempsSec } from '../temps-sec/entities/temps-sec.entity';
+import { UpdatePlanificationByCriteriaDto } from './dto/update-planification-by-criteria.dto';
+import { GetPlanificationsViewDto } from './dto/get-planifications-view.dto';
+import { UpdateProductionPlanificationDto } from './dto/update-production-planification.dto';
 
 @Injectable()
 export class SemaineService {
@@ -32,97 +35,152 @@ export class SemaineService {
   private tempsSecRepository: Repository<TempsSec>, // AJOUTER CETTE LIGNE
   ) {}
 
-  // ==================== MÉTHODES PLANIFICATION ====================
 
-  // Dans src/semaine/semaine.service.ts - Méthode createPlanification
-// Dans src/semaine/semaine.service.ts - Méthode createPlanification corrigée
-async createPlanification(createPlanificationDto: CreatePlanificationDto) {
-  const { semaine, jour, ligne, reference, qtePlanifiee = 0 } = createPlanificationDto;
+  
+ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
+    const { semaine, jour, ligne, reference, qtePlanifiee = 0 } = createPlanificationDto;
 
-  console.log('=== DÉBUT CRÉATION PLANIFICATION ===');
-  console.log('Données reçues:', { semaine, jour, ligne, reference, qtePlanifiee });
+    console.log('=== DÉBUT CRÉATION PLANIFICATION ===');
+    console.log('Données reçues:', { semaine, jour, ligne, reference, qtePlanifiee });
 
-  // Valider le jour
-  const joursValides = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-  if (!joursValides.includes(jour)) {
-    throw new BadRequestException('Jour invalide. Les jours valides sont: lundi, mardi, mercredi, jeudi, vendredi, samedi');
-  }
-
-  // Vérifier si la planification existe déjà
-  const existingPlanification = await this.planificationRepository.findOne({
-    where: {
-      semaine,
-      jour,
-      ligne,
-      reference
+    // Valider le jour
+    const joursValides = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    if (!joursValides.includes(jour)) {
+      throw new BadRequestException('Jour invalide. Les jours valides sont: lundi, mardi, mercredi, jeudi, vendredi, samedi');
     }
-  });
 
-  if (existingPlanification) {
-    throw new ConflictException('Une planification existe déjà pour cette combinaison semaine/jour/ligne/référence');
+    // Vérifier si la planification existe déjà
+    const existingPlanification = await this.planificationRepository.findOne({
+      where: {
+        semaine,
+        jour,
+        ligne,
+        reference
+      }
+    });
+
+    if (existingPlanification) {
+      throw new ConflictException('Une planification existe déjà pour cette combinaison semaine/jour/ligne/référence');
+    }
+
+    // Trouver l'entité semaine
+    const semaineEntity = await this.semaineRepository.findOne({
+      where: { nom: semaine }
+    });
+
+    if (!semaineEntity) {
+      throw new NotFoundException(`Semaine "${semaine}" non trouvée`);
+    }
+
+    // Rechercher le temps par seconde
+    const tempsSec = await this.tempsSecRepository.findOne({
+      where: { ligne, reference }
+    });
+
+    console.log('Temps sec trouvé:', tempsSec);
+
+    if (!tempsSec) {
+      throw new NotFoundException(`Temps par seconde non trouvé pour la ligne "${ligne}" et référence "${reference}"`);
+    }
+
+    // CALCULER LES CHAMPS AUTOMATIQUES
+    const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
+      qtePlanifiee, 
+      tempsSec.seconde
+    );
+
+    // CALCULER LES CHAMPS DE PRODUCTION AUTOMATIQUES
+    const { deltaProd, pcsProd } = this.calculateAutoProductionFields(
+      qtePlanifiee, 
+      0 // decProduction initial = 0
+    );
+
+    console.log('Calculs automatiques:', { 
+      qtePlanifiee, 
+      tempsSec: tempsSec.seconde,
+      nbHeuresPlanifiees, 
+      nbOperateurs,
+      deltaProd,
+      pcsProd
+    });
+
+    try {
+      const planification = new Planification();
+      planification.semaine = semaine;
+      planification.jour = jour;
+      planification.ligne = ligne;
+      planification.reference = reference;
+      planification.of = createPlanificationDto.of || '';
+      planification.qtePlanifiee = qtePlanifiee;
+      planification.emballage = createPlanificationDto.emballage || '200';
+      planification.nbOperateurs = nbOperateurs;
+      planification.nbHeuresPlanifiees = nbHeuresPlanifiees;
+      planification.decProduction = 0;
+      planification.decMagasin = 0;
+      
+      // AJOUTER LES NOUVEAUX CHAMPS CALCULÉS
+      planification.deltaProd = deltaProd;
+      planification.pcsProd = pcsProd;
+      
+      planification.semaineEntity = semaineEntity;
+
+      console.log('Planification avant sauvegarde:', planification);
+
+      const savedPlanification = await this.planificationRepository.save(planification);
+
+      console.log('Planification sauvegardée:', savedPlanification);
+
+      return {
+        message: 'Planification créée avec succès',
+        planification: {
+          id: savedPlanification.id,
+          semaine: savedPlanification.semaine,
+          jour: savedPlanification.jour,
+          ligne: savedPlanification.ligne,
+          reference: savedPlanification.reference,
+          of: savedPlanification.of,
+          qtePlanifiee: savedPlanification.qtePlanifiee,
+          emballage: savedPlanification.emballage,
+          nbOperateurs: savedPlanification.nbOperateurs,
+          nbHeuresPlanifiees: savedPlanification.nbHeuresPlanifiees,
+          decProduction: savedPlanification.decProduction,
+          decMagasin: savedPlanification.decMagasin,
+          deltaProd: savedPlanification.deltaProd,
+          pcsProd: `${savedPlanification.pcsProd}%`,
+          createdAt: savedPlanification.createdAt,
+          updatedAt: savedPlanification.updatedAt
+        },
+        interpretation: {
+          deltaProd: this.getDeltaProdInterpretation(savedPlanification.deltaProd),
+          pcsProd: this.getPcsProdInterpretation(savedPlanification.pcsProd)
+        }
+      };
+    } catch (error) {
+      console.error('Erreur détaillée création planification:', error);
+      throw new InternalServerErrorException('Erreur lors de la création de la planification');
+    }
   }
+// Dans src/semaine/semaine.service.ts - Ajouter ces méthodes
 
-  // CORRECTION: Bien définir la variable semaineEntity
-  const semaineEntity = await this.semaineRepository.findOne({
-    where: { nom: semaine }
-  });
-
-  if (!semaineEntity) {
-    throw new NotFoundException(`Semaine "${semaine}" non trouvée`);
+private getDeltaProdInterpretation(deltaProd: number): string {
+  if (deltaProd > 0) {
+    return `Il reste ${deltaProd} pièces à produire`;
+  } else if (deltaProd < 0) {
+    return `Surproduction de ${Math.abs(deltaProd)} pièces`;
+  } else {
+    return 'Production exactement conforme au plan';
   }
+}
 
-  // RECHERCHER LE TEMPS PAR SECONDE
-  const tempsSec = await this.tempsSecRepository.findOne({
-    where: { ligne, reference }
-  });
-
-  console.log('Temps sec trouvé:', tempsSec);
-
-  if (!tempsSec) {
-    throw new NotFoundException(`Temps par seconde non trouvé pour la ligne "${ligne}" et référence "${reference}"`);
-  }
-
-  // CALCULER LES CHAMPS AUTOMATIQUES
-  const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
-    qtePlanifiee, 
-    tempsSec.seconde
-  );
-
-  console.log('Calculs automatiques:', { 
-    qtePlanifiee, 
-    tempsSec: tempsSec.seconde,
-    nbHeuresPlanifiees, 
-    nbOperateurs 
-  });
-
-  try {
-    const planification = new Planification();
-    planification.semaine = semaine;
-    planification.jour = jour;
-    planification.ligne = ligne;
-    planification.reference = reference;
-    planification.of = createPlanificationDto.of || '';
-    planification.qtePlanifiee = qtePlanifiee;
-    planification.emballage = createPlanificationDto.emballage || '200';
-    planification.nbOperateurs = nbOperateurs;
-    planification.nbHeuresPlanifiees = nbHeuresPlanifiees;
-    planification.decProduction = 0;
-    planification.decMagasin = 0;
-    planification.semaineEntity = semaineEntity; // MAINTENANT LA VARIABLE EST DÉFINIE
-
-    console.log('Planification avant sauvegarde:', planification);
-
-    const savedPlanification = await this.planificationRepository.save(planification);
-
-    console.log('Planification sauvegardée:', savedPlanification);
-
-    return {
-      message: 'Planification créée avec succès',
-      planification: savedPlanification
-    };
-  } catch (error) {
-    console.error('Erreur détaillée création planification:', error);
-    throw new InternalServerErrorException('Erreur lors de la création de la planification');
+private getPcsProdInterpretation(pcsProd: number): string {
+  if (pcsProd === 0) {
+    return 'Aucune production déclarée';
+  } else if (pcsProd < 100) {
+    return `Réalisation à ${pcsProd}% du plan`;
+  } else if (pcsProd === 100) {
+    return 'Production conforme à 100% du plan';
+  } else {
+    return `Surproduction à ${pcsProd}% du plan`;
   }
 }
  private calculateAutoPlanificationFields(qtePlanifiee: number, tempsSec: number) {
@@ -157,59 +215,71 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
   };
 }
 
-  async updatePlanification(id: number, updatePlanificationDto: UpdatePlanificationDto) {
-  const planification = await this.planificationRepository.findOne({
-    where: { id }
-  });
+  // Dans la méthode updatePlanification
+ async updatePlanification(id: number, updatePlanificationDto: UpdatePlanificationDto) {
+    const planification = await this.planificationRepository.findOne({
+      where: { id }
+    });
 
-  if (!planification) {
-    throw new NotFoundException('Planification non trouvée');
-  }
-
-  try {
-    // Si la quantité planifiée change, recalculer les champs automatiques
-    if (updatePlanificationDto.qtePlanifiee !== undefined) {
-      // Rechercher le temps par seconde
-      const tempsSec = await this.tempsSecRepository.findOne({
-        where: { 
-          ligne: planification.ligne, 
-          reference: planification.reference 
-        }
-      });
-
-      if (tempsSec) {
-        const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
-          updatePlanificationDto.qtePlanifiee, 
-          tempsSec.seconde
-        );
-        
-        planification.nbOperateurs = nbOperateurs;
-        // Vous pouvez stocker nbHeuresPlanifiees si vous ajoutez ce champ à l'entité
-      }
+    if (!planification) {
+      throw new NotFoundException('Planification non trouvée');
     }
 
-    // Mettre à jour les autres champs
-    if (updatePlanificationDto.of !== undefined) planification.of = updatePlanificationDto.of;
-    if (updatePlanificationDto.qtePlanifiee !== undefined) planification.qtePlanifiee = updatePlanificationDto.qtePlanifiee;
-    if (updatePlanificationDto.emballage !== undefined) planification.emballage = updatePlanificationDto.emballage;
-    if (updatePlanificationDto.decProduction !== undefined) planification.decProduction = updatePlanificationDto.decProduction;
-    if (updatePlanificationDto.decMagasin !== undefined) planification.decMagasin = updatePlanificationDto.decMagasin;
+    try {
+      let recalculerTemps = false;
+      
+      // Si la quantité planifiée change, recalculer les champs temps
+      if (updatePlanificationDto.qtePlanifiee !== undefined) {
+        recalculerTemps = true;
+        // Rechercher le temps par seconde
+        const tempsSec = await this.tempsSecRepository.findOne({
+          where: { 
+            ligne: planification.ligne, 
+            reference: planification.reference 
+          }
+        });
 
-    planification.updatedAt = new Date();
+        if (tempsSec) {
+          const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
+            updatePlanificationDto.qtePlanifiee, 
+            tempsSec.seconde
+          );
+          
+          planification.nbOperateurs = nbOperateurs;
+          planification.nbHeuresPlanifiees = nbHeuresPlanifiees;
+        }
+      }
 
-    const updatedPlanification = await this.planificationRepository.save(planification);
+      // Mettre à jour les autres champs
+      if (updatePlanificationDto.of !== undefined) planification.of = updatePlanificationDto.of;
+      if (updatePlanificationDto.qtePlanifiee !== undefined) planification.qtePlanifiee = updatePlanificationDto.qtePlanifiee;
+      if (updatePlanificationDto.emballage !== undefined) planification.emballage = updatePlanificationDto.emballage;
+      if (updatePlanificationDto.decProduction !== undefined) planification.decProduction = updatePlanificationDto.decProduction;
+      if (updatePlanificationDto.decMagasin !== undefined) planification.decMagasin = updatePlanificationDto.decMagasin;
 
-    return {
-      message: 'Planification mise à jour avec succès',
-      planification: updatedPlanification
-    };
-  } catch (error) {
-    console.error('Erreur mise à jour planification:', error);
-    throw new InternalServerErrorException('Erreur lors de la mise à jour de la planification');
+      // RECALCULER LES CHAMPS AUTOMATIQUES DE PRODUCTION
+      const { deltaProd, pcsProd } = this.calculateAutoProductionFields(
+        planification.qtePlanifiee,
+        planification.decProduction
+      );
+      planification.deltaProd = deltaProd;
+      planification.pcsProd = pcsProd;
+
+      planification.updatedAt = new Date();
+
+      const updatedPlanification = await this.planificationRepository.save(planification);
+
+      return {
+        message: 'Planification mise à jour avec succès',
+        planification: updatedPlanification
+      };
+    } catch (error) {
+      console.error('Erreur mise à jour planification:', error);
+      throw new InternalServerErrorException('Erreur lors de la mise à jour de la planification');
+    }
   }
-}
 
-  async getPlanificationsBySemaine(semaineNom: string) {
+   async getPlanificationsBySemaine(semaineNom: string) {
     const semaine = await this.semaineRepository.findOne({
       where: { nom: semaineNom }
     });
@@ -233,6 +303,7 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
       planifications
     };
   }
+
 
   async getPlanificationsBySemaineAndLigne(semaineNom: string, ligne: string) {
     const semaine = await this.semaineRepository.findOne({
@@ -261,7 +332,7 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
     };
   }
 
-  async getPlanificationsBySemaineLigneJour(semaineNom: string, ligne: string, jour: string) {
+   async getPlanificationsBySemaineLigneJour(semaineNom: string, ligne: string, jour: string) {
     // Valider le jour
     const joursValides = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
     if (!joursValides.includes(jour)) {
@@ -314,8 +385,11 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
         qtePlanifiee: plan.qtePlanifiee,
         emballage: plan.emballage,
         nbOperateurs: plan.nbOperateurs,
+        nbHeuresPlanifiees: plan.nbHeuresPlanifiees,
         decProduction: plan.decProduction,
         decMagasin: plan.decMagasin,
+        deltaProd: plan.deltaProd,
+        pcsProd: `${plan.pcsProd}%`,
         createdAt: plan.createdAt,
         updatedAt: plan.updatedAt,
         semaineEntity: {
@@ -350,7 +424,7 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
     };
   }
 
-  async getPlanificationStats(semaineNom: string) {
+   async getPlanificationStats(semaineNom: string) {
     const planifications = await this.planificationRepository.find({
       where: { semaine: semaineNom }
     });
@@ -859,4 +933,257 @@ async createPlanification(createPlanificationDto: CreatePlanificationDto) {
       deltaProdMag: deltaProdMag
     };
   }
+   // Dans src/semaine/semaine.service.ts
+async updatePlanificationByCriteria(updatePlanificationDto: UpdatePlanificationByCriteriaDto) {
+    const { semaine, jour, ligne, reference, qtePlanifiee, decProduction, decMagasin } = updatePlanificationDto;
+
+    console.log('=== MISE À JOUR PLANIFICATION PAR CRITÈRES ===');
+    console.log('Critères de recherche:', { semaine, jour, ligne, reference });
+    console.log('Nouvelles valeurs:', { qtePlanifiee, decProduction, decMagasin });
+
+    // Trouver la planification par critères
+    const planification = await this.planificationRepository.findOne({
+      where: {
+        semaine,
+        jour,
+        ligne,
+        reference
+      }
+    });
+
+    if (!planification) {
+      throw new NotFoundException(
+        `Planification non trouvée pour semaine: "${semaine}", jour: "${jour}", ligne: "${ligne}", référence: "${reference}"`
+      );
+    }
+
+    try {
+      let recalculerTemps = false;
+      let nouvelleQtePlanifiee = planification.qtePlanifiee;
+      let nouvelleDecProduction = planification.decProduction;
+
+      // Si la quantité planifiée change, recalculer les champs temps
+      if (qtePlanifiee !== undefined) {
+        recalculerTemps = true;
+        nouvelleQtePlanifiee = qtePlanifiee;
+        
+        // Rechercher le temps par seconde
+        const tempsSec = await this.tempsSecRepository.findOne({
+          where: { 
+            ligne: planification.ligne, 
+            reference: planification.reference 
+          }
+        });
+
+        if (tempsSec) {
+          const { nbHeuresPlanifiees, nbOperateurs } = this.calculateAutoPlanificationFields(
+            qtePlanifiee, 
+            tempsSec.seconde
+          );
+          
+          planification.nbOperateurs = nbOperateurs;
+          planification.nbHeuresPlanifiees = nbHeuresPlanifiees;
+          console.log('Champs temps recalculés:', { nbHeuresPlanifiees, nbOperateurs });
+        } else {
+          throw new NotFoundException(
+            `Temps par seconde non trouvé pour la ligne "${ligne}" et référence "${reference}"`
+          );
+        }
+      }
+
+      // Mettre à jour les champs de base
+      if (updatePlanificationDto.of !== undefined) planification.of = updatePlanificationDto.of;
+      if (qtePlanifiee !== undefined) planification.qtePlanifiee = qtePlanifiee;
+      if (updatePlanificationDto.emballage !== undefined) planification.emballage = updatePlanificationDto.emballage;
+      if (decProduction !== undefined) {
+        planification.decProduction = decProduction;
+        nouvelleDecProduction = decProduction;
+      }
+      if (decMagasin !== undefined) planification.decMagasin = decMagasin;
+
+      // RECALCULER LES CHAMPS AUTOMATIQUES DE PRODUCTION
+      const { deltaProd, pcsProd } = this.calculateAutoProductionFields(
+        nouvelleQtePlanifiee,
+        nouvelleDecProduction
+      );
+      planification.deltaProd = deltaProd;
+      planification.pcsProd = pcsProd;
+
+      console.log('Champs production recalculés:', { deltaProd, pcsProd });
+
+      planification.updatedAt = new Date();
+
+      const updatedPlanification = await this.planificationRepository.save(planification);
+
+      console.log('Planification mise à jour avec succès:', updatedPlanification);
+
+      return {
+        message: 'Mise à jour effectuée avec succès',
+        planification: {
+          id: updatedPlanification.id,
+          semaine: updatedPlanification.semaine,
+          jour: updatedPlanification.jour,
+          ligne: updatedPlanification.ligne,
+          reference: updatedPlanification.reference,
+          of: updatedPlanification.of,
+          qtePlanifiee: updatedPlanification.qtePlanifiee,
+          emballage: updatedPlanification.emballage,
+          nbOperateurs: updatedPlanification.nbOperateurs,
+          nbHeuresPlanifiees: updatedPlanification.nbHeuresPlanifiees,
+          decProduction: updatedPlanification.decProduction,
+          decMagasin: updatedPlanification.decMagasin,
+          deltaProd: updatedPlanification.deltaProd,
+          pcsProd: `${updatedPlanification.pcsProd}%`,
+          updatedAt: updatedPlanification.updatedAt
+        },
+        interpretation: {
+          deltaProd: this.getDeltaProdInterpretation(updatedPlanification.deltaProd),
+          pcsProd: this.getPcsProdInterpretation(updatedPlanification.pcsProd)
+        }
+      };
+    } catch (error) {
+      console.error('Erreur mise à jour planification par critères:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Erreur lors de la mise à jour de la planification');
+    }
+  }
+   async getPlanificationsView(getPlanificationsViewDto: GetPlanificationsViewDto) {
+    const { semaine } = getPlanificationsViewDto;
+
+    console.log('=== VUE PLANIFICATIONS UTILISATEUR ===');
+    console.log('Semaine demandée:', semaine);
+
+    // Vérifier si la semaine existe
+    const semaineEntity = await this.semaineRepository.findOne({
+      where: { nom: semaine }
+    });
+
+    if (!semaineEntity) {
+      throw new NotFoundException(`Semaine "${semaine}" non trouvée`);
+    }
+
+    // Récupérer toutes les planifications de la semaine
+    const planifications = await this.planificationRepository.find({
+      where: { semaine },
+      order: { 
+        ligne: 'ASC', 
+        jour: 'ASC', 
+        reference: 'ASC' 
+      }
+    });
+
+    console.log(`Nombre de planifications trouvées: ${planifications.length}`);
+
+    return {
+      message: `Planifications de la semaine "${semaine}" récupérées avec succès`,
+      semaine: {
+        id: semaineEntity.id,
+        nom: semaineEntity.nom,
+        dateDebut: semaineEntity.dateDebut,
+        dateFin: semaineEntity.dateFin
+      },
+      totalPlanifications: planifications.length,
+      planifications: planifications.map(plan => ({
+        id: plan.id,
+        semaine: plan.semaine,
+        jour: plan.jour,
+        ligne: plan.ligne,
+        reference: plan.reference,
+        of: plan.of,
+        qtePlanifiee: plan.qtePlanifiee,
+        emballage: plan.emballage,
+        nbOperateurs: plan.nbOperateurs,
+        nbHeuresPlanifiees: plan.nbHeuresPlanifiees,
+        decProduction: plan.decProduction, 
+        decMagasin: plan.decMagasin,
+        deltaProd: plan.deltaProd,
+        pcsProd: `${plan.pcsProd}%`,
+        createdAt: plan.createdAt,
+        updatedAt: plan.updatedAt
+      }))
+    };
+  }
+  async updateProductionPlanification(updateProductionDto: UpdateProductionPlanificationDto) {
+    const { semaine, jour, ligne, reference, decProduction } = updateProductionDto;
+
+    console.log('=== MISE À JOUR PRODUCTION UTILISATEUR ===');
+    console.log('Critères:', { semaine, jour, ligne, reference });
+    console.log('Nouvelle déclaration production:', decProduction);
+
+    // Trouver la planification
+    const planification = await this.planificationRepository.findOne({
+      where: {
+        semaine,
+        jour,
+        ligne,
+        reference
+      }
+    });
+
+    if (!planification) {
+      throw new NotFoundException(
+        `Planification non trouvée pour semaine: "${semaine}", jour: "${jour}", ligne: "${ligne}", référence: "${reference}"`
+      );
+    }
+
+    try {
+      // Mettre à jour la déclaration production
+      planification.decProduction = decProduction;
+      
+      // RECALCULER LES CHAMPS AUTOMATIQUES DE PRODUCTION
+      const { deltaProd, pcsProd } = this.calculateAutoProductionFields(
+        planification.qtePlanifiee,
+        decProduction
+      );
+      planification.deltaProd = deltaProd;
+      planification.pcsProd = pcsProd;
+      
+      planification.updatedAt = new Date();
+
+      const updatedPlanification = await this.planificationRepository.save(planification);
+
+      console.log('Production mise à jour avec succès:', updatedPlanification);
+
+      return {
+        message: 'Mise à jour de la production effectuée avec succès',
+        planification: {
+          id: updatedPlanification.id,
+          semaine: updatedPlanification.semaine,
+          jour: updatedPlanification.jour,
+          ligne: updatedPlanification.ligne,
+          reference: updatedPlanification.reference,
+          of: updatedPlanification.of,
+          qtePlanifiee: updatedPlanification.qtePlanifiee,
+          decProduction: updatedPlanification.decProduction,
+          decMagasin: updatedPlanification.decMagasin,
+          deltaProd: updatedPlanification.deltaProd,
+          pcsProd: `${updatedPlanification.pcsProd}%`,
+          updatedAt: updatedPlanification.updatedAt
+        }
+      };
+    } catch (error) {
+      console.error('Erreur mise à jour production:', error);
+      throw new InternalServerErrorException('Erreur lors de la mise à jour de la production');
+    }
+  }
+  // Dans src/semaine/semaine.service.ts
+// Dans src/semaine/semaine.service.ts
+// Dans src/semaine/semaine.service.ts
+private calculateAutoProductionFields(qtePlanifiee: number, decProduction: number) {
+  // Calcul du DeltaProd (decProduction - qtePlanifiee)
+  // Si decProduction < qtePlanifiee → résultat négatif
+  // Si decProduction > qtePlanifiee → résultat positif
+  const deltaProd = decProduction - qtePlanifiee;
+  
+  // Calcul du %PCs Prod (decProduction / qtePlanifiee * 100)
+  // Si qtePlanifiee = 0 → 0%
+  const pcsProd = qtePlanifiee > 0 ? (decProduction / qtePlanifiee) * 100 : 0;
+  
+  return {
+    deltaProd: deltaProd, // Garder le signe négatif/positif
+    pcsProd: Math.round(pcsProd * 100) / 100 // Arrondi à 2 décimales
+  };
+}
 }

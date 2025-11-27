@@ -13,6 +13,7 @@ import { TempsSecModule } from './temps-sec/temps-sec.module';
 import { Phase } from './phase/entities/phase.entity';
 import { PhaseModule } from './phase/phase.module';
 import { MatierePremierModule } from './matiere-premier/matiere-premier.module';
+import { SaisieRapportModule } from './saisie-rapport/saisie-rapport.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { MatierePremierModule } from './matiere-premier/matiere-premier.module';
     OuvrierModule,
     TempsSecModule,
     PhaseModule,
-    MatierePremierModule
+    MatierePremierModule,
+    SaisieRapportModule
   ],
   controllers: [],
   providers: [],

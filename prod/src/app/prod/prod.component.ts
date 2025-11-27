@@ -58,6 +58,34 @@ interface UserForm {
   };
 }
 
+// NOUVELLES INTERFACES AJOUTÉES
+interface TimeForm {
+  ligne: string;
+  secondes: number;
+  errors: {
+    ligne?: string;
+    secondes?: string;
+  };
+}
+
+interface WorkerForm {
+  matricule: string;
+  nomPrenom: string;
+  errors: {
+    matricule?: string;
+    nomPrenom?: string;
+  };
+}
+
+interface PhaseForm {
+  ligne: string;
+  numeroPhase: number;
+  errors: {
+    ligne?: string;
+    numeroPhase?: string;
+  };
+}
+
 @Component({
   selector: 'app-prod',
   standalone: true,
@@ -70,7 +98,7 @@ export class ProdComponent implements OnInit {
   loading = signal(false);
   lines = signal<ProductionLine[]>([]);
   searchQuery = signal('');
-  activeTab = signal('view'); // 'view', 'create', 'add-ref', 'new-week', 'add-user'
+  activeTab = signal('view'); // 'view', 'create', 'add-ref', 'new-week', 'add-user', 'add-time', 'add-worker', 'add-phase'
   selectedLine = signal<ProductionLine | null>(null);
 
   createForm: CreateLineForm = {
@@ -99,6 +127,25 @@ export class ProdComponent implements OnInit {
   userForm: UserForm = {
     nom: '',
     motDePasse: '',
+    errors: {}
+  };
+
+  // NOUVELLES FORMULAIRES AJOUTÉES
+  timeForm: TimeForm = {
+    ligne: '',
+    secondes: 0,
+    errors: {}
+  };
+
+  workerForm: WorkerForm = {
+    matricule: '',
+    nomPrenom: '',
+    errors: {}
+  };
+
+  phaseForm: PhaseForm = {
+    ligne: '',
+    numeroPhase: 0,
     errors: {}
   };
 
@@ -404,5 +451,133 @@ export class ProdComponent implements OnInit {
 
   getTotalUsers(): number {
     return this.users().length;
+  }
+
+  // NOUVELLES MÉTHODES AJOUTÉES
+
+  // Méthodes pour l'onglet "Ajouter Temps"
+  onAddTime() {
+    // Validation
+    this.timeForm.errors = {};
+    let hasErrors = false;
+
+    if (!this.timeForm.ligne.trim()) {
+      this.timeForm.errors.ligne = 'Veuillez sélectionner une ligne';
+      hasErrors = true;
+    }
+
+    if (!this.timeForm.secondes || this.timeForm.secondes <= 0) {
+      this.timeForm.errors.secondes = 'Veuillez saisir un temps valide (supérieur à 0)';
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    this.loading.set(true);
+
+    // Simulation d'ajout de temps
+    setTimeout(() => {
+      this.showSuccessMessage(`Temps de ${this.timeForm.secondes} secondes ajouté pour la ligne ${this.timeForm.ligne} !`);
+      this.resetTimeForm();
+      this.activeTab.set('view');
+      this.loading.set(false);
+    }, 1000);
+  }
+
+  onCancelTime() {
+    this.resetTimeForm();
+    this.activeTab.set('view');
+  }
+
+  private resetTimeForm() {
+    this.timeForm = {
+      ligne: '',
+      secondes: 0,
+      errors: {}
+    };
+  }
+
+  // Méthodes pour l'onglet "Ajouter Ouvrier"
+  onAddWorker() {
+    // Validation
+    this.workerForm.errors = {};
+    let hasErrors = false;
+
+    if (!this.workerForm.matricule.trim()) {
+      this.workerForm.errors.matricule = 'Le matricule est requis';
+      hasErrors = true;
+    }
+
+    if (!this.workerForm.nomPrenom.trim()) {
+      this.workerForm.errors.nomPrenom = 'Le nom et prénom sont requis';
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    this.loading.set(true);
+
+    // Simulation d'ajout d'ouvrier
+    setTimeout(() => {
+      this.showSuccessMessage(`Ouvrier "${this.workerForm.nomPrenom}" (${this.workerForm.matricule}) ajouté avec succès !`);
+      this.resetWorkerForm();
+      this.activeTab.set('view');
+      this.loading.set(false);
+    }, 1000);
+  }
+
+  onCancelWorker() {
+    this.resetWorkerForm();
+    this.activeTab.set('view');
+  }
+
+  private resetWorkerForm() {
+    this.workerForm = {
+      matricule: '',
+      nomPrenom: '',
+      errors: {}
+    };
+  }
+
+  // Méthodes pour l'onglet "Ajouter Phase"
+  onAddPhase() {
+    // Validation
+    this.phaseForm.errors = {};
+    let hasErrors = false;
+
+    if (!this.phaseForm.ligne.trim()) {
+      this.phaseForm.errors.ligne = 'Veuillez sélectionner une ligne';
+      hasErrors = true;
+    }
+
+    if (!this.phaseForm.numeroPhase || this.phaseForm.numeroPhase <= 0) {
+      this.phaseForm.errors.numeroPhase = 'Veuillez saisir un numéro de phase valide (supérieur à 0)';
+      hasErrors = true;
+    }
+
+    if (hasErrors) return;
+
+    this.loading.set(true);
+
+    // Simulation d'ajout de phase
+    setTimeout(() => {
+      this.showSuccessMessage(`Phase ${this.phaseForm.numeroPhase} ajoutée pour la ligne ${this.phaseForm.ligne} !`);
+      this.resetPhaseForm();
+      this.activeTab.set('view');
+      this.loading.set(false);
+    }, 1000);
+  }
+
+  onCancelPhase() {
+    this.resetPhaseForm();
+    this.activeTab.set('view');
+  }
+
+  private resetPhaseForm() {
+    this.phaseForm = {
+      ligne: '',
+      numeroPhase: 0,
+      errors: {}
+    };
   }
 }

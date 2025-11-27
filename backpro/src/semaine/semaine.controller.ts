@@ -22,6 +22,9 @@ import { CreatePlanificationDto } from './dto/create-planification.dto';
 import { UpdatePlanificationDto } from './dto/update-planification.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
+import { UpdatePlanificationByCriteriaDto } from './dto/update-planification-by-criteria.dto';
+import { GetPlanificationsViewDto } from './dto/get-planifications-view.dto';
+import { UpdateProductionPlanificationDto } from './dto/update-production-planification.dto';
 
 @Controller()
 export class SemaineController {
@@ -36,15 +39,7 @@ export class SemaineController {
     return this.semaineService.createPlanification(createPlanificationDto);
   }
 
-  @Patch('planifications/:id')
-  @UseGuards(JwtAuthGuard, AdminRoleGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async updatePlanification(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updatePlanificationDto: UpdatePlanificationDto
-  ) {
-    return this.semaineService.updatePlanification(id, updatePlanificationDto);
-  }
+  
 
   @Get('planifications')
   @UseGuards(JwtAuthGuard)
@@ -165,5 +160,29 @@ export class SemaineController {
   @UseGuards(JwtAuthGuard, AdminRoleGuard)
   async deleteSemaine(@Param('id', ParseIntPipe) id: number) {
     return this.semaineService.deleteSemaine(id);
+  }
+  @Patch('planifications')
+@UseGuards(JwtAuthGuard, AdminRoleGuard)
+@UsePipes(new ValidationPipe({ whitelist: true }))
+async updatePlanificationByCriteria(
+  @Body() updatePlanificationDto: UpdatePlanificationByCriteriaDto
+) {
+  return this.semaineService.updatePlanificationByCriteria(updatePlanificationDto);
+}
+ @Post('planifications/vue')
+  @UseGuards(JwtAuthGuard) // Seulement JwtAuthGuard, pas AdminRoleGuard
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async getPlanificationsView(@Body() getPlanificationsViewDto: GetPlanificationsViewDto) {
+    return this.semaineService.getPlanificationsView(getPlanificationsViewDto);
+  }
+
+  /**
+   * PATCH /planifications/prod - Mettre à jour la déclaration production (pour utilisateurs)
+   */
+  @Patch('planifications/prod')
+  @UseGuards(JwtAuthGuard) // Seulement JwtAuthGuard, pas AdminRoleGuard
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async updateProductionPlanification(@Body() updateProductionDto: UpdateProductionPlanificationDto) {
+    return this.semaineService.updateProductionPlanification(updateProductionDto);
   }
 }

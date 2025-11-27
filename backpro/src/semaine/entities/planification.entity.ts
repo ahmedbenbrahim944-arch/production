@@ -28,11 +28,9 @@ export class Planification {
   @Column({ type: 'varchar', length: 100, default: '200' })
   emballage: string;
 
-  // CHANGER EN FLOAT POUR STOCKER LES DÉCIMALES
   @Column({ type: 'float', default: 0 })
   nbOperateurs: number;
 
-  // CHANGER EN FLOAT POUR STOCKER LES DÉCIMALES
   @Column({ type: 'float', default: 0 })
   nbHeuresPlanifiees: number;
 
@@ -41,6 +39,13 @@ export class Planification {
 
   @Column({ type: 'int', default: 0 })
   decMagasin: number;
+
+  // NOUVEAUX CHAMPS CALCULÉS
+  @Column({ type: 'int', default: 0 })
+  deltaProd: number; // qtePlanifiee - decProduction
+
+  @Column({ type: 'float', default: 0 })
+  pcsProd: number; // (decProduction / qtePlanifiee) * 100
 
   @CreateDateColumn()
   createdAt: Date;

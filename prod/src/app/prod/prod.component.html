@@ -91,6 +91,31 @@
                    'text-gray-300 hover:text-white hover:bg-gray-700/50'">
           👤 Ajouter Utilisateur
         </button>
+        <!-- NOUVEAUX ONGLETS AJOUTÉS -->
+        <button 
+          (click)="setActiveTab('add-time')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'add-time' ? 
+                   'bg-yellow-600 text-white shadow-lg shadow-yellow-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          ⏱️ Ajouter Temps
+        </button>
+        <button 
+          (click)="setActiveTab('add-worker')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'add-worker' ? 
+                   'bg-pink-600 text-white shadow-lg shadow-pink-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          👷 Ajouter Ouvrier
+        </button>
+        <button 
+          (click)="setActiveTab('add-phase')"
+          class="px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+          [class]="activeTab() === 'add-phase' ? 
+                   'bg-teal-600 text-white shadow-lg shadow-teal-600/25' : 
+                   'text-gray-300 hover:text-white hover:bg-gray-700/50'">
+          🔄 Ajouter Phase
+        </button>
       </div>
     </div>
 
@@ -473,6 +498,206 @@
               Aucun utilisateur trouvé
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOUVEL ONGLET: Ajouter Temps par Seconde -->
+    <div *ngIf="activeTab() === 'add-time'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-yellow-400 mb-6">Ajouter Temps par Seconde</h2>
+          
+          <form (ngSubmit)="onAddTime()" class="space-y-6">
+            <!-- Sélection de la ligne -->
+            <div>
+              <label class="form-label">Ligne *</label>
+              <select 
+                [(ngModel)]="timeForm.ligne" 
+                name="ligne"
+                class="form-input"
+                [class.error]="timeForm.errors.ligne">
+                <option value="">Sélectionnez une ligne</option>
+                <option *ngFor="let line of lines()" [value]="line.ligne">
+                  {{ line.ligne }}
+                </option>
+              </select>
+              <div *ngIf="timeForm.errors.ligne" class="form-error">
+                {{ timeForm.errors.ligne }}
+              </div>
+            </div>
+
+            <!-- Temps en secondes -->
+            <div>
+              <label class="form-label">Temps (secondes) *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="timeForm.secondes" 
+                name="secondes"
+                placeholder="Ex: 120"
+                min="1"
+                class="form-input"
+                [class.error]="timeForm.errors.secondes">
+              <div *ngIf="timeForm.errors.secondes" class="form-error">
+                {{ timeForm.errors.secondes }}
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-4">
+              <button 
+                type="button" 
+                (click)="onCancelTime()"
+                class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="loading()"
+                class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-yellow-600 hover:bg-yellow-500 text-white"
+                [class.opacity-50]="loading()">
+                <span class="flex items-center justify-center">
+                  <span *ngIf="loading()" class="loader-small mr-2"></span>
+                  {{ loading() ? 'Sauvegarde...' : 'Sauvegarder' }}
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOUVEL ONGLET: Ajouter Ouvrier -->
+    <div *ngIf="activeTab() === 'add-worker'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-pink-400 mb-6">Ajouter un Ouvrier</h2>
+          
+          <form (ngSubmit)="onAddWorker()" class="space-y-6">
+            <!-- Matricule -->
+            <div>
+              <label class="form-label">Matricule *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="workerForm.matricule" 
+                name="matricule"
+                placeholder="Ex: MAT001"
+                class="form-input"
+                [class.error]="workerForm.errors.matricule">
+              <div *ngIf="workerForm.errors.matricule" class="form-error">
+                {{ workerForm.errors.matricule }}
+              </div>
+            </div>
+
+            <!-- Nom et Prénom -->
+            <div>
+              <label class="form-label">Nom et Prénom *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="workerForm.nomPrenom" 
+                name="nomPrenom"
+                placeholder="Ex: DUPONT Jean"
+                class="form-input"
+                [class.error]="workerForm.errors.nomPrenom">
+              <div *ngIf="workerForm.errors.nomPrenom" class="form-error">
+                {{ workerForm.errors.nomPrenom }}
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-4">
+              <button 
+                type="button" 
+                (click)="onCancelWorker()"
+                class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="loading()"
+                class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-pink-600 hover:bg-pink-500 text-white"
+                [class.opacity-50]="loading()">
+                <span class="flex items-center justify-center">
+                  <span *ngIf="loading()" class="loader-small mr-2"></span>
+                  {{ loading() ? 'Ajout en cours...' : 'Ajouter l\'Ouvrier' }}
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOUVEL ONGLET: Ajouter Phase -->
+    <div *ngIf="activeTab() === 'add-phase'" class="fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="creation-card">
+          <h2 class="text-2xl font-bold text-teal-400 mb-6">Ajouter une Phase</h2>
+          
+          <form (ngSubmit)="onAddPhase()" class="space-y-6">
+            <!-- Sélection de la ligne -->
+            <div>
+              <label class="form-label">Ligne *</label>
+              <select 
+                [(ngModel)]="phaseForm.ligne" 
+                name="ligne"
+                class="form-input"
+                [class.error]="phaseForm.errors.ligne">
+                <option value="">Sélectionnez une ligne</option>
+                <option *ngFor="let line of lines()" [value]="line.ligne">
+                  {{ line.ligne }}
+                </option>
+              </select>
+              <div *ngIf="phaseForm.errors.ligne" class="form-error">
+                {{ phaseForm.errors.ligne }}
+              </div>
+            </div>
+
+            <!-- Numéro de phase -->
+            <div>
+              <label class="form-label">Numéro de Phase *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="phaseForm.numeroPhase" 
+                name="numeroPhase"
+                placeholder="Ex: 1, 2, 3..."
+                min="1"
+                class="form-input"
+                [class.error]="phaseForm.errors.numeroPhase">
+              <div *ngIf="phaseForm.errors.numeroPhase" class="form-error">
+                {{ phaseForm.errors.numeroPhase }}
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-4">
+              <button 
+                type="button" 
+                (click)="onCancelPhase()"
+                class="flex-1 py-4 rounded-xl font-semibold transition-all duration-300 bg-gray-600 hover:bg-gray-500 text-white">
+                Annuler
+              </button>
+              <button 
+                type="submit" 
+                [disabled]="loading()"
+                class="flex-1 submit-btn py-4 rounded-xl font-semibold transition-all duration-300 bg-teal-600 hover:bg-teal-500 text-white"
+                [class.opacity-50]="loading()">
+                <span class="flex items-center justify-center">
+                  <span *ngIf="loading()" class="loader-small mr-2"></span>
+                  {{ loading() ? 'Ajout en cours...' : 'Ajouter la Phase' }}
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
